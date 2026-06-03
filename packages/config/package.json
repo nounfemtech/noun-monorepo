@@ -1,0 +1,29 @@
+{
+  "name": "@noun/config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Configurações compartilhadas — Noun",
+  "exports": {
+    "./eslint": "./eslint/index.js",
+    "./prettier": "./prettier/index.js",
+    "./tsconfig": "./tsconfig/base.json",
+    "./supabase": "./src/supabase/index.ts",
+    "./supabase/client": "./src/supabase/client.ts",
+    "./supabase/server": "./src/supabase/server.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "@noun/types": "workspace:*"
+  }
+}
