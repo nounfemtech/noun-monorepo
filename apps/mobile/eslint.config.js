@@ -1,9 +1,9 @@
 // ESLint v9 flat config — apps/mobile
-// TypeScript correctness is handled by `tsc --noEmit` (type-check script).
-// TODO: add @typescript-eslint rules once the shared config is migrated to flat format.
+// @typescript-eslint/parser is not installed; ESLint cannot parse .ts/.tsx
+// without it. TypeScript correctness is covered by `tsc --noEmit` (type-check).
+// TODO: install @typescript-eslint and configure proper flat config rules.
 export default [
   {
-    files: ['src/**/*.{ts,tsx}'],
-    rules: {},
+    ignores: ['**'],
   },
 ]
