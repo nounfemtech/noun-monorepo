@@ -13,49 +13,42 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-
 jobs:
   ci:
-    name: Type-check & Build (Node ${{ matrix.node-version }})
+    name: Type-check & Build (apps/web + apps/admin)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-
-    strategy:
-      matrix:
-        node-version: [20, 22]
-      fail-fast: false
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
           cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # TODO: Reativar quando ESLint v9 flat config estiver corretamente configurado
-      # Ver tech debt issue no GitHub (ESLint v8/v9 + isolamento pnpm + next lint deprecated)
-      # - name: Lint
-      #   run: pnpm lint
+      - name: Type-check apps/web
+        run: cd apps/web && pnpm type-check
 
-      - name: Type-check
-        run: pnpm type-check
+      - name: Type-check apps/admin
+        run: cd apps/admin && pnpm type-check
 
-      - name: Build
-        run: pnpm build
+      - name: Build apps/web
+        run: cd apps/web && pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Build apps/admin
+        run: cd apps/admin && pnpm build
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -68,7 +61,6 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           BRANCH: ${{ github.head_ref }}
           SHA: ${{ github.sha }}
-          NODE_VERSION: ${{ matrix.node-version }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           curl -s -X POST "$DISCORD_WEBHOOK_URL" \
@@ -78,11 +70,10 @@ jobs:
               --arg pr_url "$PR_URL" \
               --arg branch "$BRANCH" \
               --arg sha "${SHA:0:7}" \
-              --arg node "$NODE_VERSION" \
               --arg run_url "$RUN_URL" \
               '{
                 embeds: [{
-                  title: "❌ CI Falhou — Node \($node)",
+                  title: "❌ CI Falhou",
                   description: "**PR:** [\($pr)](\($pr_url))\n**Branch:** `\($branch)`\n**Commit:** `\($sha)`\n**Logs:** [\($run_url)](\($run_url))",
                   color: 15158332,
                   footer: { text: "Noun CI" }
