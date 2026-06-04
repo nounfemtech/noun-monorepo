@@ -1,31 +1,53 @@
 import { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native'
 import { router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { IconArrowLeft, IconMail, IconLock, IconEye, IconEyeOff, IconBrandGoogle, IconBrandApple } from '@tabler/icons-react-native'
+import * as WebBrowser from 'expo-web-browser'
+import { makeRedirectUri } from 'expo-auth-session'
+import {
+  IconArrowLeft, IconMail, IconLock, IconEye, IconEyeOff,
+  IconBrandGoogle, IconBrandApple,
+} from '@tabler/icons-react-native'
+import { authService } from '@/lib/auth.service'
 
-// ============================================================
-// Login — e-mail + senha
-// FASE 2: chamar authService.signInWithPassword(email, password)
-// ============================================================
+WebBrowser.maybeCompleteAuthSession()
 
 export default function SignIn() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email,        setEmail]        = useState('')
+  const [password,     setPassword]     = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error,        setError]        = useState('')
+  const [loading,      setLoading]      = useState<'email' | 'google' | null>(null)
 
   const isValid = email.includes('@') && password.length >= 8
 
   const handleSignIn = async () => {
-    if (!isValid) return
-    setLoading(true)
+    setLoading('email')
     setError('')
-    // TODO FASE 2: const result = await authService.signInWithPassword(email, password)
-    // if (!result.success) { setError(result.error); setLoading(false); return }
-    setLoading(false)
-    router.replace('/(app)/')
+    const result = await authService.signInWithPassword(email.trim().toLowerCase(), password)
+    setLoading(null)
+    if (!result.success) {
+      setError(result.error ?? 'E-mail ou senha incorretos.')
+    }
+    // Sucesso → AuthProvider detecta sessão → AuthGate redireciona
+  }
+
+  const handleGoogle = async () => {
+    setLoading('google')
+    try {
+      const redirectTo    = makeRedirectUri({ scheme: 'noun', path: 'auth/callback' })
+      const oauthResult   = await authService.getGoogleOAuthUrl(redirectTo)
+      if (!oauthResult.success || !oauthResult.url) throw new Error(oauthResult.error)
+      const browserResult = await WebBrowser.openAuthSessionAsync(oauthResult.url, redirectTo)
+      if (browserResult.type === 'success' && browserResult.url) {
+        const sessionResult = await authService.setSessionFromUrl(browserResult.url)
+        if (!sessionResult.success) throw new Error(sessionResult.error)
+      }
+    } catch (err: any) {
+      Alert.alert('Erro', err.message ?? 'Falha no login com Google')
+    } finally {
+      setLoading(null)
+    }
   }
 
   return (
@@ -37,31 +59,31 @@ export default function SignIn() {
           </TouchableOpacity>
 
           <Text className="text-3xl text-gray-900 mb-2" style={{ fontFamily: 'RedditSans-Bold' }}>Entrar</Text>
-          <Text className="text-base text-gray-500 mb-8" style={{ fontFamily: 'RedditSans-Regular' }}>
-            Bem-vinda de volta! 🌸
-          </Text>
+          <Text className="text-base text-gray-500 mb-8" style={{ fontFamily: 'RedditSans-Regular' }}>Bem-vinda de volta! 🌸</Text>
 
           {/* OAuth */}
           <View className="gap-3 mb-6">
-            <TouchableOpacity className="flex-row items-center justify-center gap-3 rounded-full border border-gray-200 bg-white py-4" onPress={() => {}}>
+            <TouchableOpacity
+              className="flex-row items-center justify-center gap-3 rounded-full border border-gray-200 bg-white py-4"
+              onPress={handleGoogle}
+              disabled={!!loading}
+              activeOpacity={0.7}
+            >
               <IconBrandGoogle size={20} color="#252525" />
-              <Text className="text-base text-gray-900" style={{ fontFamily: 'RedditSans-SemiBold' }}>Entrar com Google</Text>
-            </TouchableOpacity>
-            <TouchableOpacity className="flex-row items-center justify-center gap-3 rounded-full border border-gray-200 bg-white py-4" onPress={() => {}}>
-              <IconBrandApple size={20} color="#252525" />
-              <Text className="text-base text-gray-900" style={{ fontFamily: 'RedditSans-SemiBold' }}>Entrar com Apple</Text>
+              <Text className="text-base text-gray-900" style={{ fontFamily: 'RedditSans-SemiBold' }}>
+                {loading === 'google' ? 'Aguarde...' : 'Entrar com Google'}
+              </Text>
             </TouchableOpacity>
           </View>
 
-          {/* Divisor */}
           <View className="flex-row items-center gap-3 mb-6">
             <View className="flex-1 h-px bg-gray-200" />
             <Text className="text-sm text-gray-400" style={{ fontFamily: 'RedditSans-Regular' }}>ou</Text>
             <View className="flex-1 h-px bg-gray-200" />
           </View>
 
-          {/* E-mail */}
-          <View className="gap-4 mb-2">
+          {/* E-mail + senha */}
+          <View className="gap-3 mb-2">
             <View className="flex-row items-center border border-gray-200 rounded-xl px-4 gap-3 bg-white" style={{ height: 52 }}>
               <IconMail size={18} color="#A1A7AE" />
               <TextInput
@@ -94,17 +116,10 @@ export default function SignIn() {
             </View>
           </View>
 
-          {error ? (
-            <Text className="text-sm text-red-500 mb-4" style={{ fontFamily: 'RedditSans-Regular' }}>{error}</Text>
-          ) : null}
+          {error ? <Text className="text-sm text-red-500 mb-2" style={{ fontFamily: 'RedditSans-Regular' }}>{error}</Text> : null}
 
-          <TouchableOpacity
-            className="self-end mb-6"
-            onPress={() => router.push('/(auth)/forgot-password')}
-          >
-            <Text className="text-sm text-violet-600" style={{ fontFamily: 'RedditSans-SemiBold' }}>
-              Esqueci minha senha
-            </Text>
+          <TouchableOpacity className="self-end mb-6" onPress={() => router.push('/(auth)/forgot-password')}>
+            <Text className="text-sm text-violet-600" style={{ fontFamily: 'RedditSans-SemiBold' }}>Esqueci minha senha</Text>
           </TouchableOpacity>
 
           <View className="flex-1" />
@@ -112,11 +127,11 @@ export default function SignIn() {
           <TouchableOpacity
             className={`rounded-full py-4 items-center ${isValid ? 'bg-violet-600' : 'bg-gray-200'}`}
             onPress={handleSignIn}
-            disabled={!isValid || loading}
+            disabled={!isValid || !!loading}
             activeOpacity={0.8}
           >
             <Text className={`text-base ${isValid ? 'text-white' : 'text-gray-400'}`} style={{ fontFamily: 'RedditSans-SemiBold' }}>
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading === 'email' ? 'Entrando...' : 'Entrar'}
             </Text>
           </TouchableOpacity>
 

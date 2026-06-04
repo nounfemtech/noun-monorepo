@@ -1,23 +1,46 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { IconLogout } from '@tabler/icons-react-native'
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { router } from 'expo-router'
-
-// ============================================================
-// Perfil — placeholder (FASE 2: dados do usuário + logout real)
-// ============================================================
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { IconLogout, IconUser } from '@tabler/icons-react-native'
+import { useAuth } from '@/providers/auth-provider'
+import { authService } from '@/lib/auth.service'
 
 export default function Profile() {
-  const handleSignOut = () => {
-    // TODO FASE 2: await authService.signOut()
-    router.replace('/(auth)/')
+  const { user } = useAuth()
+
+  const handleSignOut = async () => {
+    Alert.alert('Sair da conta', 'Tem certeza que deseja sair?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Sair',
+        style: 'destructive',
+        onPress: async () => {
+          await authService.signOut()
+          // AuthProvider detecta SIGNED_OUT → AuthGate redireciona para (auth)/
+        },
+      },
+    ])
   }
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDFDFD] px-6 pt-6">
-      <Text className="text-2xl text-gray-900 mb-6" style={{ fontFamily: 'RedditSans-Bold' }}>
-        Perfil
-      </Text>
+      <Text className="text-2xl text-gray-900 mb-6" style={{ fontFamily: 'RedditSans-Bold' }}>Perfil</Text>
+
+      {user && (
+        <View className="flex-row items-center gap-4 p-4 rounded-2xl border border-gray-100 bg-white mb-6">
+          <View className="w-12 h-12 rounded-full bg-violet-100 items-center justify-center">
+            <IconUser size={24} color="#7C3AED" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-base text-gray-900" style={{ fontFamily: 'RedditSans-SemiBold' }}>
+              {user.email}
+            </Text>
+            <Text className="text-sm text-gray-500" style={{ fontFamily: 'RedditSans-Regular' }}>
+              Paciente · Noun App
+            </Text>
+          </View>
+        </View>
+      )}
 
       <View className="flex-1" />
 
@@ -27,9 +50,7 @@ export default function Profile() {
         activeOpacity={0.7}
       >
         <IconLogout size={20} color="#DC2626" />
-        <Text className="text-base text-red-600" style={{ fontFamily: 'RedditSans-SemiBold' }}>
-          Sair da conta
-        </Text>
+        <Text className="text-base text-red-600" style={{ fontFamily: 'RedditSans-SemiBold' }}>Sair da conta</Text>
       </TouchableOpacity>
     </SafeAreaView>
   )

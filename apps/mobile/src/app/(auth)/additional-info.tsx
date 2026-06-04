@@ -1,13 +1,10 @@
 import { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { IconArrowLeft, IconUser, IconInfoCircle } from '@tabler/icons-react-native'
-
-// ============================================================
-// Passo 5/5 — Nome social (opcional)
-// FASE 2: chamar authService.saveProfile(data) e navegar para success
-// ============================================================
+import { useAuth } from '@/providers/auth-provider'
+import { authService } from '@/lib/auth.service'
 
 function ProgressBar({ step, total }: { step: number; total: number }) {
   return (
@@ -21,13 +18,37 @@ function ProgressBar({ step, total }: { step: number; total: number }) {
 
 export default function AdditionalInfo() {
   const params = useLocalSearchParams<{ fullName: string; cpf: string; birthDate: string }>()
+  const { user, refreshProfile } = useAuth()
   const [socialName, setSocialName] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading,    setLoading]    = useState(false)
 
-  const handleFinish = async () => {
+  const handleFinish = async (skipSocialName = false) => {
+    if (!user) {
+      Alert.alert('Erro', 'Sessão expirada. Faça login novamente.')
+      router.replace('/(auth)/')
+      return
+    }
+
     setLoading(true)
-    // TODO FASE 2: await authService.saveProfile({ ...params, socialName: socialName || undefined })
+
+    const result = await authService.saveProfile({
+      userId:     user.id,
+      fullName:   params.fullName ?? '',
+      socialName: skipSocialName ? undefined : (socialName.trim() || undefined),
+      cpf:        params.cpf,
+      birthDate:  params.birthDate ?? '',
+      email:      user.email,
+    })
+
     setLoading(false)
+
+    if (!result.success) {
+      Alert.alert('Erro', result.error ?? 'Não foi possível salvar seu perfil')
+      return
+    }
+
+    // Atualiza hasProfile no AuthProvider para que AuthGate libere o (app)/
+    await refreshProfile()
     router.replace('/(auth)/success')
   }
 
@@ -44,19 +65,17 @@ export default function AdditionalInfo() {
           <Text className="text-2xl text-gray-900 mb-2" style={{ fontFamily: 'RedditSans-Bold' }}>
             Como prefere ser chamada?
           </Text>
-          <Text className="text-base text-gray-500 mb-2" style={{ fontFamily: 'RedditSans-Regular' }}>
-            Seu nome social é opcional — mas queremos te chamar do jeito que você se identifica.
+          <Text className="text-base text-gray-500 mb-3" style={{ fontFamily: 'RedditSans-Regular' }}>
+            Seu nome social é opcional.
           </Text>
 
-          {/* Info box */}
           <View className="flex-row gap-3 bg-violet-50 border border-violet-100 rounded-xl p-4 mb-8">
             <IconInfoCircle size={20} color="#7C3AED" />
             <Text className="flex-1 text-sm text-violet-700" style={{ fontFamily: 'RedditSans-Regular' }}>
-              O nome social é o nome pelo qual uma pessoa trans ou não-binária se identifica, diferente do nome registrado em documentos.
+              Nome social é o nome pelo qual uma pessoa trans ou não-binária se identifica, diferente do nome no documento.
             </Text>
           </View>
 
-          {/* Input */}
           <View className="gap-1.5 mb-6">
             <Text className="text-sm text-gray-700" style={{ fontFamily: 'RedditSans-Medium' }}>
               Nome social <Text className="text-gray-400">(opcional)</Text>
@@ -76,11 +95,10 @@ export default function AdditionalInfo() {
 
           <View className="flex-1" />
 
-          {/* Botões */}
           <View className="gap-3">
             <TouchableOpacity
               className="rounded-full bg-violet-600 py-4 items-center"
-              onPress={handleFinish}
+              onPress={() => handleFinish(false)}
               disabled={loading}
               activeOpacity={0.8}
             >
@@ -91,7 +109,7 @@ export default function AdditionalInfo() {
 
             <TouchableOpacity
               className="items-center py-3"
-              onPress={handleFinish}
+              onPress={() => handleFinish(true)}
               disabled={loading}
             >
               <Text className="text-base text-gray-500" style={{ fontFamily: 'RedditSans-Regular' }}>

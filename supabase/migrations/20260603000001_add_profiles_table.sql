@@ -1,0 +1,23 @@
+-- ============================================================
+-- profiles — tabela já existente no projeto Supabase (Noun-Hub)
+-- Este arquivo documenta o schema descoberto para o monorepo.
+-- RLS e policies já configuradas.
+--
+-- Colunas relevantes para o app mobile:
+--   id            uuid        PK references auth.users
+--   role          user_role   NOT NULL ('patient' para pacientes)
+--   full_name     text        NOT NULL
+--   social_name   text
+--   cpf           text        UNIQUE
+--   email         text
+--   date_of_birth date        NOT NULL
+--   is_active     boolean     NOT NULL default true
+--   created_at    timestamptz NOT NULL
+--   updated_at    timestamptz NOT NULL
+--
+-- Enum role: patient | doctor | nutritionist | psychologist
+--            | pharmacist | attendant | noun_admin
+-- ============================================================
+
+-- No-op: tabela já existe no banco de dados remoto.
+-- Para inspecionar: SELECT * FROM profiles LIMIT 1;

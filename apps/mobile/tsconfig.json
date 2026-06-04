@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "strict": true,
+    "exactOptionalPropertyTypes": false,
     "esModuleInterop": true,
     "jsx": "react-native",
     "lib": ["ES2022"],

@@ -3,11 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { IconArrowLeft, IconMail } from '@tabler/icons-react-native'
-
-// ============================================================
-// Passo 2/5 — Verificar OTP de 6 dígitos
-// FASE 2: chamar authService.verifyOTP(email, code)
-// ============================================================
+import { authService } from '@/lib/auth.service'
 
 function ProgressBar({ step, total }: { step: number; total: number }) {
   return (
@@ -23,8 +19,9 @@ const CODE_LENGTH = 6
 
 export default function VerifyEmail() {
   const { email } = useLocalSearchParams<{ email: string }>()
-  const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''))
-  const [loading, setLoading] = useState(false)
+  const [digits,    setDigits]    = useState<string[]>(Array(CODE_LENGTH).fill(''))
+  const [error,     setError]     = useState('')
+  const [loading,   setLoading]   = useState(false)
   const [countdown, setCountdown] = useState(60)
   const inputRefs = useRef<(TextInput | null)[]>([])
 
@@ -35,12 +32,11 @@ export default function VerifyEmail() {
 
   const handleDigit = (value: string, index: number) => {
     const cleaned = value.replace(/\D/g, '').slice(-1)
-    const next = [...digits]
-    next[index] = cleaned
+    const next    = [...digits]
+    next[index]   = cleaned
     setDigits(next)
-    if (cleaned && index < CODE_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus()
-    }
+    setError('')
+    if (cleaned && index < CODE_LENGTH - 1) inputRefs.current[index + 1]?.focus()
   }
 
   const handleKeyPress = (key: string, index: number) => {
@@ -49,22 +45,36 @@ export default function VerifyEmail() {
     }
   }
 
-  const code = digits.join('')
+  const code       = digits.join('')
   const isComplete = code.length === CODE_LENGTH
 
   const handleVerify = async () => {
-    if (!isComplete) return
+    if (!isComplete || !email) return
     setLoading(true)
-    // TODO FASE 2: const result = await authService.verifyOTP(email!, code)
+    setError('')
+
+    const result = await authService.verifyOTP(email, code)
     setLoading(false)
+
+    if (!result.success) {
+      setError(result.error ?? 'Código inválido')
+      setDigits(Array(CODE_LENGTH).fill(''))
+      inputRefs.current[0]?.focus()
+      return
+    }
+
     router.push({ pathname: '/(auth)/set-password', params: { email } })
   }
 
   const handleResend = async () => {
-    if (countdown > 0) return
+    if (countdown > 0 || !email) return
     setCountdown(60)
-    // TODO FASE 2: await authService.resendOTP(email!)
-    Alert.alert('Código reenviado', `Verifique sua caixa de entrada em ${email}`)
+    const result = await authService.resendOTP(email)
+    if (result.success) {
+      Alert.alert('Código reenviado', `Verifique sua caixa de entrada em ${email}`)
+    } else {
+      Alert.alert('Erro', result.error ?? 'Não foi possível reenviar o código')
+    }
   }
 
   return (
@@ -76,28 +86,27 @@ export default function VerifyEmail() {
 
         <ProgressBar step={2} total={5} />
 
-        <View className="items-center mb-2">
+        <View className="items-center mb-4">
           <View className="w-14 h-14 rounded-full bg-violet-100 items-center justify-center mb-4">
             <IconMail size={28} color="#7C3AED" />
           </View>
+          <Text className="text-2xl text-gray-900 text-center" style={{ fontFamily: 'RedditSans-Bold' }}>
+            Verifique seu e-mail
+          </Text>
+          <Text className="mt-2 text-base text-gray-500 text-center" style={{ fontFamily: 'RedditSans-Regular' }}>
+            Código enviado para{'\n'}
+            <Text className="text-gray-700" style={{ fontFamily: 'RedditSans-SemiBold' }}>{email}</Text>
+          </Text>
         </View>
 
-        <Text className="text-2xl text-gray-900 mb-2 text-center" style={{ fontFamily: 'RedditSans-Bold' }}>
-          Verifique seu e-mail
-        </Text>
-        <Text className="text-base text-gray-500 mb-8 text-center" style={{ fontFamily: 'RedditSans-Regular' }}>
-          Enviamos um código de 6 dígitos para{'\n'}
-          <Text className="text-gray-700" style={{ fontFamily: 'RedditSans-SemiBold' }}>{email}</Text>
-        </Text>
-
-        {/* 6 inputs de dígito */}
-        <View className="flex-row justify-center gap-3 mb-8">
+        {/* 6 caixas de dígito */}
+        <View className="flex-row justify-center gap-3 mb-4">
           {digits.map((digit, i) => (
             <TextInput
               key={i}
               ref={(r) => { inputRefs.current[i] = r }}
               className={`w-12 h-14 border rounded-xl text-center text-2xl bg-white ${
-                digit ? 'border-violet-500' : 'border-gray-200'
+                error ? 'border-red-400' : digit ? 'border-violet-500' : 'border-gray-200'
               }`}
               style={{ fontFamily: 'RedditSans-Bold' }}
               value={digit}
@@ -110,12 +119,19 @@ export default function VerifyEmail() {
           ))}
         </View>
 
-        {/* Reenviar */}
+        {error ? (
+          <Text className="text-sm text-red-500 text-center mb-4" style={{ fontFamily: 'RedditSans-Regular' }}>
+            {error}
+          </Text>
+        ) : null}
+
         <TouchableOpacity onPress={handleResend} disabled={countdown > 0} className="items-center mb-8">
           <Text className="text-base text-gray-500" style={{ fontFamily: 'RedditSans-Regular' }}>
-            {countdown > 0
-              ? `Reenviar em ${countdown}s`
-              : <Text className="text-violet-600" style={{ fontFamily: 'RedditSans-SemiBold' }}>Reenviar código</Text>}
+            {countdown > 0 ? `Reenviar em ${countdown}s` : (
+              <Text className="text-violet-600" style={{ fontFamily: 'RedditSans-SemiBold' }}>
+                Reenviar código
+              </Text>
+            )}
           </Text>
         </TouchableOpacity>
 
@@ -127,10 +143,7 @@ export default function VerifyEmail() {
           disabled={!isComplete || loading}
           activeOpacity={0.8}
         >
-          <Text
-            className={`text-base ${isComplete ? 'text-white' : 'text-gray-400'}`}
-            style={{ fontFamily: 'RedditSans-SemiBold' }}
-          >
+          <Text className={`text-base ${isComplete ? 'text-white' : 'text-gray-400'}`} style={{ fontFamily: 'RedditSans-SemiBold' }}>
             {loading ? 'Verificando...' : 'Verificar'}
           </Text>
         </TouchableOpacity>
