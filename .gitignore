@@ -54,3 +54,6 @@ web-build
 # Supabase
 supabase/.branches
 supabase/.temp
+
+# Claude Code — configurações locais (paths pessoais, não commitar)
+.claude/settings.local.json
