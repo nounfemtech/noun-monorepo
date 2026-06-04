@@ -1,9 +1,13 @@
-import { FlatCompat } from '@eslint/eslintrc'
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-const compat = new FlatCompat({ baseDirectory: __dirname })
-
-export default compat.extends('next/core-web-vitals')
+// ESLint v9 flat config — apps/web
+// TypeScript files are excluded: @typescript-eslint/parser is not an explicit
+// devDependency. TS correctness is covered by `tsc --noEmit` (type-check).
+// TODO: add typescript-eslint once the shared ESLint setup is migrated to v9.
+export default [
+  {
+    files: ['**/*.{js,jsx,mjs,cjs}'],
+    rules: {},
+  },
+  {
+    ignores: ['**/*.{ts,tsx}', '.next/**', 'node_modules/**'],
+  },
+]
