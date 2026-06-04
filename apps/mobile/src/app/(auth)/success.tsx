@@ -27,11 +27,11 @@ export default function Success() {
           </View>
         </View>
 
-        {/* AuthGate redireciona automaticamente para /(app)/ quando hasProfile = true.
+        {/* AuthGate redireciona para /(auth)/consent quando hasRequiredConsents = false.
             Este botão é um fallback explícito. */}
         <TouchableOpacity
           className="w-full rounded-full bg-violet-600 py-4 items-center"
-          onPress={() => router.replace('/(app)/')}
+          onPress={() => router.replace('/(auth)/consent')}
           activeOpacity={0.8}
         >
           <Text className="text-base text-white" style={{ fontFamily: 'RedditSans-SemiBold' }}>

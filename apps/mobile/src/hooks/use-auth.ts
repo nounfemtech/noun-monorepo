@@ -10,12 +10,14 @@ export function useAuth() {
 
   return {
     // Estado
-    user:            ctx.user,
-    session:         ctx.session,
-    loading:         ctx.loading,
-    isAuthenticated: ctx.isAuthenticated,
-    hasProfile:      ctx.hasProfile,
-    refreshProfile:  ctx.refreshProfile,
+    user:                ctx.user,
+    session:             ctx.session,
+    loading:             ctx.loading,
+    isAuthenticated:     ctx.isAuthenticated,
+    hasProfile:          ctx.hasProfile,
+    hasRequiredConsents: ctx.hasRequiredConsents,
+    refreshProfile:      ctx.refreshProfile,
+    refreshConsents:     ctx.refreshConsents,
 
     // Métodos (delegam para authService)
     signIn:        (email: string, password: string) =>

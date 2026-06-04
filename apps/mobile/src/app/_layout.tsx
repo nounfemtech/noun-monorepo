@@ -14,15 +14,16 @@ SplashScreen.preventAutoHideAsync()
 // ============================================================
 
 function AuthGate() {
-  const { session, loading, hasProfile } = useAuth()
+  const { session, loading, hasProfile, hasRequiredConsents } = useAuth()
   const segments  = useSegments()
   const router    = useRouter()
 
   useEffect(() => {
     if (loading) return
 
-    const inAuth = segments[0] === '(auth)'
-    const inApp  = segments[0] === '(app)'
+    const segs   = segments as unknown as string[]
+    const inAuth = segs[0] === '(auth)'
+    const page   = segs[1] as string | undefined
 
     if (!session) {
       // Não autenticado → landing de auth
@@ -33,17 +34,27 @@ function AuthGate() {
     // Autenticado mas hasProfile ainda não foi verificado → aguarda
     if (hasProfile === null) return
 
-    if (!hasProfile && !inAuth) {
+    if (!hasProfile) {
       // Logou via OAuth mas ainda não preencheu o perfil
-      router.replace('/(auth)/personal-info')
+      if (!inAuth) router.replace('/(auth)/personal-info')
       return
     }
 
-    if (hasProfile && inAuth) {
-      // Já tem perfil e está em tela de auth → manda para o app
+    // Perfil existe mas consentimentos ainda não verificados → aguarda
+    if (hasRequiredConsents === null) return
+
+    if (!hasRequiredConsents) {
+      // Permite aguardar na success e na própria tela de consent
+      if (inAuth && (page === 'consent' || page === 'success')) return
+      router.replace('/(auth)/consent')
+      return
+    }
+
+    if (inAuth) {
+      // Tudo ok → entra no app
       router.replace('/(app)/')
     }
-  }, [session, loading, hasProfile, segments])
+  }, [session, loading, hasProfile, hasRequiredConsents, segments])
 
   return null
 }

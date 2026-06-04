@@ -73,6 +73,11 @@ export default function AppLayout() {
           },
         }}
       />
+      {/* Tela de privacidade — acessível via router.push, sem ícone na tab bar */}
+      <Tabs.Screen
+        name="privacy-settings"
+        options={{ href: null }}
+      />
     </Tabs>
   )
 }

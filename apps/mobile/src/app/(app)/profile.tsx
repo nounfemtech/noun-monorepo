@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { IconLogout, IconUser } from '@tabler/icons-react-native'
+import { IconLogout, IconUser, IconShieldCheck, IconChevronRight } from '@tabler/icons-react-native'
 import { useAuth } from '@/providers/auth-provider'
 import { authService } from '@/lib/auth.service'
 
@@ -41,6 +41,21 @@ export default function Profile() {
           </View>
         </View>
       )}
+
+      {/* Configurações de privacidade */}
+      <TouchableOpacity
+        className="flex-row items-center justify-between p-4 rounded-2xl border border-gray-100 bg-white mb-4"
+        onPress={() => router.push('/(app)/privacy-settings')}
+        activeOpacity={0.7}
+      >
+        <View className="flex-row items-center gap-3">
+          <IconShieldCheck size={20} color="#7C3AED" />
+          <Text className="text-sm text-gray-800" style={{ fontFamily: 'RedditSans-Medium' }}>
+            Configurações de privacidade
+          </Text>
+        </View>
+        <IconChevronRight size={18} color="#A1A7AE" />
+      </TouchableOpacity>
 
       <View className="flex-1" />
 
