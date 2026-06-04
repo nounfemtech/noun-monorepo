@@ -1,0 +1,115 @@
+name: Deploy Admin
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-admin-${{ github.ref }}
+  cancel-in-progress: true
+
+# PREREQUISITE: Configure VERCEL_PROJECT_ID_ADMIN secret after creating
+# the admin project on Vercel. Until then, this workflow will fail at
+# the "Pull Vercel environment" step.
+
+jobs:
+  deploy:
+    name: Deploy apps/admin → Vercel
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel environment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_ADMIN }}
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Build project
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_ADMIN }}
+        run: vercel build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy to Vercel
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_ADMIN }}
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN)
+          echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+
+      - name: Notify Discord on success
+        if: success()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+        run: |
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg url "$DEPLOYMENT_URL" \
+              --arg sha "${SHA:0:7}" \
+              --arg actor "$ACTOR" \
+              --arg commit_url "$COMMIT_URL" \
+              '{
+                embeds: [{
+                  title: "✅ Deploy Admin — Sucesso",
+                  description: "**App:** apps/admin\n**URL:** \($url)\n**Commit:** [`\($sha)`](\($commit_url))\n**Por:** \($actor)",
+                  color: 3066993,
+                  footer: { text: "Noun CD • apps/admin" }
+                }]
+              }')"
+
+      - name: Notify Discord on failure
+        if: failure()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg sha "${SHA:0:7}" \
+              --arg actor "$ACTOR" \
+              --arg commit_url "$COMMIT_URL" \
+              --arg run_url "$RUN_URL" \
+              '{
+                embeds: [{
+                  title: "❌ Deploy Admin — Falhou",
+                  description: "**App:** apps/admin\n**Commit:** [`\($sha)`](\($commit_url))\n**Por:** \($actor)\n**Logs:** [\($run_url)](\($run_url))",
+                  color: 15158332,
+                  footer: { text: "Noun CD • apps/admin" }
+                }]
+              }')"

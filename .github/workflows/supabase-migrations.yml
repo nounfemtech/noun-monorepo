@@ -1,0 +1,81 @@
+name: Supabase Migrations
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "supabase/migrations/**"
+
+concurrency:
+  group: supabase-migrations-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Apply Supabase Migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Apply migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: supabase db push --project-ref $SUPABASE_PROJECT_ID
+
+      - name: Notify Discord on success
+        if: success()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+        run: |
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg sha "${SHA:0:7}" \
+              --arg actor "$ACTOR" \
+              --arg commit_url "$COMMIT_URL" \
+              '{
+                embeds: [{
+                  title: "✅ Migrations Supabase — Aplicadas",
+                  description: "**Commit:** [`\($sha)`](\($commit_url))\n**Por:** \($actor)",
+                  color: 3066993,
+                  footer: { text: "Noun CD • Supabase" }
+                }]
+              }')"
+
+      - name: Notify Discord on failure
+        if: failure()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg sha "${SHA:0:7}" \
+              --arg actor "$ACTOR" \
+              --arg commit_url "$COMMIT_URL" \
+              --arg run_url "$RUN_URL" \
+              '{
+                embeds: [{
+                  title: "❌ Migrations Supabase — Falhou",
+                  description: "**Commit:** [`\($sha)`](\($commit_url))\n**Por:** \($actor)\n**Logs:** [\($run_url)](\($run_url))",
+                  color: 15158332,
+                  footer: { text: "Noun CD • Supabase" }
+                }]
+              }')"

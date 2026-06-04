@@ -19,9 +19,14 @@ env:
 
 jobs:
   ci:
-    name: Lint, Type-check & Build
+    name: Lint, Type-check & Build (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
+    strategy:
+      matrix:
+        node-version: [20, 22]
+      fail-fast: false
 
     steps:
       - name: Checkout
@@ -34,10 +39,10 @@ jobs:
         with:
           version: 9
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: "pnpm"
 
       - name: Install dependencies
@@ -54,3 +59,32 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Notify Discord on failure
+        if: failure() && github.event_name == 'pull_request'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          BRANCH: ${{ github.head_ref }}
+          SHA: ${{ github.sha }}
+          NODE_VERSION: ${{ matrix.node-version }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg pr "$PR_TITLE" \
+              --arg pr_url "$PR_URL" \
+              --arg branch "$BRANCH" \
+              --arg sha "${SHA:0:7}" \
+              --arg node "$NODE_VERSION" \
+              --arg run_url "$RUN_URL" \
+              '{
+                embeds: [{
+                  title: "❌ CI Falhou — Node \($node)",
+                  description: "**PR:** [\($pr)](\($pr_url))\n**Branch:** `\($branch)`\n**Commit:** `\($sha)`\n**Logs:** [\($run_url)](\($run_url))",
+                  color: 15158332,
+                  footer: { text: "Noun CI" }
+                }]
+              }')"
