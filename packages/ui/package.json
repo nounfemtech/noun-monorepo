@@ -10,8 +10,7 @@
     "./*": "./src/components/*.tsx"
   },
   "scripts": {
-    "type-check": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

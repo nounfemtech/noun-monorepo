@@ -13,8 +13,7 @@
     "./tailwind": "./tailwind/preset.ts"
   },
   "scripts": {
-    "type-check": "tsc --noEmit",
-    "lint": "eslint src --ext .ts"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
