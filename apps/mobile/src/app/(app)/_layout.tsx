@@ -2,12 +2,12 @@ import { Tabs } from 'expo-router'
 import { Platform } from 'react-native'
 
 // SVG tab icons (copiados do noun-app)
-import HomeIconFocused from '../../../../assets/tab_bar/solar_home-smile-bold-duotone.svg'
-import HomeIconUnfocused from '../../../../assets/tab_bar/solar_home-smile-line-duotone.svg'
-import HealthIconFocused from '../../../../assets/tab_bar/solar_heart-pulse-bold-duotone.svg'
-import HealthIconUnfocused from '../../../../assets/tab_bar/solar_heart-pulse-line-duotone.svg'
-import ProfileIconFocused from '../../../../assets/tab_bar/solar_user-rounded-bold-duotone.svg'
-import ProfileIconUnfocused from '../../../../assets/tab_bar/solar_user-rounded-line-duotone.svg'
+import HomeIconFocused from '../../../assets/tab_bar/solar_home-smile-bold-duotone.svg'
+import HomeIconUnfocused from '../../../assets/tab_bar/solar_home-smile-line-duotone.svg'
+import HealthIconFocused from '../../../assets/tab_bar/solar_heart-pulse-bold-duotone.svg'
+import HealthIconUnfocused from '../../../assets/tab_bar/solar_heart-pulse-line-duotone.svg'
+import ProfileIconFocused from '../../../assets/tab_bar/solar_user-rounded-bold-duotone.svg'
+import ProfileIconUnfocused from '../../../assets/tab_bar/solar_user-rounded-line-duotone.svg'
 
 // ============================================================
 // App Layout — Bottom Tabs protegido
@@ -73,9 +73,13 @@ export default function AppLayout() {
           },
         }}
       />
-      {/* Tela de privacidade — acessível via router.push, sem ícone na tab bar */}
+      {/* Telas acessíveis via router.push, sem ícone na tab bar */}
       <Tabs.Screen
         name="privacy-settings"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="health-profile"
         options={{ href: null }}
       />
     </Tabs>
