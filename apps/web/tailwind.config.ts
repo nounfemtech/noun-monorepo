@@ -1,23 +1,15 @@
 import type { Config } from 'tailwindcss'
+import nounPreset from '@noun/config/tailwind'
 
 const config: Config = {
+  presets: [nounPreset as Config],
   content: [
     './src/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{ts,tsx}',
   ],
+  // Qualquer override específico do apps/web (raramente necessário)
   theme: {
-    extend: {
-      colors: {
-        // Noun Design System — será expandido
-        brand: {
-          50: '#fdf4ff',
-          100: '#fae8ff',
-          500: '#a855f7',
-          600: '#9333ea',
-          700: '#7e22ce',
-        },
-      },
-    },
+    extend: {},
   },
   plugins: [],
 }

@@ -14,12 +14,15 @@
   },
   "dependencies": {
     "@noun/types": "workspace:*",
+    "@tabler/icons-react-native": "^3.34.0",
     "expo": "~53.0.0",
     "expo-router": "~5.0.0",
     "expo-status-bar": "~2.2.0",
     "nativewind": "^4.1.23",
     "react": "19.0.0",
-    "react-native": "0.79.2"
+    "react-native": "0.79.2",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-svg": "^15.12.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",

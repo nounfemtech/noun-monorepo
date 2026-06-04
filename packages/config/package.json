@@ -9,7 +9,8 @@
     "./tsconfig": "./tsconfig/base.json",
     "./supabase": "./src/supabase/index.ts",
     "./supabase/client": "./src/supabase/client.ts",
-    "./supabase/server": "./src/supabase/server.ts"
+    "./supabase/server": "./src/supabase/server.ts",
+    "./tailwind": "./tailwind/preset.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.7",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
