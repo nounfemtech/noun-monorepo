@@ -1,5 +1,5 @@
 // ============================================================
-// Babel Config — NativeWind v4 + Expo
+// Babel Config — NativeWind v4 + Expo SDK 54
 // ============================================================
 module.exports = function (api) {
   api.cache(true)
