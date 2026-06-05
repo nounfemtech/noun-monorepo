@@ -1,5 +1,6 @@
 'use client'
 
+import type { Route } from 'next'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -17,7 +18,7 @@ import { Separator } from '@/components/ui/separator'
 import { createSupabaseBrowser } from '@/lib/supabase'
 
 interface NavItem {
-  href: string
+  href: Route
   label: string
   icon: React.ReactNode
 }
