@@ -9,7 +9,7 @@ import {
   IconCalendar,
   IconCoins,
 } from '@tabler/icons-react'
-import { createSupabaseServer } from '@/lib/supabase'
+import { createSupabaseServer } from '@/lib/supabase-server'
 import { StatsCard } from '@/components/stats-card'
 import { RevenueChart } from '@/components/revenue-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

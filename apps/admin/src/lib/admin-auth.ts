@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createSupabaseServer } from './supabase'
+import { createSupabaseServer } from './supabase-server'
 import type { Session } from '@supabase/supabase-js'
 
 export interface AdminProfile {
