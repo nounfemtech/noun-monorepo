@@ -110,28 +110,28 @@ export const COLOR_HSL: Record<ColorName, { light: string; dark: string; lightFg
 // ---------------------------------------------------------------------------
 export const colors: Record<ColorName, ColorShades> = {
   taupe: {
-    // warm stone-like gray — hue ~25°, sat ~9% (similar to Stone but warmer/browner)
-    50: '#fdfbf9', 100: '#f5f2ed', 200: '#ebe4db', 300: '#d8cfc5',
-    400: '#bcb0a3', 500: '#9d9186', 600: '#82766c', 700: '#69605a',
-    800: '#554f4a', 900: '#464240', 950: '#272321',
+    // warm brown-gray — H 25°, S 9%, mesma curva de lightness do Tailwind Zinc
+    50: '#fdfbf9', 100: '#f7f4f0', 200: '#ede8e1', 300: '#dad2c9',
+    400: '#aea59e', 500: '#837b72', 600: '#645b54', 700: '#48413c',
+    800: '#2c2825', 900: '#1f1c1a', 950: '#110f0e',
   },
   mauve: {
-    // purple-tinted gray — Radix Mauve palette (hue ~270°, sat ~5–8%)
-    50: '#fdfcfd', 100: '#f2eff3', 200: '#e3dfe6', 300: '#d0cdd7',
-    400: '#bcbac7', 500: '#8e8c99', 600: '#84828f', 700: '#65636d',
-    800: '#4d4b57', 900: '#3a3845', 950: '#211f26',
+    // purple-tinted gray — H 270°, S 7%, mesma curva de lightness do Tailwind Zinc
+    50: '#fdfcfd', 100: '#f2f0f3', 200: '#e6e4e8', 300: '#d6d3d9',
+    400: '#a6a0ac', 500: '#787280', 600: '#5c5562', 700: '#423e47',
+    800: '#29262c', 900: '#1c1a1e', 950: '#0f0e10',
   },
   mist: {
-    // cool blue-gray — hue ~207°, sat ~10–12% (Slate but slightly bluer, less saturated)
-    50: '#f7f9fb', 100: '#eff3f7', 200: '#dde6ee', 300: '#c8d6e0',
-    400: '#a6bac8', 500: '#7e8d99', 600: '#607685', 700: '#4d6070',
-    800: '#3c4e5c', 900: '#303f4c', 950: '#1a242c',
+    // cool blue-gray — H 210°, S 11%, mesma curva de lightness do Tailwind Zinc
+    50: '#f7f9fb', 100: '#f1f2f4', 200: '#e0e3e6', 300: '#d2d6db',
+    400: '#9ca6b0', 500: '#6b7885', 600: '#525c66', 700: '#3b424a',
+    800: '#24292d', 900: '#191c1f', 950: '#0e0f11',
   },
   olive: {
-    // olive green-gray — Radix Olive palette (hue ~85°, sat ~5–9%)
-    50: '#f8f9f6', 100: '#f1f2ec', 200: '#e2e4d9', 300: '#cad0c2',
-    400: '#abb5a1', 500: '#7a826d', 600: '#5f6b55', 700: '#4c5744',
-    800: '#3b4535', 900: '#2f382a', 950: '#191d15',
+    // olive green-gray — H 90°, S 8%, mesma curva de lightness do Tailwind Zinc
+    50: '#f9faf7', 100: '#f2f3f1', 200: '#e5e8e4', 300: '#d6dad3',
+    400: '#a6ad9f', 500: '#78826e', 600: '#5c6354', 700: '#42483d',
+    800: '#292c26', 900: '#1c1e1a', 950: '#0f110e',
   },
   black: {
     50: '#f5f5f5', 100: '#e8e8e8', 200: '#d0d0d0', 300: '#b0b0b0',
