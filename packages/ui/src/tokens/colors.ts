@@ -77,10 +77,10 @@ export function hexToHsl(hex: string): string {
 // ---------------------------------------------------------------------------
 export const COLOR_HSL: Record<ColorName, { light: string; dark: string; lightFg: string; darkFg: string }> = {
   black:   { light: '0 0% 9%',          dark: '0 0% 63.9%',      lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
-  taupe:   { light: '22 19% 43%',       dark: '22 24% 56%',      lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
-  mauve:   { light: '267 15% 55%',      dark: '267 20% 68%',     lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
-  mist:    { light: '207 27% 45%',      dark: '207 32% 60%',     lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
-  olive:   { light: '80 24% 35%',       dark: '80 28% 48%',      lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
+  taupe:   { light: '25 9% 46%',         dark: '25 9% 56%',       lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
+  mauve:   { light: '270 5% 53%',        dark: '270 5% 59%',      lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
+  mist:    { light: '207 14% 44%',       dark: '207 14% 55%',     lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
+  olive:   { light: '97 11% 38%',        dark: '97 11% 47%',      lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
   slate:   { light: '215 27.9% 16.9%',  dark: '215 16.3% 46.9%', lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
   gray:    { light: '220 8.9% 35.3%',   dark: '220 8.9% 46.1%',  lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
   zinc:    { light: '240 3.7% 15.9%',   dark: '240 5.2% 33.9%',  lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
@@ -110,24 +110,28 @@ export const COLOR_HSL: Record<ColorName, { light: string; dark: string; lightFg
 // ---------------------------------------------------------------------------
 export const colors: Record<ColorName, ColorShades> = {
   taupe: {
-    50: '#faf8f5', 100: '#f2ede7', 200: '#e4d9cc', 300: '#cfbfac',
-    400: '#b5a08a', 500: '#9b826c', 600: '#83695a', 700: '#6b554b',
-    800: '#574741', 900: '#473b37', 950: '#281f1b',
+    // warm stone-like gray — hue ~25°, sat ~9% (similar to Stone but warmer/browner)
+    50: '#fdfbf9', 100: '#f5f2ed', 200: '#ebe4db', 300: '#d8cfc5',
+    400: '#bcb0a3', 500: '#9d9186', 600: '#82766c', 700: '#69605a',
+    800: '#554f4a', 900: '#464240', 950: '#272321',
   },
   mauve: {
-    50: '#fdfcfe', 100: '#f8f5fe', 200: '#ece8f5', 300: '#dad4ea',
-    400: '#c3bbd9', 500: '#a99fc4', 600: '#8e83ac', 700: '#746992',
-    800: '#5e5577', 900: '#4c4460', 950: '#2a2438',
+    // purple-tinted gray — Radix Mauve palette (hue ~270°, sat ~5–8%)
+    50: '#fdfcfd', 100: '#f2eff3', 200: '#e3dfe6', 300: '#d0cdd7',
+    400: '#bcbac7', 500: '#8e8c99', 600: '#84828f', 700: '#65636d',
+    800: '#4d4b57', 900: '#3a3845', 950: '#211f26',
   },
   mist: {
-    50: '#f5f8fa', 100: '#e8eef3', 200: '#d0dde7', 300: '#afc4d5',
-    400: '#87a5be', 500: '#6589aa', 600: '#4f7091', 700: '#415c78',
-    800: '#384e63', 900: '#304252', 950: '#1d2834',
+    // cool blue-gray — hue ~207°, sat ~10–12% (Slate but slightly bluer, less saturated)
+    50: '#f7f9fb', 100: '#eff3f7', 200: '#dde6ee', 300: '#c8d6e0',
+    400: '#a6bac8', 500: '#7e8d99', 600: '#607685', 700: '#4d6070',
+    800: '#3c4e5c', 900: '#303f4c', 950: '#1a242c',
   },
   olive: {
-    50: '#f8f9f2', 100: '#eef1e0', 200: '#dae1c1', 300: '#c1cc9b',
-    400: '#a5b471', 500: '#8b9b51', 600: '#6d7b3d', 700: '#566233',
-    800: '#47502e', 900: '#3b4529', 950: '#1e2313',
+    // olive green-gray — Radix Olive palette (hue ~85°, sat ~5–9%)
+    50: '#f8f9f6', 100: '#f1f2ec', 200: '#e2e4d9', 300: '#cad0c2',
+    400: '#abb5a1', 500: '#7a826d', 600: '#5f6b55', 700: '#4c5744',
+    800: '#3b4535', 900: '#2f382a', 950: '#191d15',
   },
   black: {
     50: '#f5f5f5', 100: '#e8e8e8', 200: '#d0d0d0', 300: '#b0b0b0',
