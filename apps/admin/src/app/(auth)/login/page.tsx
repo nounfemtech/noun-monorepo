@@ -19,49 +19,59 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const supabase = createSupabaseBrowser()
+    try {
+      const supabase = createSupabaseBrowser()
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (signInError) {
-      setError('E-mail ou senha inválidos.')
+      if (signInError) {
+        setError('E-mail ou senha inválidos.')
+        setLoading(false)
+        return
+      }
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        setError('Erro ao obter usuário.')
+        setLoading(false)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile || profile.role !== 'noun_admin') {
+        await supabase.auth.signOut()
+        setError('Acesso restrito ao time Noun.')
+        setLoading(false)
+        return
+      }
+
+      router.push('/dashboard')
+      router.refresh()
+    } catch (err) {
+      console.error('[Vaughan] login error:', err)
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Erro inesperado. Tente novamente.',
+      )
       setLoading(false)
-      return
     }
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      setError('Erro ao obter usuário.')
-      setLoading(false)
-      return
-    }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.role !== 'noun_admin') {
-      await supabase.auth.signOut()
-      setError('Acesso restrito ao time Noun.')
-      setLoading(false)
-      return
-    }
-
-    router.push('/dashboard')
-    router.refresh()
   }
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
-      {/* Coluna esquerda — logo + formulário */}
+      {/* Coluna esquerda — wordmark + formulário */}
       <div className="flex flex-col gap-6 p-8 md:p-12">
         {/* Wordmark */}
         <div className="flex items-center">
