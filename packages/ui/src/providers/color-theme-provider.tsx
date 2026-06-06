@@ -15,8 +15,10 @@ import {
 // ---------------------------------------------------------------------------
 
 const PRIMARY_KEY = 'vaughan-primary'
+const NEUTRAL_KEY = 'vaughan-neutral'
 
 export const DEFAULT_PRIMARY: PaletteSelection = { palette: 'yellow', shade: 400 }
+export const DEFAULT_NEUTRAL: PaletteSelection = { palette: 'zinc', shade: 950 }
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -32,6 +34,7 @@ function getHsl(palette: ColorName, shade: ColorShadeValue): string {
   return hexToHsl(colors[palette][shade])
 }
 
+/** Reads a PaletteSelection from localStorage, falls back to defaultVal */
 function readStorage(key: string, defaultVal: PaletteSelection): PaletteSelection {
   try {
     const raw = localStorage.getItem(key)
@@ -60,39 +63,37 @@ function readStorage(key: string, defaultVal: PaletteSelection): PaletteSelectio
 export function applyPrimary(sel: PaletteSelection): void {
   const root = document.documentElement
   const primaryHsl = getHsl(sel.palette, sel.shade)
-  // Auto-contraste: shade ≤ 400 → foreground 950 (escuro); shade ≥ 500 → foreground 50
+  // Auto-contrast: shade index ≤ index of 400 → use 950 (dark fg); else use 50
   const fgShade: ColorShadeValue = shadeIndex(sel.shade) <= shadeIndex(400) ? 950 : 50
   const fgHsl = getHsl(sel.palette, fgShade)
 
-  root.style.setProperty('--primary',                    primaryHsl)
-  root.style.setProperty('--primary-foreground',         fgHsl)
-  root.style.setProperty('--ring',                       primaryHsl)
-  root.style.setProperty('--sidebar-primary',            primaryHsl)
+  root.style.setProperty('--primary', primaryHsl)
+  root.style.setProperty('--primary-foreground', fgHsl)
+  root.style.setProperty('--ring', primaryHsl)
+  root.style.setProperty('--sidebar-primary', primaryHsl)
   root.style.setProperty('--sidebar-primary-foreground', fgHsl)
-  root.style.setProperty('--sidebar-ring',               primaryHsl)
+  root.style.setProperty('--sidebar-ring', primaryHsl)
 }
 
 // ---------------------------------------------------------------------------
-// Apply neutral CSS vars — automático por modo, sem input do usuário.
-// Usa zinc como paleta neutra base em ambos os modos.
+// Apply neutral CSS vars
+// Light mode: lighter shades for bg; dark mode: darker shades
 // ---------------------------------------------------------------------------
 
-export function applyNeutral(): void {
+export function applyNeutral(sel: PaletteSelection): void {
   const root = document.documentElement
   const isDark = root.classList.contains('dark')
 
   if (isDark) {
-    // dark: fundos sutis e bordas escuras
-    root.style.setProperty('--muted',            getHsl('zinc', 800))
-    root.style.setProperty('--muted-foreground', getHsl('zinc', 400))
-    root.style.setProperty('--border',           getHsl('zinc', 700))
-    root.style.setProperty('--input',            getHsl('zinc', 700))
+    root.style.setProperty('--muted',            getHsl(sel.palette, 800))
+    root.style.setProperty('--muted-foreground', getHsl(sel.palette, 400))
+    root.style.setProperty('--border',           getHsl(sel.palette, 700))
+    root.style.setProperty('--input',            getHsl(sel.palette, 700))
   } else {
-    // light: fundos claros, bordas suaves
-    root.style.setProperty('--muted',            getHsl('zinc', 100))
-    root.style.setProperty('--muted-foreground', getHsl('zinc', 500))
-    root.style.setProperty('--border',           getHsl('zinc', 200))
-    root.style.setProperty('--input',            getHsl('zinc', 200))
+    root.style.setProperty('--muted',            getHsl(sel.palette, 100))
+    root.style.setProperty('--muted-foreground', getHsl(sel.palette, 500))
+    root.style.setProperty('--border',           getHsl(sel.palette, 200))
+    root.style.setProperty('--input',            getHsl(sel.palette, 200))
   }
 }
 
@@ -102,7 +103,9 @@ export function applyNeutral(): void {
 
 interface ColorThemeContextValue {
   primary: PaletteSelection
+  neutral: PaletteSelection
   setPrimary: (sel: PaletteSelection) => void
+  setNeutral: (sel: PaletteSelection) => void
   /** @deprecated — use primary.palette */
   colorTheme: ColorName
   /** @deprecated — use setPrimary */
@@ -111,7 +114,9 @@ interface ColorThemeContextValue {
 
 const ColorThemeContext = React.createContext<ColorThemeContextValue>({
   primary: DEFAULT_PRIMARY,
+  neutral: DEFAULT_NEUTRAL,
   setPrimary: () => {},
+  setNeutral: () => {},
   colorTheme: DEFAULT_PRIMARY.palette as ColorName,
   setColorTheme: () => {},
 })
@@ -122,24 +127,31 @@ const ColorThemeContext = React.createContext<ColorThemeContextValue>({
 
 export function ColorThemeProvider({
   children,
+  defaultColorTheme,
 }: {
   children: React.ReactNode
-  /** @deprecated — ignorado; use localStorage["vaughan-primary"] */
+  /** @deprecated — ignored; use localStorage["vaughan-primary"] */
   defaultColorTheme?: string
 }) {
   const [primary, setPrimaryState] = React.useState<PaletteSelection>(DEFAULT_PRIMARY)
+  const [neutral, setNeutralState] = React.useState<PaletteSelection>(DEFAULT_NEUTRAL)
 
-  // Boot: lê localStorage e aplica primary + neutral
+  // Boot: read from localStorage and apply
   React.useEffect(() => {
     const p = readStorage(PRIMARY_KEY, DEFAULT_PRIMARY)
+    const n = readStorage(NEUTRAL_KEY, DEFAULT_NEUTRAL)
     setPrimaryState(p)
+    setNeutralState(n)
     applyPrimary(p)
-    applyNeutral()
+    applyNeutral(n)
   }, [])
 
-  // Re-aplica neutral automaticamente quando o modo claro/escuro muda
+  // Re-apply neutral when dark-mode class changes
   React.useEffect(() => {
-    const observer = new MutationObserver(() => applyNeutral())
+    const observer = new MutationObserver(() => {
+      const currentNeutral = readStorage(NEUTRAL_KEY, DEFAULT_NEUTRAL)
+      applyNeutral(currentNeutral)
+    })
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class'],
@@ -153,11 +165,19 @@ export function ColorThemeProvider({
     localStorage.setItem(PRIMARY_KEY, JSON.stringify(sel))
   }
 
+  function setNeutral(sel: PaletteSelection) {
+    setNeutralState(sel)
+    applyNeutral(sel)
+    localStorage.setItem(NEUTRAL_KEY, JSON.stringify(sel))
+  }
+
   return (
     <ColorThemeContext.Provider
       value={{
         primary,
+        neutral,
         setPrimary,
+        setNeutral,
         colorTheme: primary.palette as ColorName,
         setColorTheme: (color: ColorName) => setPrimary({ ...primary, palette: color }),
       }}
