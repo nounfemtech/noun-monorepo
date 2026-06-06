@@ -13,7 +13,6 @@ import {
 } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { createSupabaseBrowser } from '@/lib/supabase'
 
@@ -82,19 +81,14 @@ export function Sidebar({ adminName }: SidebarProps) {
       }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-5">
+      <div className="flex items-center gap-3 px-4 py-5">
+        <img src="/logo.svg" width={32} height={32} alt="Noun" />
         <span
-          className="text-xl font-bold"
-          style={{ color: 'hsl(var(--sidebar-primary))' }}
+          className="text-lg font-semibold tracking-tight"
+          style={{ color: 'hsl(var(--sidebar-foreground))' }}
         >
-          noun
+          Vaughan
         </span>
-        <Badge
-          variant="secondary"
-          className="text-xs bg-violet-100 text-violet-700 border-violet-200"
-        >
-          Admin
-        </Badge>
       </div>
 
       <Separator style={{ backgroundColor: 'hsl(var(--sidebar-border))' }} />
