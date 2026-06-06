@@ -5,6 +5,7 @@
 
 export const COLOR_NAMES = [
   'slate', 'gray', 'zinc', 'neutral', 'stone',
+  'taupe', 'mauve', 'mist', 'olive',
   'black', 'red', 'orange', 'amber', 'yellow', 'lime',
   'green', 'emerald', 'teal', 'cyan', 'sky',
   'blue', 'indigo', 'violet', 'purple', 'fuchsia',
@@ -19,9 +20,10 @@ export const CHROMATIC_NAMES = [
   'pink', 'rose',
 ] as const
 
-/** 5 paletas neutras — usadas no picker neutro */
+/** 9 paletas neutras — usadas no picker neutro */
 export const NEUTRAL_NAMES = [
   'slate', 'gray', 'zinc', 'neutral', 'stone',
+  'taupe', 'mauve', 'mist', 'olive',
 ] as const
 
 export type ColorName = (typeof COLOR_NAMES)[number]
@@ -75,6 +77,10 @@ export function hexToHsl(hex: string): string {
 // ---------------------------------------------------------------------------
 export const COLOR_HSL: Record<ColorName, { light: string; dark: string; lightFg: string; darkFg: string }> = {
   black:   { light: '0 0% 9%',          dark: '0 0% 63.9%',      lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
+  taupe:   { light: '22 19% 43%',       dark: '22 24% 56%',      lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
+  mauve:   { light: '267 15% 55%',      dark: '267 20% 68%',     lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
+  mist:    { light: '207 27% 45%',      dark: '207 32% 60%',     lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
+  olive:   { light: '80 24% 35%',       dark: '80 28% 48%',      lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
   slate:   { light: '215 27.9% 16.9%',  dark: '215 16.3% 46.9%', lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
   gray:    { light: '220 8.9% 35.3%',   dark: '220 8.9% 46.1%',  lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
   zinc:    { light: '240 3.7% 15.9%',   dark: '240 5.2% 33.9%',  lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
@@ -103,6 +109,26 @@ export const COLOR_HSL: Record<ColorName, { light: string; dark: string; lightFg
 // Full hex palette — usado no ColorPicker e NativeWind
 // ---------------------------------------------------------------------------
 export const colors: Record<ColorName, ColorShades> = {
+  taupe: {
+    50: '#faf8f5', 100: '#f2ede7', 200: '#e4d9cc', 300: '#cfbfac',
+    400: '#b5a08a', 500: '#9b826c', 600: '#83695a', 700: '#6b554b',
+    800: '#574741', 900: '#473b37', 950: '#281f1b',
+  },
+  mauve: {
+    50: '#fdfcfe', 100: '#f8f5fe', 200: '#ece8f5', 300: '#dad4ea',
+    400: '#c3bbd9', 500: '#a99fc4', 600: '#8e83ac', 700: '#746992',
+    800: '#5e5577', 900: '#4c4460', 950: '#2a2438',
+  },
+  mist: {
+    50: '#f5f8fa', 100: '#e8eef3', 200: '#d0dde7', 300: '#afc4d5',
+    400: '#87a5be', 500: '#6589aa', 600: '#4f7091', 700: '#415c78',
+    800: '#384e63', 900: '#304252', 950: '#1d2834',
+  },
+  olive: {
+    50: '#f8f9f2', 100: '#eef1e0', 200: '#dae1c1', 300: '#c1cc9b',
+    400: '#a5b471', 500: '#8b9b51', 600: '#6d7b3d', 700: '#566233',
+    800: '#47502e', 900: '#3b4529', 950: '#1e2313',
+  },
   black: {
     50: '#f5f5f5', 100: '#e8e8e8', 200: '#d0d0d0', 300: '#b0b0b0',
     400: '#888888', 500: '#5e5e5e', 600: '#3d3d3d', 700: '#2a2a2a',
