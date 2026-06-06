@@ -5,15 +5,15 @@
 
 export const COLOR_NAMES = [
   'slate', 'gray', 'zinc', 'neutral', 'stone',
-  'red', 'orange', 'amber', 'yellow', 'lime',
+  'black', 'red', 'orange', 'amber', 'yellow', 'lime',
   'green', 'emerald', 'teal', 'cyan', 'sky',
   'blue', 'indigo', 'violet', 'purple', 'fuchsia',
   'pink', 'rose',
 ] as const
 
-/** 17 paletas cromáticas — usadas no picker primário */
+/** 18 paletas cromáticas — usadas no picker primário */
 export const CHROMATIC_NAMES = [
-  'red', 'orange', 'amber', 'yellow', 'lime',
+  'black', 'red', 'orange', 'amber', 'yellow', 'lime',
   'green', 'emerald', 'teal', 'cyan', 'sky',
   'blue', 'indigo', 'violet', 'purple', 'fuchsia',
   'pink', 'rose',
@@ -74,6 +74,7 @@ export function hexToHsl(hex: string): string {
 // Format: "H S% L%" (sem "hsl()")
 // ---------------------------------------------------------------------------
 export const COLOR_HSL: Record<ColorName, { light: string; dark: string; lightFg: string; darkFg: string }> = {
+  black:   { light: '0 0% 9%',          dark: '0 0% 63.9%',      lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
   slate:   { light: '215 27.9% 16.9%',  dark: '215 16.3% 46.9%', lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
   gray:    { light: '220 8.9% 35.3%',   dark: '220 8.9% 46.1%',  lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
   zinc:    { light: '240 3.7% 15.9%',   dark: '240 5.2% 33.9%',  lightFg: '0 0% 100%',   darkFg: '0 0% 100%' },
@@ -102,6 +103,11 @@ export const COLOR_HSL: Record<ColorName, { light: string; dark: string; lightFg
 // Full hex palette — usado no ColorPicker e NativeWind
 // ---------------------------------------------------------------------------
 export const colors: Record<ColorName, ColorShades> = {
+  black: {
+    50: '#f5f5f5', 100: '#e8e8e8', 200: '#d0d0d0', 300: '#b0b0b0',
+    400: '#888888', 500: '#5e5e5e', 600: '#3d3d3d', 700: '#2a2a2a',
+    800: '#1a1a1a', 900: '#0d0d0d', 950: '#000000',
+  },
   slate: {
     50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
     400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',

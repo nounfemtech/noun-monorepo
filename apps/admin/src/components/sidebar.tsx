@@ -77,7 +77,7 @@ export function Sidebar({ adminName }: SidebarProps) {
 
   return (
     <aside
-      className="hidden md:flex flex-col w-60 min-h-screen border-r"
+      className="hidden md:flex flex-col w-60 h-screen border-r overflow-y-auto"
       style={{
         backgroundColor: 'hsl(var(--sidebar-background))',
         color: 'hsl(var(--sidebar-foreground))',
