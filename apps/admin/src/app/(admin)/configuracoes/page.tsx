@@ -1,11 +1,12 @@
 'use client'
 
 import * as React from 'react'
-import { PrimaryColorPicker, NeutralColorPicker } from '@noun/ui'
+import { PrimaryColorPicker } from '@noun/ui'
 import { useSpacemanTheme } from '@space-man/react-theme-animation'
 import type { Theme } from '@space-man/react-theme-animation'
 import { IconSun, IconMoon, IconDeviceDesktop } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 
 const MODES: { value: Theme; label: string; Icon: React.FC<{ size?: number }> }[] = [
@@ -54,7 +55,7 @@ function ThemeModeSwitcher() {
 
 export default function ConfiguracoesPage() {
   return (
-    <div className="p-6 max-w-2xl space-y-8">
+    <div className="p-6 max-w-2xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Configurações</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -64,8 +65,8 @@ export default function ConfiguracoesPage() {
 
       <Separator />
 
-      {/* Aparência */}
-      <section className="space-y-8">
+      {/* ── Modo de tema ── */}
+      <section className="space-y-3">
         <div>
           <h2 className="text-base font-medium">Aparência</h2>
           <p className="text-sm text-muted-foreground mt-0.5">
@@ -73,37 +74,35 @@ export default function ConfiguracoesPage() {
           </p>
         </div>
 
-        {/* Modo: Light / System / Dark */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <p className="text-sm font-medium">Modo</p>
           <ThemeModeSwitcher />
         </div>
+      </section>
 
-        <Separator />
+      <Separator />
 
-        {/* Cor primária */}
-        <div className="space-y-2">
-          <div>
-            <p className="text-sm font-medium">Cor primária</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Selecione a paleta e a tonalidade principal da interface.
-            </p>
-          </div>
-          <PrimaryColorPicker />
+      {/* ── Cor primária ── */}
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-base font-medium">Cor primária</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Define a cor de destaque em botões, links e elementos interativos.
+            Os tons neutros são ajustados automaticamente de acordo com a cor e o modo.
+          </p>
         </div>
 
-        <Separator />
-
-        {/* Cor neutra */}
-        <div className="space-y-2">
-          <div>
-            <p className="text-sm font-medium">Tons neutros</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Controla bordas, fundos secundários e textos auxiliares.
-            </p>
-          </div>
-          <NeutralColorPicker />
-        </div>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Paleta e tonalidade</CardTitle>
+            <CardDescription>
+              Escolha a cor e a intensidade para toda a interface.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <PrimaryColorPicker />
+          </CardContent>
+        </Card>
       </section>
     </div>
   )

@@ -16,7 +16,6 @@ export {
   applyPrimary,
   applyNeutral,
   DEFAULT_PRIMARY,
-  DEFAULT_NEUTRAL,
 } from './providers/color-theme-provider'
 
 // Componentes compartilhados

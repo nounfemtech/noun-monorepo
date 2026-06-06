@@ -14,7 +14,8 @@
 @layer base {
   :root {
     /* Shadcn/UI — base semântica */
-    --background:          0 0% 100%;
+    /* Fundo da página levemente acinzentado; card/sidebar/popover = branco */
+    --background:          240 4.8% 95.9%;
     --foreground:          222.2 84% 4.9%;
     --card:                0 0% 100%;
     --card-foreground:     222.2 84% 4.9%;
@@ -46,8 +47,8 @@
     --border:              240 5.9% 90%;
     --input:               240 5.9% 90%;
 
-    /* Sidebar (admin) */
-    --sidebar-background:         240 5.9% 97%;
+    /* Sidebar (admin) — branco no modo claro */
+    --sidebar-background:         0 0% 100%;
     --sidebar-foreground:         240 5.3% 26.1%;
     --sidebar-primary:            47.9 95.8% 53.1%;
     --sidebar-primary-foreground: 222.2 84% 4.9%;
