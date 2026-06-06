@@ -32,10 +32,6 @@ export type NeutralName = (typeof NEUTRAL_NAMES)[number]
 export const COLOR_SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const
 export type ColorShadeValue = (typeof COLOR_SHADES)[number]
 
-/** Shades expostos no color picker — a partir de 100 (50 excluído) */
-export const PICKER_SHADES = [100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const
-export type PickerShadeValue = (typeof PICKER_SHADES)[number]
-
 /** Seleção persistida no localStorage */
 export interface PaletteSelection {
   palette: ColorName
