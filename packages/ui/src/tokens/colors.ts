@@ -11,11 +11,62 @@ export const COLOR_NAMES = [
   'pink', 'rose',
 ] as const
 
+/** 17 paletas cromáticas — usadas no picker primário */
+export const CHROMATIC_NAMES = [
+  'red', 'orange', 'amber', 'yellow', 'lime',
+  'green', 'emerald', 'teal', 'cyan', 'sky',
+  'blue', 'indigo', 'violet', 'purple', 'fuchsia',
+  'pink', 'rose',
+] as const
+
+/** 5 paletas neutras — usadas no picker neutro */
+export const NEUTRAL_NAMES = [
+  'slate', 'gray', 'zinc', 'neutral', 'stone',
+] as const
+
 export type ColorName = (typeof COLOR_NAMES)[number]
+export type ChromaticName = (typeof CHROMATIC_NAMES)[number]
+export type NeutralName = (typeof NEUTRAL_NAMES)[number]
+
+/** Shades disponíveis para seleção */
+export const COLOR_SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const
+export type ColorShadeValue = (typeof COLOR_SHADES)[number]
+
+/** Seleção persistida no localStorage */
+export interface PaletteSelection {
+  palette: ColorName
+  shade: ColorShadeValue
+}
 
 export type ColorShades = {
   50: string; 100: string; 200: string; 300: string; 400: string
   500: string; 600: string; 700: string; 800: string; 900: string; 950: string
+}
+
+/** HSL completo por paleta × shade (formato "H S% L%", sem hsl()) */
+export type HslShades = Record<ColorShadeValue, string>
+export type FullHslMap = Record<ColorName, HslShades>
+
+// ---------------------------------------------------------------------------
+// Utility: convert hex → "H S% L%" string (sem hsl())
+// ---------------------------------------------------------------------------
+export function hexToHsl(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  if (max === min) return `0 0% ${Math.round(l * 1000) / 10}%`
+  const d = max - min
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+  let h: number
+  switch (max) {
+    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break
+    case g: h = ((b - r) / d + 2) / 6; break
+    default: h = ((r - g) / d + 4) / 6
+  }
+  return `${Math.round(h * 3600) / 10} ${Math.round(s * 1000) / 10}% ${Math.round(l * 1000) / 10}%`
 }
 
 // ---------------------------------------------------------------------------

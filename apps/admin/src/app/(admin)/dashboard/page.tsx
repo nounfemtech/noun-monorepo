@@ -213,25 +213,25 @@ async function DashboardContent() {
         <StatsCard
           title="Total de pacientes"
           value={patientsCount.toLocaleString('pt-BR')}
-          icon={<IconUser size={18} className="text-blue-600" />}
+          icon={<IconUser size={18} className="text-primary" />}
           description="Cadastrados na plataforma"
         />
         <StatsCard
           title="Profissionais ativos"
           value={professionalsCount.toLocaleString('pt-BR')}
-          icon={<IconStethoscope size={18} className="text-green-600" />}
+          icon={<IconStethoscope size={18} className="text-primary" />}
           description="Médicos, nutricionistas e psicólogos"
         />
         <StatsCard
           title="Farmácias ativas"
           value={pharmaciesCount.toLocaleString('pt-BR')}
-          icon={<IconBuildingStore size={18} className="text-orange-600" />}
+          icon={<IconBuildingStore size={18} className="text-primary" />}
           description="Parceiras da plataforma"
         />
         <StatsCard
           title="Consultas realizadas"
           value={appointmentsCount.toLocaleString('pt-BR')}
-          icon={<IconCalendarCheck size={18} className="text-purple-600" />}
+          icon={<IconCalendarCheck size={18} className="text-primary" />}
           description="Total de consultas concluídas"
         />
       </div>
@@ -241,28 +241,28 @@ async function DashboardContent() {
         <StatsCard
           title="GMV acumulado"
           value={brl.format(totalGmv)}
-          icon={<IconTrendingUp size={18} className="text-green-700" />}
+          icon={<IconTrendingUp size={18} className="text-primary" />}
           description="Volume total transacionado"
           highlight
         />
         <StatsCard
           title="Receita Noun acumulada"
           value={brl.format(nounsRevenue)}
-          icon={<IconCurrencyReal size={18} className="text-violet-700" />}
+          icon={<IconCurrencyReal size={18} className="text-primary" />}
           description="Take rate sobre GMV total"
           highlight
         />
         <StatsCard
           title="GMV este mês"
           value={brl.format(monthGmv)}
-          icon={<IconCalendar size={18} className="text-blue-600" />}
+          icon={<IconCalendar size={18} className="text-primary" />}
           description="Clínico + Farmácia"
           highlight
         />
         <StatsCard
           title="Receita este mês"
           value={brl.format(monthRevenue)}
-          icon={<IconCoins size={18} className="text-violet-600" />}
+          icon={<IconCoins size={18} className="text-primary" />}
           description="Receita líquida Noun"
           highlight
         />
