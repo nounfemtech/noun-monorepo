@@ -25,6 +25,7 @@ const CHROMATIC_LABELS: Record<ChromaticName, string> = {
 
 const NEUTRAL_LABELS: Record<NeutralName, string> = {
   slate: 'Slate', gray: 'Gray', zinc: 'Zinc', neutral: 'Neutral', stone: 'Stone',
+  taupe: 'Taupe', mauve: 'Mauve', mist: 'Mist', olive: 'Olive',
 }
 
 // Shades expostos no picker — começa em 100 (50 excluído)
@@ -49,7 +50,7 @@ function ColorItem({
     <button
       onClick={onClick}
       className={[
-        'flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition-colors',
+        'flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 text-sm transition-colors w-full',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
         isActive
           ? 'bg-muted border-border text-foreground font-medium'
@@ -66,7 +67,7 @@ function ColorItem({
 }
 
 // ---------------------------------------------------------------------------
-// PrimaryColorPicker — 17 paletas cromáticas em grade 3 colunas
+// PrimaryColorPicker — 18 paletas cromáticas em grade 3 colunas
 // ---------------------------------------------------------------------------
 
 export function PrimaryColorPicker({ className }: { className?: string }) {
@@ -76,7 +77,7 @@ export function PrimaryColorPicker({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label="Cor primária"
-      className={['flex flex-wrap gap-1.5', className].filter(Boolean).join(' ')}
+      className={['grid grid-cols-3 gap-1.5 max-w-sm', className].filter(Boolean).join(' ')}
     >
       {CHROMATIC_NAMES.map((name) => (
         <ColorItem
@@ -102,7 +103,7 @@ export function ShadeColorPicker({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label="Tonalidade"
-      className={['flex flex-wrap gap-1.5', className].filter(Boolean).join(' ')}
+      className={['grid grid-cols-3 gap-1.5 max-w-sm', className].filter(Boolean).join(' ')}
     >
       {PICKER_SHADES.map((shade) => (
         <ColorItem
@@ -118,7 +119,7 @@ export function ShadeColorPicker({ className }: { className?: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// NeutralColorPicker — 5 paletas neutras, grade 3 colunas (sem shade)
+// NeutralColorPicker — 9 paletas neutras, grade 3 colunas (sem shade)
 // O shade é calculado automaticamente pelo provider (Tailwind v4 defaults).
 // ---------------------------------------------------------------------------
 
@@ -129,7 +130,7 @@ export function NeutralColorPicker({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label="Tons neutros"
-      className={['flex flex-wrap gap-1.5', className].filter(Boolean).join(' ')}
+      className={['grid grid-cols-3 gap-1.5 max-w-sm', className].filter(Boolean).join(' ')}
     >
       {NEUTRAL_NAMES.map((name) => (
         <ColorItem
