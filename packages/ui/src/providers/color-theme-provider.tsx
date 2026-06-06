@@ -1,22 +1,123 @@
 'use client'
 
 import * as React from 'react'
-import { COLOR_NAMES, type ColorName } from '../tokens/colors'
+import {
+  colors,
+  hexToHsl,
+  COLOR_SHADES,
+  type ColorName,
+  type ColorShadeValue,
+  type PaletteSelection,
+} from '../tokens/colors'
 
-const STORAGE_KEY = 'noun-color-theme'
-const DEFAULT_COLOR: ColorName = 'violet'
+// ---------------------------------------------------------------------------
+// Storage keys + defaults
+// ---------------------------------------------------------------------------
+
+const PRIMARY_KEY = 'vaughan-primary'
+const NEUTRAL_KEY = 'vaughan-neutral'
+
+export const DEFAULT_PRIMARY: PaletteSelection = { palette: 'yellow', shade: 400 }
+export const DEFAULT_NEUTRAL: PaletteSelection = { palette: 'zinc', shade: 950 }
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+const SHADE_ORDER: ColorShadeValue[] = [...COLOR_SHADES]
+
+function shadeIndex(shade: ColorShadeValue): number {
+  return SHADE_ORDER.indexOf(shade)
+}
+
+function getHsl(palette: ColorName, shade: ColorShadeValue): string {
+  return hexToHsl(colors[palette][shade])
+}
+
+/** Reads a PaletteSelection from localStorage, falls back to defaultVal */
+function readStorage(key: string, defaultVal: PaletteSelection): PaletteSelection {
+  try {
+    const raw = localStorage.getItem(key)
+    if (!raw) return defaultVal
+    const parsed = JSON.parse(raw) as Partial<PaletteSelection>
+    if (
+      parsed.palette &&
+      typeof parsed.palette === 'string' &&
+      parsed.shade &&
+      typeof parsed.shade === 'number' &&
+      (SHADE_ORDER as number[]).includes(parsed.shade) &&
+      colors[parsed.palette as ColorName]
+    ) {
+      return parsed as PaletteSelection
+    }
+  } catch {
+    // ignore
+  }
+  return defaultVal
+}
+
+// ---------------------------------------------------------------------------
+// Apply primary CSS vars
+// ---------------------------------------------------------------------------
+
+export function applyPrimary(sel: PaletteSelection): void {
+  const root = document.documentElement
+  const primaryHsl = getHsl(sel.palette, sel.shade)
+  // Auto-contrast: shade index ≤ index of 400 → use 950 (dark fg); else use 50
+  const fgShade: ColorShadeValue = shadeIndex(sel.shade) <= shadeIndex(400) ? 950 : 50
+  const fgHsl = getHsl(sel.palette, fgShade)
+
+  root.style.setProperty('--primary', primaryHsl)
+  root.style.setProperty('--primary-foreground', fgHsl)
+  root.style.setProperty('--ring', primaryHsl)
+  root.style.setProperty('--sidebar-primary', primaryHsl)
+  root.style.setProperty('--sidebar-primary-foreground', fgHsl)
+  root.style.setProperty('--sidebar-ring', primaryHsl)
+}
+
+// ---------------------------------------------------------------------------
+// Apply neutral CSS vars
+// Light mode: lighter shades for bg; dark mode: darker shades
+// ---------------------------------------------------------------------------
+
+export function applyNeutral(sel: PaletteSelection): void {
+  const root = document.documentElement
+  const isDark = root.classList.contains('dark')
+
+  if (isDark) {
+    root.style.setProperty('--muted',            getHsl(sel.palette, 800))
+    root.style.setProperty('--muted-foreground', getHsl(sel.palette, 400))
+    root.style.setProperty('--border',           getHsl(sel.palette, 700))
+    root.style.setProperty('--input',            getHsl(sel.palette, 700))
+  } else {
+    root.style.setProperty('--muted',            getHsl(sel.palette, 100))
+    root.style.setProperty('--muted-foreground', getHsl(sel.palette, 500))
+    root.style.setProperty('--border',           getHsl(sel.palette, 200))
+    root.style.setProperty('--input',            getHsl(sel.palette, 200))
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Context
 // ---------------------------------------------------------------------------
 
 interface ColorThemeContextValue {
+  primary: PaletteSelection
+  neutral: PaletteSelection
+  setPrimary: (sel: PaletteSelection) => void
+  setNeutral: (sel: PaletteSelection) => void
+  /** @deprecated — use primary.palette */
   colorTheme: ColorName
+  /** @deprecated — use setPrimary */
   setColorTheme: (color: ColorName) => void
 }
 
 const ColorThemeContext = React.createContext<ColorThemeContextValue>({
-  colorTheme: DEFAULT_COLOR,
+  primary: DEFAULT_PRIMARY,
+  neutral: DEFAULT_NEUTRAL,
+  setPrimary: () => {},
+  setNeutral: () => {},
+  colorTheme: DEFAULT_PRIMARY.palette as ColorName,
   setColorTheme: () => {},
 })
 
@@ -26,35 +127,61 @@ const ColorThemeContext = React.createContext<ColorThemeContextValue>({
 
 export function ColorThemeProvider({
   children,
-  defaultColorTheme = DEFAULT_COLOR,
+  defaultColorTheme,
 }: {
   children: React.ReactNode
-  defaultColorTheme?: ColorName
+  /** @deprecated — ignored; use localStorage["vaughan-primary"] */
+  defaultColorTheme?: string
 }) {
-  const [colorTheme, setColorThemeState] = React.useState<ColorName>(defaultColorTheme)
+  const [primary, setPrimaryState] = React.useState<PaletteSelection>(DEFAULT_PRIMARY)
+  const [neutral, setNeutralState] = React.useState<PaletteSelection>(DEFAULT_NEUTRAL)
 
-  // Lê do localStorage na montagem e aplica o atributo no <html>
+  // Boot: read from localStorage and apply
   React.useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as ColorName | null
-    const initial = stored && (COLOR_NAMES as ReadonlyArray<string>).includes(stored)
-      ? (stored as ColorName)
-      : defaultColorTheme
-    setColorThemeState(initial)
-    applyAttribute(initial)
-  }, [defaultColorTheme])
+    const p = readStorage(PRIMARY_KEY, DEFAULT_PRIMARY)
+    const n = readStorage(NEUTRAL_KEY, DEFAULT_NEUTRAL)
+    setPrimaryState(p)
+    setNeutralState(n)
+    applyPrimary(p)
+    applyNeutral(n)
+  }, [])
 
-  function applyAttribute(color: ColorName) {
-    document.documentElement.setAttribute('data-color-theme', color)
+  // Re-apply neutral when dark-mode class changes
+  React.useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const currentNeutral = readStorage(NEUTRAL_KEY, DEFAULT_NEUTRAL)
+      applyNeutral(currentNeutral)
+    })
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+    return () => observer.disconnect()
+  }, [])
+
+  function setPrimary(sel: PaletteSelection) {
+    setPrimaryState(sel)
+    applyPrimary(sel)
+    localStorage.setItem(PRIMARY_KEY, JSON.stringify(sel))
   }
 
-  function setColorTheme(color: ColorName) {
-    setColorThemeState(color)
-    applyAttribute(color)
-    localStorage.setItem(STORAGE_KEY, color)
+  function setNeutral(sel: PaletteSelection) {
+    setNeutralState(sel)
+    applyNeutral(sel)
+    localStorage.setItem(NEUTRAL_KEY, JSON.stringify(sel))
   }
 
   return (
-    <ColorThemeContext.Provider value={{ colorTheme, setColorTheme }}>
+    <ColorThemeContext.Provider
+      value={{
+        primary,
+        neutral,
+        setPrimary,
+        setNeutral,
+        colorTheme: primary.palette as ColorName,
+        setColorTheme: (color: ColorName) => setPrimary({ ...primary, palette: color }),
+      }}
+    >
       {children}
     </ColorThemeContext.Provider>
   )

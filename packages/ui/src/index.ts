@@ -10,11 +10,18 @@ export * from './tokens'
 
 // Providers
 export { ThemeProvider } from './providers/theme-provider'
-export { ColorThemeProvider, useColorTheme } from './providers/color-theme-provider'
+export {
+  ColorThemeProvider,
+  useColorTheme,
+  applyPrimary,
+  applyNeutral,
+  DEFAULT_PRIMARY,
+  DEFAULT_NEUTRAL,
+} from './providers/color-theme-provider'
 
 // Componentes compartilhados
 export { ThemeSwitcher } from './components/theme-switcher'
-export { ColorPicker } from './components/color-picker'
+export { ColorPicker, PrimaryColorPicker, NeutralColorPicker } from './components/color-picker'
 
 // Componentes Shadcn/UI (adicionados via shadcn add em cada app)
 // Os componentes gerados pelo Shadcn ficam em cada app — não aqui.
