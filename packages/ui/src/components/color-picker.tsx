@@ -50,7 +50,7 @@ function ColorItem({
     <button
       onClick={onClick}
       className={[
-        'flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 text-sm transition-colors w-full',
+        'flex items-center gap-2 px-3 py-2.5 rounded-lg border-[1.5px] text-sm transition-colors w-full',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
         isActive
           ? 'bg-muted border-border text-foreground font-medium'
