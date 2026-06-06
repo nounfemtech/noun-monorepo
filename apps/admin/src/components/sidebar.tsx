@@ -10,7 +10,10 @@ import {
   IconCurrencyReal,
   IconSettings,
   IconLogout,
+  IconSun,
+  IconMoon,
 } from '@tabler/icons-react'
+import { useSpacemanTheme } from '@space-man/react-theme-animation'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
@@ -57,6 +60,7 @@ interface SidebarProps {
 export function Sidebar({ adminName }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const { ref, toggleTheme, resolvedTheme } = useSpacemanTheme()
 
   const initials = adminName
     .split(' ')
@@ -139,6 +143,17 @@ export function Sidebar({ adminName }: SidebarProps) {
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate">{adminName}</p>
         </div>
+
+        {/* Toggle tema com animação circular */}
+        <button
+          ref={ref}
+          onClick={toggleTheme}
+          className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+          title={resolvedTheme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+        >
+          {resolvedTheme === 'dark' ? <IconSun size={16} /> : <IconMoon size={16} />}
+        </button>
+
         <button
           onClick={handleLogout}
           className="text-destructive hover:text-destructive/80 transition-colors p-1 rounded"

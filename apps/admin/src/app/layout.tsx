@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Reddit_Sans, Reddit_Mono } from 'next/font/google'
-import { ThemeProvider, ColorThemeProvider } from '@noun/ui'
+import { SpacemanThemeProvider, ThemeAnimationType } from '@space-man/react-theme-animation'
+import { ColorThemeProvider } from '@noun/ui'
 import './globals.css'
 
 const fontSans = Reddit_Sans({
@@ -26,11 +27,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${fontSans.variable} ${fontMono.variable}`}>
-        <ThemeProvider>
-          <ColorThemeProvider defaultColorTheme="violet">
+        <SpacemanThemeProvider
+          defaultTheme="system"
+          animationType={ThemeAnimationType.CIRCLE}
+          duration={500}
+        >
+          <ColorThemeProvider defaultColorTheme="yellow">
             {children}
           </ColorThemeProvider>
-        </ThemeProvider>
+        </SpacemanThemeProvider>
       </body>
     </html>
   )

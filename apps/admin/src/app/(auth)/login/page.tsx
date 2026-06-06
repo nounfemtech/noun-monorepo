@@ -63,9 +63,8 @@ export default function LoginPage() {
     <div className="grid min-h-svh lg:grid-cols-2">
       {/* Coluna esquerda — logo + formulário */}
       <div className="flex flex-col gap-6 p-8 md:p-12">
-        {/* Logo + nome */}
-        <div className="flex items-center gap-3">
-          <img src="/logo.svg" width={48} height={48} alt="Noun" />
+        {/* Wordmark */}
+        <div className="flex items-center">
           <span className="text-xl font-semibold tracking-tight">Vaughan</span>
         </div>
 
@@ -121,17 +120,7 @@ export default function LoginPage() {
 
       {/* Coluna direita — visual de capa (hidden em mobile) */}
       <div className="relative hidden lg:flex flex-col bg-gradient-to-br from-violet-600 via-purple-500 to-pink-400">
-        {/* Watermark da logo centralizada */}
-        <div className="flex flex-1 items-center justify-center">
-          <img
-            src="/logo.svg"
-            width={120}
-            height={120}
-            alt=""
-            aria-hidden="true"
-            className="opacity-20"
-          />
-        </div>
+        <div className="flex-1" />
 
         {/* Quote no canto inferior */}
         <div className="p-10 text-white space-y-2">

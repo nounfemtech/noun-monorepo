@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   transpilePackages: ['@noun/ui', '@noun/config'],
   experimental: {
     typedRoutes: true,
+    viewTransition: true,
   },
 }
 
