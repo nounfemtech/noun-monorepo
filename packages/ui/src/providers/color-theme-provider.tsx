@@ -77,7 +77,9 @@ export function applyPrimary(sel: PaletteSelection): void {
 
 // ---------------------------------------------------------------------------
 // Apply neutral CSS vars
-// Light mode: lighter shades for bg; dark mode: darker shades
+// Shades seguem o padrão Tailwind v4: 100/500/200 no light, 800/400/700 no dark.
+// Controla: --muted (fundo secundário), --muted-foreground (texto auxiliar),
+//           --border (bordas), --input (bordas de input)
 // ---------------------------------------------------------------------------
 
 export function applyNeutral(sel: PaletteSelection): void {
@@ -85,15 +87,23 @@ export function applyNeutral(sel: PaletteSelection): void {
   const isDark = root.classList.contains('dark')
 
   if (isDark) {
+    // Tailwind v4 dark defaults: fundos escuros, bordas sutis, texto médio
     root.style.setProperty('--muted',            getHsl(sel.palette, 800))
     root.style.setProperty('--muted-foreground', getHsl(sel.palette, 400))
     root.style.setProperty('--border',           getHsl(sel.palette, 700))
     root.style.setProperty('--input',            getHsl(sel.palette, 700))
+    root.style.setProperty('--sidebar-border',   getHsl(sel.palette, 700))
+    root.style.setProperty('--sidebar-accent',   getHsl(sel.palette, 800))
+    root.style.setProperty('--sidebar-accent-foreground', getHsl(sel.palette, 100))
   } else {
+    // Tailwind v4 light defaults: fundos quase-brancos, bordas leves, texto cinza médio
     root.style.setProperty('--muted',            getHsl(sel.palette, 100))
     root.style.setProperty('--muted-foreground', getHsl(sel.palette, 500))
     root.style.setProperty('--border',           getHsl(sel.palette, 200))
     root.style.setProperty('--input',            getHsl(sel.palette, 200))
+    root.style.setProperty('--sidebar-border',   getHsl(sel.palette, 200))
+    root.style.setProperty('--sidebar-accent',   getHsl(sel.palette, 100))
+    root.style.setProperty('--sidebar-accent-foreground', getHsl(sel.palette, 700))
   }
 }
 

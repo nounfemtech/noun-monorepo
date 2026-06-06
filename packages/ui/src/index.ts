@@ -21,7 +21,7 @@ export {
 
 // Componentes compartilhados
 export { ThemeSwitcher } from './components/theme-switcher'
-export { ColorPicker, PrimaryColorPicker, NeutralColorPicker } from './components/color-picker'
+export { ColorPicker, PrimaryColorPicker, NeutralColorPicker, ShadeColorPicker } from './components/color-picker'
 
 // Componentes Shadcn/UI (adicionados via shadcn add em cada app)
 // Os componentes gerados pelo Shadcn ficam em cada app — não aqui.
