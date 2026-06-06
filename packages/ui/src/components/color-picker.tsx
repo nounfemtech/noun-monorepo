@@ -17,9 +17,9 @@ import {
 // ---------------------------------------------------------------------------
 
 const CHROMATIC_LABELS: Record<ChromaticName, string> = {
-  red: 'Red', orange: 'Orange', amber: 'Amber', yellow: 'Yellow', lime: 'Lime',
-  green: 'Green', emerald: 'Emerald', teal: 'Teal', cyan: 'Cyan', sky: 'Sky',
-  blue: 'Blue', indigo: 'Indigo', violet: 'Violet', purple: 'Purple',
+  black: 'Black', red: 'Red', orange: 'Orange', amber: 'Amber', yellow: 'Yellow',
+  lime: 'Lime', green: 'Green', emerald: 'Emerald', teal: 'Teal', cyan: 'Cyan',
+  sky: 'Sky', blue: 'Blue', indigo: 'Indigo', violet: 'Violet', purple: 'Purple',
   fuchsia: 'Fuchsia', pink: 'Pink', rose: 'Rose',
 }
 
@@ -49,7 +49,7 @@ function ColorItem({
     <button
       onClick={onClick}
       className={[
-        'flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition-colors w-full',
+        'flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
         isActive
           ? 'bg-muted border-border text-foreground font-medium'
@@ -76,13 +76,13 @@ export function PrimaryColorPicker({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label="Cor primária"
-      className={['grid grid-cols-3 gap-1.5', className].filter(Boolean).join(' ')}
+      className={['flex flex-wrap gap-1.5', className].filter(Boolean).join(' ')}
     >
       {CHROMATIC_NAMES.map((name) => (
         <ColorItem
           key={name}
           label={CHROMATIC_LABELS[name]}
-          dotColor={colors[name][500]}
+          dotColor={name === 'black' ? colors[name][950] : colors[name][500]}
           isActive={primary.palette === name}
           onClick={() => setPrimary({ ...primary, palette: name })}
         />
@@ -102,7 +102,7 @@ export function ShadeColorPicker({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label="Tonalidade"
-      className={['grid grid-cols-3 gap-1.5', className].filter(Boolean).join(' ')}
+      className={['flex flex-wrap gap-1.5', className].filter(Boolean).join(' ')}
     >
       {PICKER_SHADES.map((shade) => (
         <ColorItem
@@ -129,7 +129,7 @@ export function NeutralColorPicker({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label="Tons neutros"
-      className={['grid grid-cols-3 gap-1.5', className].filter(Boolean).join(' ')}
+      className={['flex flex-wrap gap-1.5', className].filter(Boolean).join(' ')}
     >
       {NEUTRAL_NAMES.map((name) => (
         <ColorItem
