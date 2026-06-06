@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { PrimaryColorPicker, NeutralColorPicker } from '@noun/ui'
+import { PrimaryColorPicker, ShadeColorPicker, NeutralColorPicker } from '@noun/ui'
 import { useSpacemanTheme } from '@space-man/react-theme-animation'
 import type { Theme } from '@space-man/react-theme-animation'
 import { IconSun, IconMoon, IconDeviceDesktop } from '@tabler/icons-react'
@@ -64,7 +64,6 @@ export default function ConfiguracoesPage() {
 
       <Separator />
 
-      {/* Aparência */}
       <section className="space-y-8">
         <div>
           <h2 className="text-base font-medium">Aparência</h2>
@@ -73,7 +72,7 @@ export default function ConfiguracoesPage() {
           </p>
         </div>
 
-        {/* Modo: Light / System / Dark */}
+        {/* Modo */}
         <div className="space-y-2">
           <p className="text-sm font-medium">Modo</p>
           <ThemeModeSwitcher />
@@ -86,7 +85,7 @@ export default function ConfiguracoesPage() {
           <div>
             <p className="text-sm font-medium">Cor primária</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Selecione a paleta e a tonalidade principal da interface.
+              Define a cor de destaque em botões, links e elementos interativos.
             </p>
           </div>
           <PrimaryColorPicker />
@@ -94,7 +93,20 @@ export default function ConfiguracoesPage() {
 
         <Separator />
 
-        {/* Cor neutra */}
+        {/* Tonalidade */}
+        <div className="space-y-2">
+          <div>
+            <p className="text-sm font-medium">Tonalidade</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Intensidade da cor primária selecionada.
+            </p>
+          </div>
+          <ShadeColorPicker />
+        </div>
+
+        <Separator />
+
+        {/* Tons neutros */}
         <div className="space-y-2">
           <div>
             <p className="text-sm font-medium">Tons neutros</p>

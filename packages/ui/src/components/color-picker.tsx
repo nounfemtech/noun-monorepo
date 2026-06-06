@@ -6,17 +6,15 @@ import { useColorTheme } from '../providers/color-theme-provider'
 import {
   CHROMATIC_NAMES,
   NEUTRAL_NAMES,
-  COLOR_SHADES,
   colors,
   type ChromaticName,
   type NeutralName,
   type ColorName,
   type ColorShadeValue,
-  type PaletteSelection,
 } from '../tokens/colors'
 
 // ---------------------------------------------------------------------------
-// Label maps
+// Labels
 // ---------------------------------------------------------------------------
 
 const CHROMATIC_LABELS: Record<ChromaticName, string> = {
@@ -30,71 +28,110 @@ const NEUTRAL_LABELS: Record<NeutralName, string> = {
   slate: 'Slate', gray: 'Gray', zinc: 'Zinc', neutral: 'Neutral', stone: 'Stone',
 }
 
+// Shades expostos no picker — começa em 100 (50 excluído)
+const PICKER_SHADES = [100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const
+type PickerShade = (typeof PICKER_SHADES)[number]
+
 // ---------------------------------------------------------------------------
-// TwoLevelPicker — generic: palette grid → shade strip
+// PaletteCircles — base interna: grid de círculos de paleta (sem shade strip)
 // ---------------------------------------------------------------------------
 
-interface TwoLevelPickerProps<T extends ColorName> {
+interface PaletteCirclesProps<T extends ColorName> {
   palettes: readonly T[]
   labels: Record<T, string>
-  value: PaletteSelection
-  onChange: (sel: PaletteSelection) => void
-  defaultShade: ColorShadeValue
+  selected: ColorName
+  onSelect: (palette: T) => void
+  className?: string
 }
 
-function TwoLevelPicker<T extends ColorName>({
+function PaletteCircles<T extends ColorName>({
   palettes,
   labels,
-  value,
-  onChange,
-  defaultShade,
-}: TwoLevelPickerProps<T>) {
-  const [hovered, setHovered] = React.useState<T | null>(null)
-  const previewPalette = hovered ?? (value.palette as T)
+  selected,
+  onSelect,
+  className,
+}: PaletteCirclesProps<T>) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Paleta"
+      className={['flex flex-wrap gap-1.5', className].filter(Boolean).join(' ')}
+    >
+      {palettes.map((p) => {
+        const isActive = selected === p
+        return (
+          <button
+            key={p}
+            role="radio"
+            aria-checked={isActive}
+            aria-label={labels[p]}
+            title={labels[p]}
+            onClick={() => onSelect(p)}
+            className={[
+              'relative h-6 w-6 rounded-full border-2 transition-all',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              'hover:scale-110 active:scale-95',
+              isActive
+                ? 'border-foreground shadow-md scale-110'
+                : 'border-transparent hover:border-foreground/30',
+            ].join(' ')}
+            style={{ backgroundColor: colors[p][500] }}
+          >
+            {isActive && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <IconCheck size={11} className="text-white drop-shadow-sm" strokeWidth={3} />
+              </span>
+            )}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
-  function handlePaletteClick(p: T) {
-    if (value.palette === p) return // já selecionado, mantém shade
-    onChange({ palette: p, shade: defaultShade })
-  }
+// ---------------------------------------------------------------------------
+// PrimaryColorPicker — 17 paletas cromáticas, círculos apenas
+// ---------------------------------------------------------------------------
 
-  function handleShadeClick(shade: ColorShadeValue) {
-    onChange({ palette: value.palette, shade })
-  }
+export function PrimaryColorPicker({ className }: { className?: string }) {
+  const { primary, setPrimary } = useColorTheme()
+  return (
+    <PaletteCircles
+      palettes={CHROMATIC_NAMES}
+      labels={CHROMATIC_LABELS}
+      selected={primary.palette}
+      onSelect={(palette) => setPrimary({ ...primary, palette })}
+      className={className}
+    />
+  )
+}
+
+// ---------------------------------------------------------------------------
+// ShadeColorPicker — círculos de tonalidade (100–950) da paleta primária ativa
+// ---------------------------------------------------------------------------
+
+export function ShadeColorPicker({ className }: { className?: string }) {
+  const { primary, setPrimary } = useColorTheme()
 
   return (
-    <div className="space-y-3">
-      {/* Linha de preview da paleta hover/ativa */}
-      <div className="flex items-center gap-2 h-5">
-        <div
-          className="h-4 w-4 rounded-full border border-border/50 transition-all"
-          style={{ backgroundColor: colors[previewPalette][500] }}
-        />
-        <span className="text-sm font-medium text-foreground capitalize">
-          {labels[previewPalette]}
-          {value.palette === previewPalette && (
-            <span className="text-muted-foreground font-normal ml-1">— {value.shade}</span>
-          )}
-        </span>
-      </div>
+    <div
+      role="radiogroup"
+      aria-label="Tonalidade"
+      className={['flex flex-wrap gap-3', className].filter(Boolean).join(' ')}
+    >
+      {PICKER_SHADES.map((shade) => {
+        const isActive = primary.shade === shade
+        // shades claros (≤ 300): check escuro; escuros: check branco
+        const checkClass = shade <= 300 ? 'text-gray-900' : 'text-white'
 
-      {/* Grid de paletas */}
-      <div
-        role="radiogroup"
-        aria-label="Paleta"
-        className="flex flex-wrap gap-1.5"
-      >
-        {palettes.map((p) => {
-          const isActive = value.palette === p
-          return (
+        return (
+          <div key={shade} className="flex flex-col items-center gap-1">
             <button
-              key={p}
               role="radio"
               aria-checked={isActive}
-              aria-label={labels[p]}
-              title={labels[p]}
-              onClick={() => handlePaletteClick(p)}
-              onMouseEnter={() => setHovered(p)}
-              onMouseLeave={() => setHovered(null)}
+              aria-label={String(shade)}
+              title={String(shade)}
+              onClick={() => setPrimary({ ...primary, shade: shade as ColorShadeValue })}
               className={[
                 'relative h-6 w-6 rounded-full border-2 transition-all',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
@@ -103,99 +140,44 @@ function TwoLevelPicker<T extends ColorName>({
                   ? 'border-foreground shadow-md scale-110'
                   : 'border-transparent hover:border-foreground/30',
               ].join(' ')}
-              style={{ backgroundColor: colors[p][500] }}
+              style={{ backgroundColor: colors[primary.palette][shade] }}
             >
               {isActive && (
                 <span className="absolute inset-0 flex items-center justify-center">
-                  <IconCheck size={11} className="text-white drop-shadow-sm" strokeWidth={3} />
+                  <IconCheck size={11} className={`${checkClass} drop-shadow-sm`} strokeWidth={3} />
                 </span>
               )}
             </button>
-          )
-        })}
-      </div>
-
-      {/* Strip de shades — só aparece quando a paleta está selecionada */}
-      {value.palette && (
-        <div
-          role="radiogroup"
-          aria-label={`Tonalidade de ${labels[value.palette as T] ?? value.palette}`}
-          className="flex gap-1"
-        >
-          {COLOR_SHADES.map((shade) => {
-            const isActiveShade = value.shade === shade
-            return (
-              <button
-                key={shade}
-                role="radio"
-                aria-checked={isActiveShade}
-                aria-label={String(shade)}
-                title={String(shade)}
-                onClick={() => handleShadeClick(shade)}
-                className={[
-                  'relative flex-1 h-6 min-w-[18px] rounded transition-all',
-                  'focus-visible:outline-none',
-                  'hover:scale-y-110 active:scale-95',
-                  isActiveShade ? 'ring-2 ring-offset-1 ring-foreground' : '',
-                ].join(' ')}
-                style={{ backgroundColor: colors[value.palette as ColorName][shade] }}
-              />
-            )
-          })}
-        </div>
-      )}
-
-      {/* Label dos shades */}
-      <div className="flex gap-1 text-[10px] text-muted-foreground select-none">
-        {COLOR_SHADES.map((shade) => (
-          <span key={shade} className="flex-1 text-center leading-none">
-            {shade === 50 ? '50' : shade === 950 ? '950' : shade >= 100 && shade % 200 === 0 ? String(shade) : ''}
-          </span>
-        ))}
-      </div>
+            <span className="text-[10px] text-muted-foreground leading-none select-none">
+              {shade}
+            </span>
+          </div>
+        )
+      })}
     </div>
   )
 }
 
 // ---------------------------------------------------------------------------
-// Public components
+// NeutralColorPicker — 5 paletas neutras, círculos apenas (sem shade)
+// O shade é determinado automaticamente pelo provider com base no modo.
 // ---------------------------------------------------------------------------
 
-/** Picker de cor primária — 17 paletas cromáticas com seletor de shade */
-export function PrimaryColorPicker({ className }: { className?: string }) {
-  const { primary, setPrimary } = useColorTheme()
-  return (
-    <div className={className}>
-      <TwoLevelPicker
-        palettes={CHROMATIC_NAMES}
-        labels={CHROMATIC_LABELS}
-        value={primary}
-        onChange={setPrimary}
-        defaultShade={400}
-      />
-    </div>
-  )
-}
-
-/** Picker de cor neutra — 5 paletas com seletor de shade */
 export function NeutralColorPicker({ className }: { className?: string }) {
   const { neutral, setNeutral } = useColorTheme()
   return (
-    <div className={className}>
-      <TwoLevelPicker
-        palettes={NEUTRAL_NAMES}
-        labels={NEUTRAL_LABELS}
-        value={neutral}
-        onChange={setNeutral}
-        defaultShade={200}
-      />
-    </div>
+    <PaletteCircles
+      palettes={NEUTRAL_NAMES}
+      labels={NEUTRAL_LABELS}
+      selected={neutral.palette}
+      onSelect={(palette) => setNeutral({ ...neutral, palette })}
+      className={className}
+    />
   )
 }
 
 /**
  * @deprecated Use PrimaryColorPicker.
- * Mantido para retrocompatibilidade — seleciona apenas a paleta primária.
  */
 export function ColorPicker({ className }: { className?: string }) {
   return <PrimaryColorPicker className={className} />
