@@ -63,14 +63,6 @@ interface TransactionDisplay {
   kind: 'Consulta' | 'Pedido'
 }
 
-const MOCK_TRANSACTIONS: TransactionDisplay[] = [
-  { id: 'mock-1', name: 'Dr. Ana Lima',        paymentMethod: 'Pix',     value: 250.00, date: '2026-06-05T10:30:00Z', kind: 'Consulta' },
-  { id: 'mock-2', name: 'Farmácia São Lucas',  paymentMethod: 'Crédito', value: 189.90, date: '2026-06-05T08:15:00Z', kind: 'Pedido'   },
-  { id: 'mock-3', name: 'Dr. Carlos Mendes',   paymentMethod: 'Pix',     value: 300.00, date: '2026-06-04T14:00:00Z', kind: 'Consulta' },
-  { id: 'mock-4', name: 'Farmácia Bem Estar',  paymentMethod: 'Débito',  value: 450.50, date: '2026-06-03T16:45:00Z', kind: 'Pedido'   },
-  { id: 'mock-5', name: 'Dra. Marina Costa',   paymentMethod: 'Pix',     value: 175.00, date: '2026-06-02T11:20:00Z', kind: 'Consulta' },
-]
-
 async function DashboardContent() {
   const supabase = await createSupabaseServer()
 
@@ -87,7 +79,7 @@ async function DashboardContent() {
   let monthGmvOrders = 0
   let monthRevenue = 0
   const chartData: Array<{ month: string; gmvClinico: number; gmvFarmacia: number; receitaNoun: number }> = []
-  let lastTransactions: TransactionDisplay[] = MOCK_TRANSACTIONS
+  let lastTransactions: TransactionDisplay[] = []
 
   try {
     const [
@@ -152,7 +144,7 @@ async function DashboardContent() {
       })),
     ]
     combined.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    if (combined.length > 0) lastTransactions = combined.slice(0, 5)
+    lastTransactions = combined.slice(0, 5)
 
     // Chart — últimos 6 meses fixo
     const chartMonths = await Promise.all(
@@ -282,6 +274,9 @@ async function DashboardContent() {
             <CardTitle className="text-base">Últimas transações</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
+            {lastTransactions.length === 0 ? (
+              <p className="px-4 py-6 text-sm text-muted-foreground text-center">Nenhuma transação encontrada.</p>
+            ) : null}
             <div>
               {lastTransactions.map((item, index) => (
                 <Fragment key={item.id}>
