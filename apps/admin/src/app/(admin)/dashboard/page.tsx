@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, Fragment } from 'react'
 import {
   IconUser,
   IconStethoscope,
@@ -282,18 +282,21 @@ async function DashboardContent() {
             <CardTitle className="text-base">Últimas transações</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="divide-y">
-              {lastTransactions.map((item) => (
-                <div key={item.id} className="px-4 py-3 flex items-center gap-3">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{item.name}</p>
-                    <p className="text-xs text-muted-foreground">{item.paymentMethod}</p>
+            <div>
+              {lastTransactions.map((item, index) => (
+                <Fragment key={item.id}>
+                  {index > 0 && <div className="mx-4 border-t border-border" />}
+                  <div className="px-4 py-3 flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">{item.paymentMethod}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-semibold">{brl.format(item.value)}</p>
+                      <p className="text-xs text-muted-foreground">{formatDateTime(item.date)}</p>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold">{brl.format(item.value)}</p>
-                    <p className="text-xs text-muted-foreground">{formatDateTime(item.date)}</p>
-                  </div>
-                </div>
+                </Fragment>
               ))}
             </div>
           </CardContent>
