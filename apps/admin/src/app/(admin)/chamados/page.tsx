@@ -48,35 +48,50 @@ async function ChamadosContent({ searchParams }: PageProps) {
   const supabase = await createSupabaseServer()
 
   // Paginated + filtered query
-  let query = supabase
-    .from('support_tickets')
-    .select(
-      'id, title, category, priority, status, source, created_at, profiles(full_name), tenants(name)',
-      { count: 'exact' },
-    )
-    .eq('source', tab)
+  let tickets: TicketRow[]      = []
+  let totalCount                = 0
 
-  if (q)      query = query.ilike('title', `%${q}%`)
-  if (status) query = query.eq('status', status)
+  try {
+    let query = supabase
+      .from('support_tickets')
+      .select(
+        'id, title, category, priority, status, source, created_at, profiles(full_name), tenants(name)',
+        { count: 'exact' },
+      )
+      .eq('source', tab)
 
-  const { data, count } = await query
-    .order('created_at', { ascending: false })
-    .range(offset, offset + perPage - 1)
+    if (q)      query = query.ilike('title', `%${q}%`)
+    if (status) query = query.eq('status', status)
 
-  const tickets    = (data ?? []) as unknown as TicketRow[]
-  const totalCount = count ?? 0
+    const { data, count, error } = await query
+      .order('created_at', { ascending: false })
+      .range(offset, offset + perPage - 1)
+
+    if (error) console.error('[chamados] query error:', error)
+    tickets    = (data ?? []) as unknown as TicketRow[]
+    totalCount = count ?? 0
+  } catch (e) {
+    console.error('[chamados] query threw:', e)
+  }
+
   const totalPages = Math.max(1, Math.ceil(totalCount / perPage))
 
   // Stats always show full source totals (unaffected by search/status filter)
-  const { data: statsRaw } = await supabase
-    .from('support_tickets')
-    .select('status')
-    .eq('source', tab)
+  let abertos = 0, emAndamento = 0, resolvidos = 0
+  try {
+    const { data: statsRaw, error: statsError } = await supabase
+      .from('support_tickets')
+      .select('status')
+      .eq('source', tab)
 
-  const all         = statsRaw ?? []
-  const abertos     = all.filter(t => t.status === 'aberto').length
-  const emAndamento = all.filter(t => t.status === 'em_andamento').length
-  const resolvidos  = all.filter(t => ['resolvido', 'fechado'].includes(t.status)).length
+    if (statsError) console.error('[chamados] stats error:', statsError)
+    const all  = statsRaw ?? []
+    abertos     = all.filter(t => t.status === 'aberto').length
+    emAndamento = all.filter(t => t.status === 'em_andamento').length
+    resolvidos  = all.filter(t => ['resolvido', 'fechado'].includes(t.status)).length
+  } catch (e) {
+    console.error('[chamados] stats threw:', e)
+  }
 
   return (
     <div className="p-6 space-y-6">
