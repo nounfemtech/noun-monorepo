@@ -585,13 +585,13 @@ export default function ConfiguracoesPage() {
       </div>
 
       <Tabs defaultValue="aparencia" className="mt-6">
-        <TabsList>
-          <TabsTrigger value="geral">Geral</TabsTrigger>
-          <TabsTrigger value="time">Time</TabsTrigger>
-          <TabsTrigger value="aparencia">Aparência</TabsTrigger>
-          <TabsTrigger value="notificacoes">Notificações</TabsTrigger>
-          <TabsTrigger value="seguranca">Segurança</TabsTrigger>
-          <TabsTrigger value="regiao">Região</TabsTrigger>
+        <TabsList variant="underline">
+          <TabsTrigger value="geral"         variant="underline">Geral</TabsTrigger>
+          <TabsTrigger value="time"          variant="underline">Time</TabsTrigger>
+          <TabsTrigger value="aparencia"     variant="underline">Aparência</TabsTrigger>
+          <TabsTrigger value="notificacoes"  variant="underline">Notificações</TabsTrigger>
+          <TabsTrigger value="seguranca"     variant="underline">Segurança</TabsTrigger>
+          <TabsTrigger value="regiao"        variant="underline">Região</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral">
