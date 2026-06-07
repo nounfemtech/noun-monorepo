@@ -1,10 +1,18 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import brazilPaths from '@/data/brazil-states-paths.json'
 
-const GEO_URL = '/brazil-states.json'
+// Bounding box do Brasil para projeção linear
+const W = 500, H = 420
+const WEST = -73.98, EAST = -28.86, NORTH = 5.27, SOUTH = -33.74
+
+function project(lng: number, lat: number): [number, number] {
+  const x = ((lng - WEST) / (EAST - WEST)) * W
+  const y = ((NORTH - lat) / (NORTH - SOUTH)) * H
+  return [x, y]
+}
 
 export interface CityPoint {
   city:        string
@@ -17,7 +25,7 @@ interface UsersMapCardProps {
   cities: CityPoint[]
 }
 
-// Dados de exemplo exibidos enquanto nenhum usuário cadastrou endereço
+// Dados de exemplo exibidos enquanto nenhum usuário cadastrar endereço
 const MOCK_CITIES: CityPoint[] = [
   { city: 'São Paulo',      state: 'SP', count: 45, coordinates: [-46.63, -23.55] },
   { city: 'Rio de Janeiro', state: 'RJ', count: 28, coordinates: [-43.17, -22.91] },
@@ -34,17 +42,14 @@ const MOCK_CITIES: CityPoint[] = [
 ]
 
 export function UsersMapCard({ cities }: UsersMapCardProps) {
-  const isMock    = cities.length === 0
-  const data      = isMock ? MOCK_CITIES : cities
-  const total     = useMemo(() => data.reduce((s, c) => s + c.count, 0), [data])
-  const maxCount  = useMemo(() => Math.max(...data.map(c => c.count)), [data])
+  const isMock   = cities.length === 0
+  const data     = isMock ? MOCK_CITIES : cities
+  const total    = useMemo(() => data.reduce((s, c) => s + c.count, 0), [data])
+  const maxCount = useMemo(() => Math.max(...data.map(c => c.count)), [data])
 
-  // Agrupa por estado para o painel lateral
   const byState = useMemo(() => {
     const map: Record<string, number> = {}
-    for (const c of data) {
-      map[c.state] = (map[c.state] ?? 0) + c.count
-    }
+    for (const c of data) map[c.state] = (map[c.state] ?? 0) + c.count
     return Object.entries(map)
       .map(([state, count]) => ({ state, count }))
       .sort((a, b) => b.count - a.count)
@@ -71,51 +76,41 @@ export function UsersMapCard({ cities }: UsersMapCardProps) {
 
       <CardContent className="p-0">
         <div className="flex min-h-[300px]">
-          {/* Mapa */}
-          <div className="flex-1 overflow-hidden">
-            <ComposableMap
-              projection="geoMercator"
-              projectionConfig={{ center: [-54, -15], scale: 700 }}
-              width={520}
-              height={400}
-              style={{ width: '100%', height: '100%' }}
+          {/* Mapa SVG */}
+          <div className="flex-1 overflow-hidden p-2">
+            <svg
+              viewBox={`0 0 ${W} ${H}`}
+              className="w-full h-full"
+              style={{ maxHeight: 380 }}
             >
-              <Geographies geography={GEO_URL}>
-                {({ geographies }) =>
-                  geographies.map(geo => (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill="hsl(var(--muted))"
-                      stroke="hsl(var(--background))"
-                      strokeWidth={1}
-                      style={{
-                        default: { outline: 'none' },
-                        hover:   { fill: 'hsl(var(--muted-foreground) / 0.25)', outline: 'none' },
-                        pressed: { outline: 'none' },
-                      }}
-                    />
-                  ))
-                }
-              </Geographies>
+              {/* Estados */}
+              {(brazilPaths as { id: string; path: string }[]).map(state => (
+                <path
+                  key={state.id}
+                  d={state.path}
+                  className="fill-muted stroke-background"
+                  strokeWidth={1}
+                />
+              ))}
 
+              {/* Pontos por cidade */}
               {data.map(city => {
-                const radius = 3 + (city.count / maxCount) * 6
+                const [x, y] = project(city.coordinates[0], city.coordinates[1])
+                const r      = 3 + (city.count / maxCount) * 6
                 return (
-                  <Marker key={`${city.state}-${city.city}`} coordinates={city.coordinates}>
+                  <g key={`${city.state}-${city.city}`}>
                     {/* Glow */}
-                    <circle r={radius * 2.8} fill="hsl(var(--primary))" fillOpacity={0.12} />
+                    <circle cx={x} cy={y} r={r * 2.6} className="fill-primary" fillOpacity={0.12} />
                     {/* Dot */}
-                    <circle r={radius}        fill="hsl(var(--primary))" fillOpacity={0.85} />
-                  </Marker>
+                    <circle cx={x} cy={y} r={r}       className="fill-primary" fillOpacity={0.85} />
+                  </g>
                 )
               })}
-            </ComposableMap>
+            </svg>
           </div>
 
           {/* Painel lateral */}
           <div className="w-52 shrink-0 border-l px-5 py-5 flex flex-col gap-5">
-            {/* Total */}
             <div>
               <p className="text-3xl font-bold tabular-nums leading-none">
                 {total.toLocaleString('pt-BR')}
@@ -125,7 +120,6 @@ export function UsersMapCard({ cities }: UsersMapCardProps) {
               </p>
             </div>
 
-            {/* Top estados */}
             <div className="space-y-3">
               {byState.map(({ state, count }) => (
                 <div key={state} className="space-y-1">
