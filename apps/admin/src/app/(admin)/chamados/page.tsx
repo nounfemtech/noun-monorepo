@@ -107,13 +107,12 @@ async function ChamadosContent({ searchParams }: PageProps) {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-xl font-bold">Chamados</h1>
-          <p className="text-sm text-muted-foreground">Suporte a parceiros e usuárias do app</p>
-        </div>
-        <TabFilter current={tab} />
+      <div>
+        <h1 className="text-xl font-bold">Chamados</h1>
+        <p className="text-sm text-muted-foreground">Suporte a parceiros e usuárias do app</p>
       </div>
+
+      <TabFilter current={tab} />
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
