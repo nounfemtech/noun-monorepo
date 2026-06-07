@@ -1,15 +1,24 @@
 import { requireAdmin } from '@/lib/admin-auth'
-import { Sidebar } from '@/components/sidebar'
+import { AppSidebar } from '@/components/sidebar'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { profile } = await requireAdmin()
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar adminName={profile.full_name ?? profile.email ?? 'Admin'} />
-      <main className="flex-1 overflow-y-auto bg-muted/20">
+    <SidebarProvider>
+      <AppSidebar
+        adminName={profile.full_name ?? profile.email ?? 'Admin'}
+        adminEmail={profile.email}
+      />
+      <SidebarInset>
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b sticky top-0 z-10 bg-background px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />
+        </header>
         {children}
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

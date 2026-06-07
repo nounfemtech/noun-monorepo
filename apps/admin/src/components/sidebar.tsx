@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import type { Route } from 'next'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -12,56 +13,50 @@ import {
   IconLogout,
   IconSun,
   IconMoon,
+  IconSelector,
 } from '@tabler/icons-react'
 import { useSpacemanTheme } from '@space-man/react-theme-animation'
-import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
+} from '@/components/ui/sidebar'
 import { createSupabaseBrowser } from '@/lib/supabase'
 
-interface NavItem {
-  href: Route
-  label: string
-  icon: React.ReactNode
-}
-
-const navItems: NavItem[] = [
-  {
-    href: '/dashboard',
-    label: 'Dashboard',
-    icon: <IconLayoutDashboard size={18} />,
-  },
-  {
-    href: '/usuarios',
-    label: 'Usuários',
-    icon: <IconUsers size={18} />,
-  },
-  {
-    href: '/tenants',
-    label: 'Tenants',
-    icon: <IconBuilding size={18} />,
-  },
-  {
-    href: '/financeiro',
-    label: 'Financeiro',
-    icon: <IconCurrencyReal size={18} />,
-  },
-  {
-    href: '/configuracoes',
-    label: 'Configurações',
-    icon: <IconSettings size={18} />,
-  },
+const navItems = [
+  { href: '/dashboard',     label: 'Dashboard',     icon: IconLayoutDashboard },
+  { href: '/usuarios',      label: 'Usuários',      icon: IconUsers },
+  { href: '/tenants',       label: 'Tenants',       icon: IconBuilding },
+  { href: '/financeiro',    label: 'Financeiro',    icon: IconCurrencyReal },
+  { href: '/configuracoes', label: 'Configurações', icon: IconSettings },
 ]
 
-interface SidebarProps {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   adminName: string
+  adminEmail?: string | null
 }
 
-export function Sidebar({ adminName }: SidebarProps) {
+export function AppSidebar({ adminName, adminEmail, ...props }: AppSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const { ref, toggleTheme, resolvedTheme } = useSpacemanTheme()
+  const { toggleTheme, resolvedTheme } = useSpacemanTheme()
+  const { isMobile } = useSidebar()
 
   const initials = adminName
     .split(' ')
@@ -77,102 +72,105 @@ export function Sidebar({ adminName }: SidebarProps) {
   }
 
   return (
-    <aside
-      className="hidden md:flex flex-col w-60 h-screen border-r overflow-y-auto"
-      style={{
-        backgroundColor: 'hsl(var(--sidebar-background))',
-        color: 'hsl(var(--sidebar-foreground))',
-        borderColor: 'hsl(var(--sidebar-border))',
-      }}
-    >
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-5">
-        <img src="/logo.svg" width={32} height={32} alt="Noun" />
-        <span
-          className="text-lg font-semibold tracking-tight"
-          style={{ color: 'hsl(var(--sidebar-foreground))' }}
-        >
-          Vaughan
-        </span>
-      </div>
+    <Sidebar collapsible="icon" {...props}>
+      {/* ── Header ── */}
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <div>
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold text-sm">
+                  V
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">Vaughan</span>
+                  <span className="truncate text-xs text-sidebar-foreground/60">Admin</span>
+                </div>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-      <Separator style={{ backgroundColor: 'hsl(var(--sidebar-border))' }} />
+      {/* ── Nav ── */}
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => {
+                const isActive =
+                  item.href === '/dashboard'
+                    ? pathname === '/dashboard'
+                    : pathname.startsWith(item.href)
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
+                      <Link href={item.href as Route}>
+                        <item.icon size={18} />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-      {/* Nav */}
-      <nav className="flex-1 px-2 py-4 space-y-1">
-        {navItems.map((item) => {
-          const isActive =
-            item.href === '/dashboard'
-              ? pathname === '/dashboard'
-              : pathname.startsWith(item.href)
+      {/* ── Footer — user menu ── */}
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarFallback className="rounded-lg text-xs bg-sidebar-primary/10">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{adminName}</span>
+                    {adminEmail && (
+                      <span className="truncate text-xs text-sidebar-foreground/60">
+                        {adminEmail}
+                      </span>
+                    )}
+                  </div>
+                  <IconSelector size={16} className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                side={isMobile ? 'bottom' : 'right'}
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuItem onClick={toggleTheme}>
+                  {resolvedTheme === 'dark'
+                    ? <IconSun size={16} />
+                    : <IconMoon size={16} />}
+                  {resolvedTheme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <IconLogout size={16} />
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
-                isActive
-                  ? 'font-medium'
-                  : 'hover:bg-[hsl(var(--sidebar-accent))] hover:text-[hsl(var(--sidebar-accent-foreground))]'
-              )}
-              style={
-                isActive
-                  ? {
-                      backgroundColor: 'hsl(var(--sidebar-accent))',
-                      color: 'hsl(var(--sidebar-primary))',
-                    }
-                  : {}
-              }
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          )
-        })}
-      </nav>
-
-      <Separator style={{ backgroundColor: 'hsl(var(--sidebar-border))' }} />
-
-      {/* Footer */}
-      <div className="px-3 py-4 flex items-center gap-3">
-        <Avatar className="h-8 w-8">
-          <AvatarFallback className="text-xs bg-violet-100 text-violet-700">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{adminName}</p>
-        </div>
-
-        {/* Toggle tema com animação circular */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              ref={ref}
-              onClick={toggleTheme}
-              className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
-            >
-              {resolvedTheme === 'dark' ? <IconSun size={16} /> : <IconMoon size={16} />}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="top">
-            {resolvedTheme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              onClick={handleLogout}
-              className="text-destructive hover:text-destructive/80 transition-colors p-1 rounded"
-            >
-              <IconLogout size={16} />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="top">Sair</TooltipContent>
-        </Tooltip>
-      </div>
-    </aside>
+      <SidebarRail />
+    </Sidebar>
   )
 }
