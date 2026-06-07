@@ -24,14 +24,34 @@ export const DEFAULT_NEUTRAL: PaletteSelection = { palette: 'zinc', shade: 950 }
 // Helpers
 // ---------------------------------------------------------------------------
 
-const SHADE_ORDER: ColorShadeValue[] = [...COLOR_SHADES]
-
-function shadeIndex(shade: ColorShadeValue): number {
-  return SHADE_ORDER.indexOf(shade)
-}
-
 function getHsl(palette: ColorName, shade: ColorShadeValue): string {
   return hexToHsl(colors[palette][shade])
+}
+
+// ---------------------------------------------------------------------------
+// WCAG contrast utilities
+// ---------------------------------------------------------------------------
+
+function relativeLuminance(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4))
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+}
+
+function contrastRatio(hex1: string, hex2: string): number {
+  const l1 = relativeLuminance(hex1)
+  const l2 = relativeLuminance(hex2)
+  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
+}
+
+/** Retorna o shade (50 ou 950) da mesma paleta que oferece maior contraste com bgShade */
+function bestFgShade(palette: ColorName, bgShade: ColorShadeValue): ColorShadeValue {
+  const bg = colors[palette][bgShade]
+  const c950 = contrastRatio(bg, colors[palette][950])
+  const c50  = contrastRatio(bg, colors[palette][50])
+  return c950 >= c50 ? 950 : 50
 }
 
 /** Reads a PaletteSelection from localStorage, falls back to defaultVal */
@@ -45,7 +65,7 @@ function readStorage(key: string, defaultVal: PaletteSelection): PaletteSelectio
       typeof parsed.palette === 'string' &&
       parsed.shade &&
       typeof parsed.shade === 'number' &&
-      (SHADE_ORDER as number[]).includes(parsed.shade) &&
+      (COLOR_SHADES as unknown as number[]).includes(parsed.shade) &&
       colors[parsed.palette as ColorName]
     ) {
       return parsed as PaletteSelection
@@ -63,8 +83,7 @@ function readStorage(key: string, defaultVal: PaletteSelection): PaletteSelectio
 export function applyPrimary(sel: PaletteSelection): void {
   const root = document.documentElement
   const primaryHsl = getHsl(sel.palette, sel.shade)
-  // Auto-contrast: shade index ≤ index of 400 → use 950 (dark fg); else use 50
-  const fgShade: ColorShadeValue = shadeIndex(sel.shade) <= shadeIndex(400) ? 950 : 50
+  const fgShade = bestFgShade(sel.palette, sel.shade)
   const fgHsl = getHsl(sel.palette, fgShade)
 
   root.style.setProperty('--primary', primaryHsl)
@@ -73,6 +92,8 @@ export function applyPrimary(sel: PaletteSelection): void {
   root.style.setProperty('--sidebar-primary', primaryHsl)
   root.style.setProperty('--sidebar-primary-foreground', fgHsl)
   root.style.setProperty('--sidebar-ring', primaryHsl)
+  root.style.setProperty('--sidebar-accent', primaryHsl)
+  root.style.setProperty('--sidebar-accent-foreground', fgHsl)
 }
 
 // ---------------------------------------------------------------------------
@@ -87,23 +108,17 @@ export function applyNeutral(sel: PaletteSelection): void {
   const isDark = root.classList.contains('dark')
 
   if (isDark) {
-    // Tailwind v4 dark defaults: fundos escuros, bordas sutis, texto médio
     root.style.setProperty('--muted',            getHsl(sel.palette, 800))
     root.style.setProperty('--muted-foreground', getHsl(sel.palette, 400))
     root.style.setProperty('--border',           getHsl(sel.palette, 700))
     root.style.setProperty('--input',            getHsl(sel.palette, 700))
     root.style.setProperty('--sidebar-border',   getHsl(sel.palette, 700))
-    root.style.setProperty('--sidebar-accent',   getHsl(sel.palette, 800))
-    root.style.setProperty('--sidebar-accent-foreground', getHsl(sel.palette, 100))
   } else {
-    // Tailwind v4 light defaults: fundos quase-brancos, bordas leves, texto cinza médio
     root.style.setProperty('--muted',            getHsl(sel.palette, 100))
     root.style.setProperty('--muted-foreground', getHsl(sel.palette, 500))
     root.style.setProperty('--border',           getHsl(sel.palette, 200))
     root.style.setProperty('--input',            getHsl(sel.palette, 200))
     root.style.setProperty('--sidebar-border',   getHsl(sel.palette, 200))
-    root.style.setProperty('--sidebar-accent',   getHsl(sel.palette, 100))
-    root.style.setProperty('--sidebar-accent-foreground', getHsl(sel.palette, 700))
   }
 }
 

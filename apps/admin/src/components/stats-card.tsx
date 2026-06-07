@@ -1,61 +1,75 @@
 import { cn } from '@/lib/utils'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import { IconTrendingUp, IconTrendingDown } from '@tabler/icons-react'
 
 interface TrendInfo {
   value: number
-  label: string
+  label?: string
 }
 
 interface StatsCardProps {
   title: string
   value: string | number
-  icon: React.ReactNode
   description?: string
+  footer?: string
   trend?: TrendInfo
   className?: string
+  // backward-compat — ignored in new design
+  icon?: React.ReactNode
   highlight?: boolean
 }
 
 export function StatsCard({
   title,
   value,
-  icon,
   description,
+  footer,
   trend,
   className,
-  highlight,
 }: StatsCardProps) {
-  const isPositiveTrend = trend && trend.value >= 0
+  const isPositive = trend ? trend.value >= 0 : null
 
   return (
-    <Card className={cn(highlight && 'border-primary/20 shadow-sm', className)}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className={cn('font-medium text-muted-foreground', highlight ? 'text-sm' : 'text-sm')}>
-          {title}
-        </CardTitle>
-        <div className={cn('p-2 rounded-lg', highlight && 'p-2.5')}>
-          {icon}
+    <Card className={cn('overflow-hidden', className)}>
+      <CardContent className="px-4 pt-4 pb-4">
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-sm text-muted-foreground">{title}</p>
+          {trend && (
+            <span
+              className={cn(
+                'flex items-center gap-0.5 rounded-full border px-2 py-0.5 text-xs font-medium shrink-0',
+                isPositive
+                  ? 'text-green-600 border-green-200 bg-green-50 dark:bg-green-950/30 dark:border-green-800'
+                  : 'text-red-500 border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-800',
+              )}
+            >
+              {isPositive
+                ? <IconTrendingUp size={11} />
+                : <IconTrendingDown size={11} />}
+              {isPositive ? '+' : ''}{trend.value}%
+            </span>
+          )}
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className={cn('font-bold', highlight ? 'text-2xl' : 'text-2xl')}>
-          {value}
-        </div>
-        {description && (
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
-        )}
-        {trend && (
-          <p
-            className={cn(
-              'text-xs mt-1 font-medium',
-              isPositiveTrend ? 'text-green-600' : 'text-red-500'
-            )}
-          >
-            {isPositiveTrend ? '+' : ''}
-            {trend.value}% {trend.label}
-          </p>
-        )}
+        <p className="text-2xl font-bold mt-2 tabular-nums">{value}</p>
       </CardContent>
+
+      {(description || footer) && (
+        <div className="border-t bg-muted/40 px-4 py-3">
+          {description && (
+            <p className="flex items-center gap-1.5 text-sm font-semibold">
+              {trend && (
+                isPositive
+                  ? <IconTrendingUp size={14} className="text-green-600 shrink-0" />
+                  : <IconTrendingDown size={14} className="text-red-500 shrink-0" />
+              )}
+              {description}
+            </p>
+          )}
+          {footer && (
+            <p className="text-xs text-muted-foreground mt-0.5">{footer}</p>
+          )}
+        </div>
+      )}
     </Card>
   )
 }

@@ -16,11 +16,12 @@ import {
   IconSelector,
 } from '@tabler/icons-react'
 import { useSpacemanTheme } from '@space-man/react-theme-animation'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
@@ -50,9 +51,10 @@ const navItems = [
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   adminName: string
   adminEmail?: string | null
+  adminAvatar?: string | null
 }
 
-export function AppSidebar({ adminName, adminEmail, ...props }: AppSidebarProps) {
+export function AppSidebar({ adminName, adminEmail, adminAvatar, ...props }: AppSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { toggleTheme, resolvedTheme } = useSpacemanTheme()
@@ -77,7 +79,7 @@ export function AppSidebar({ adminName, adminEmail, ...props }: AppSidebarProps)
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton size="lg" asChild className="hover:bg-muted hover:text-foreground active:bg-muted active:text-foreground">
               <div>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold text-sm">
                   V
@@ -104,7 +106,12 @@ export function AppSidebar({ adminName, adminEmail, ...props }: AppSidebarProps)
                     : pathname.startsWith(item.href)
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.label}
+                      className="hover:bg-muted hover:text-foreground"
+                    >
                       <Link href={item.href as Route}>
                         <item.icon size={18} />
                         <span>{item.label}</span>
@@ -126,9 +133,10 @@ export function AppSidebar({ adminName, adminEmail, ...props }: AppSidebarProps)
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  className="hover:bg-muted hover:text-foreground data-[state=open]:bg-muted data-[state=open]:text-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage src={adminAvatar ?? undefined} className="object-cover" />
                     <AvatarFallback className="rounded-lg text-xs bg-sidebar-primary/10">
                       {initials}
                     </AvatarFallback>
@@ -150,6 +158,23 @@ export function AppSidebar({ adminName, adminEmail, ...props }: AppSidebarProps)
                 align="end"
                 sideOffset={4}
               >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage src={adminAvatar ?? undefined} className="object-cover" />
+                      <AvatarFallback className="rounded-lg text-xs bg-sidebar-primary/10">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-semibold">{adminName}</span>
+                      {adminEmail && (
+                        <span className="truncate text-xs text-muted-foreground">{adminEmail}</span>
+                      )}
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={toggleTheme}>
                   {resolvedTheme === 'dark'
                     ? <IconSun size={16} />

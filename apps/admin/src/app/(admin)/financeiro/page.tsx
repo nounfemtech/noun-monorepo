@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { PeriodoFilter } from './periodo-filter'
 import {
   Table,
   TableBody,
@@ -161,65 +161,47 @@ async function FinanceiroContent({ searchParams }: PageProps) {
   const chartData: ChartDataPoint[] = Array.from(chartDataMap.entries())
     .map(([label, val]) => ({ label, ...val }))
 
-  const periodos = [
-    { value: 'mes', label: 'Este mês' },
-    { value: '3meses', label: 'Últimos 3 meses' },
-    { value: '6meses', label: 'Últimos 6 meses' },
-    { value: 'ano', label: 'Este ano' },
-  ]
-
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Financeiro</h1>
-          <p className="text-muted-foreground text-sm">{periodoLabel}</p>
+          <h1 className="text-xl font-bold">Financeiro</h1>
+          <p className="text-muted-foreground text-sm">Receita e transações da plataforma</p>
         </div>
         <ExportCSVButton data={breakdown} />
       </div>
 
       {/* Seletor de período */}
-      <div className="flex gap-2 flex-wrap">
-        {periodos.map((p) => (
-          <Link key={p.value} href={`/financeiro?periodo=${p.value}`}>
-            <Button
-              variant={periodo === p.value ? 'default' : 'outline'}
-              size="sm"
-            >
-              {p.label}
-            </Button>
-          </Link>
-        ))}
-      </div>
+      <PeriodoFilter value={periodo} />
 
       {/* Cards métricas */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="GMV total"
           value={brl.format(totalGmv)}
-          icon={<IconTrendingUp size={18} className="text-green-700" />}
+          icon={<IconTrendingUp size={18} className="text-primary" />}
           description="Volume de consultas"
           highlight
         />
         <StatsCard
           title="Receita Noun"
           value={brl.format(totalNounRevenue)}
-          icon={<IconCurrencyReal size={18} className="text-violet-700" />}
+          icon={<IconCurrencyReal size={18} className="text-primary" />}
           description="Take rate sobre GMV"
           highlight
         />
         <StatsCard
           title="Take rate médio"
           value={`${avgTakeRate.toFixed(1)}%`}
-          icon={<IconChartBar size={18} className="text-blue-600" />}
+          icon={<IconChartBar size={18} className="text-primary" />}
           description="Percentual médio de comissão"
           highlight
         />
         <StatsCard
           title="Nº transações"
           value={totalTransactions.toLocaleString('pt-BR')}
-          icon={<IconReceipt size={18} className="text-orange-600" />}
+          icon={<IconReceipt size={18} className="text-primary" />}
           description="Registros de earnings"
           highlight
         />
