@@ -81,10 +81,7 @@ function useCssColor(varName: string, fallback: string): string {
 }
 
 export function RevenueChart({ data }: RevenueChartProps) {
-  const primaryColor   = useCssColor('--primary',   '#eab308')
-  // bar2: primary com 60% opacity via hex blend → usamos muted-foreground como accent
-  const bar2Color      = useCssColor('--muted-foreground', '#71717a')
-  const lineColor      = primaryColor
+  const primaryColor = useCssColor('--primary', '#eab308')
 
   return (
     <ResponsiveContainer width="100%" height={320}>
@@ -104,14 +101,15 @@ export function RevenueChart({ data }: RevenueChartProps) {
           }}
         />
         <Bar dataKey="gmvClinico"  name="gmvClinico"  fill={primaryColor} radius={[3, 3, 0, 0]} />
-        <Bar dataKey="gmvFarmacia" name="gmvFarmacia" fill={bar2Color}    radius={[3, 3, 0, 0]} opacity={0.7} />
+        <Bar dataKey="gmvFarmacia" name="gmvFarmacia" fill={primaryColor} radius={[3, 3, 0, 0]} opacity={0.4} />
         <Line
           type="monotone"
           dataKey="receitaNoun"
           name="receitaNoun"
-          stroke={lineColor}
+          stroke={primaryColor}
           strokeWidth={2}
-          dot={{ fill: lineColor, r: 3 }}
+          strokeOpacity={0.75}
+          dot={{ fill: primaryColor, r: 3 }}
         />
       </ComposedChart>
     </ResponsiveContainer>

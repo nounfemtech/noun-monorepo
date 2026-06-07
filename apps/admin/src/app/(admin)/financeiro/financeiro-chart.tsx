@@ -80,7 +80,6 @@ function useCssColor(varName: string, fallback: string): string {
 
 export function FinanceiroChart({ data }: FinanceiroChartProps) {
   const primaryColor = useCssColor('--primary', '#eab308')
-  const lineColor    = useCssColor('--muted-foreground', '#71717a')
 
   return (
     <ResponsiveContainer width="100%" height={280}>
@@ -95,9 +94,10 @@ export function FinanceiroChart({ data }: FinanceiroChartProps) {
           type="monotone"
           dataKey="receitaNoun"
           name="receitaNoun"
-          stroke={lineColor}
+          stroke={primaryColor}
           strokeWidth={2}
-          dot={{ fill: lineColor, r: 3 }}
+          strokeOpacity={0.65}
+          dot={{ fill: primaryColor, r: 3 }}
         />
       </ComposedChart>
     </ResponsiveContainer>

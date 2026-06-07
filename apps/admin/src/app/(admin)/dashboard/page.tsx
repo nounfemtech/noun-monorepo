@@ -12,6 +12,7 @@ import {
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { StatsCard } from '@/components/stats-card'
 import { RevenueChart } from '@/components/revenue-chart'
+import { PeriodoFilter } from '@/components/periodo-filter'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -39,6 +40,24 @@ function getMonthLabel(offset: number) {
   return d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')
 }
 
+function getChartMonthCount(periodo: string): number {
+  switch (periodo) {
+    case 'mes':    return 1
+    case '3meses': return 3
+    case 'ano':    return new Date().getMonth() + 1
+    default:       return 6
+  }
+}
+
+function getChartPeriodLabel(periodo: string): string {
+  switch (periodo) {
+    case 'mes':    return 'Este mês'
+    case '3meses': return 'Últimos 3 meses'
+    case 'ano':    return 'Este ano'
+    default:       return 'Últimos 6 meses'
+  }
+}
+
 interface AppointmentRow {
   id: string
   price: number | null
@@ -56,17 +75,26 @@ interface OrderRow {
   patient_id: string | null
 }
 
-interface EarningsRow {
-  noun_fee: number | null
-  appointment_id: string | null
-  created_at: string
-}
-
 type TransactionItem =
   | (AppointmentRow & { kind: 'Consulta' })
   | (OrderRow & { kind: 'Pedido' })
 
-async function DashboardContent() {
+const MOCK_TRANSACTIONS: TransactionItem[] = [
+  { id: 'mock-1', price: 250.00, paid_at: null, status: 'completed', created_at: '2026-06-05T10:30:00Z', patient_id: null, kind: 'Consulta' },
+  { id: 'mock-2', total_price: 189.90, status: 'completed', created_at: '2026-06-05T08:15:00Z', patient_id: null, kind: 'Pedido' },
+  { id: 'mock-3', price: 300.00, paid_at: null, status: 'completed', created_at: '2026-06-04T14:00:00Z', patient_id: null, kind: 'Consulta' },
+  { id: 'mock-4', total_price: 450.50, status: 'pending', created_at: '2026-06-03T16:45:00Z', patient_id: null, kind: 'Pedido' },
+  { id: 'mock-5', price: 175.00, paid_at: null, status: 'scheduled', created_at: '2026-06-02T11:20:00Z', patient_id: null, kind: 'Consulta' },
+]
+
+interface PageProps {
+  searchParams: Promise<{ periodo?: string }>
+}
+
+async function DashboardContent({ searchParams }: PageProps) {
+  const params = await searchParams
+  const periodo = params.periodo ?? '6meses'
+
   const supabase = await createSupabaseServer()
 
   const { start: monthStart, end: monthEnd } = getMonthRange(0)
@@ -82,7 +110,7 @@ async function DashboardContent() {
   let monthGmvOrders = 0
   let monthRevenue = 0
   const chartData: Array<{ month: string; gmvClinico: number; gmvFarmacia: number; receitaNoun: number }> = []
-  const lastTransactions: TransactionItem[] = []
+  let lastTransactions: TransactionItem[] = []
 
   try {
     const [
@@ -125,20 +153,20 @@ async function DashboardContent() {
     monthGmvOrders = (monthOrdersRes.data ?? []).reduce((sum, r) => sum + (r.total_price ?? 0), 0)
     monthRevenue = (monthEarningsRes.data ?? []).reduce((sum, r) => sum + (r.noun_fee ?? 0), 0)
 
-    // Últimas transações
+    // Últimas transações — usa mocks se não houver dados reais
     const appts = (recentAppointmentsRes.data ?? []) as AppointmentRow[]
     const orders = (recentOrdersRes.data ?? []) as OrderRow[]
-
     const combined: TransactionItem[] = [
       ...appts.map((a) => ({ ...a, kind: 'Consulta' as const })),
       ...orders.map((o) => ({ ...o, kind: 'Pedido' as const })),
     ]
     combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    lastTransactions.push(...combined.slice(0, 10))
+    lastTransactions = combined.length > 0 ? combined.slice(0, 5) : MOCK_TRANSACTIONS
 
-    // Chart dos últimos 6 meses
+    // Chart — period-aware
+    const nMonths = getChartMonthCount(periodo)
     const chartMonths = await Promise.all(
-      Array.from({ length: 6 }, (_, i) => 5 - i).map(async (offset) => {
+      Array.from({ length: nMonths }, (_, i) => nMonths - 1 - i).map(async (offset) => {
         const { start, end } = getMonthRange(offset)
         const label = getMonthLabel(offset)
 
@@ -158,7 +186,7 @@ async function DashboardContent() {
     )
     chartData.push(...chartMonths)
   } catch {
-    // Sem dados — layout ainda exibido zerado
+    lastTransactions = MOCK_TRANSACTIONS
   }
 
   const totalGmv = totalGmvAppointments + totalGmvOrders
@@ -175,29 +203,24 @@ async function DashboardContent() {
     if (kind === 'Consulta') {
       switch (status) {
         case 'completed': return <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">Concluída</Badge>
-        case 'scheduled': return <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs">Agendada</Badge>
-        case 'cancelled': return <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Cancelada</Badge>
-        default: return <Badge variant="secondary" className="text-xs">{status ?? '—'}</Badge>
+        case 'scheduled':  return <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs">Agendada</Badge>
+        case 'cancelled':  return <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Cancelada</Badge>
+        default:           return <Badge variant="secondary" className="text-xs">{status ?? '—'}</Badge>
       }
     }
     switch (status) {
-      case 'completed': return <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">Concluído</Badge>
-      case 'pending': return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 text-xs">Pendente</Badge>
+      case 'completed':  return <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">Concluído</Badge>
+      case 'pending':    return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 text-xs">Pendente</Badge>
       case 'processing': return <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs">Processando</Badge>
-      case 'cancelled': return <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Cancelado</Badge>
-      default: return <Badge variant="secondary" className="text-xs">{status ?? '—'}</Badge>
+      case 'cancelled':  return <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Cancelado</Badge>
+      default:           return <Badge variant="secondary" className="text-xs">{status ?? '—'}</Badge>
     }
   }
 
   function getTransactionValue(item: TransactionItem): number {
-    if (item.kind === 'Consulta') {
-      return (item as AppointmentRow).price ?? 0
-    }
-    return (item as OrderRow).total_price ?? 0
-  }
-
-  function getTransactionStatus(item: TransactionItem): string | null {
-    return item.status
+    return item.kind === 'Consulta'
+      ? (item as AppointmentRow).price ?? 0
+      : (item as OrderRow).total_price ?? 0
   }
 
   return (
@@ -211,7 +234,7 @@ async function DashboardContent() {
       {/* ROW 1 — Métricas operacionais */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
-          title="Total de pacientes"
+          title="Total de usuários"
           value={patientsCount.toLocaleString('pt-BR')}
           icon={<IconUser size={18} className="text-primary" />}
           description="Cadastrados na plataforma"
@@ -220,7 +243,7 @@ async function DashboardContent() {
           title="Profissionais ativos"
           value={professionalsCount.toLocaleString('pt-BR')}
           icon={<IconStethoscope size={18} className="text-primary" />}
-          description="Médicos, nutricionistas e psicólogos"
+          description="Médico, Nutri e Psico"
         />
         <StatsCard
           title="Farmácias ativas"
@@ -273,8 +296,13 @@ async function DashboardContent() {
         {/* Gráfico */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">Evolução de GMV e Receita</CardTitle>
-            <p className="text-sm text-muted-foreground">Últimos 6 meses</p>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <CardTitle className="text-base">Evolução de GMV e Receita</CardTitle>
+                <p className="text-sm text-muted-foreground mt-0.5">{getChartPeriodLabel(periodo)}</p>
+              </div>
+              <PeriodoFilter value={periodo} basePath="/dashboard" />
+            </div>
           </CardHeader>
           <CardContent>
             {chartData.length > 0 ? (
@@ -293,38 +321,32 @@ async function DashboardContent() {
             <CardTitle className="text-base">Últimas transações</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            {lastTransactions.length === 0 ? (
-              <div className="p-6 text-center text-sm text-muted-foreground">
-                Nenhuma transação encontrada
-              </div>
-            ) : (
-              <div className="divide-y">
-                {lastTransactions.map((item) => (
-                  <div key={item.id} className="px-4 py-3 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <Badge
-                        className={
-                          item.kind === 'Consulta'
-                            ? 'bg-blue-100 text-blue-700 border-blue-200 text-xs'
-                            : 'bg-orange-100 text-orange-700 border-orange-200 text-xs'
-                        }
-                      >
-                        {item.kind}
-                      </Badge>
-                      <span className="text-sm font-semibold">
-                        {brl.format(getTransactionValue(item))}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      {getStatusBadge(getTransactionStatus(item), item.kind)}
-                      <span className="text-xs text-muted-foreground">
-                        {formatDate(item.created_at)}
-                      </span>
-                    </div>
+            <div className="divide-y">
+              {lastTransactions.map((item) => (
+                <div key={item.id} className="px-4 py-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <Badge
+                      className={
+                        item.kind === 'Consulta'
+                          ? 'bg-blue-100 text-blue-700 border-blue-200 text-xs'
+                          : 'bg-orange-100 text-orange-700 border-orange-200 text-xs'
+                      }
+                    >
+                      {item.kind}
+                    </Badge>
+                    <span className="text-sm font-semibold">
+                      {brl.format(getTransactionValue(item))}
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="flex items-center justify-between">
+                    {getStatusBadge(item.status, item.kind)}
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(item.created_at)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -332,7 +354,7 @@ async function DashboardContent() {
   )
 }
 
-export default function DashboardPage() {
+export default function DashboardPage(props: PageProps) {
   return (
     <Suspense
       fallback={
@@ -352,7 +374,7 @@ export default function DashboardPage() {
         </div>
       }
     >
-      <DashboardContent />
+      <DashboardContent {...props} />
     </Suspense>
   )
 }

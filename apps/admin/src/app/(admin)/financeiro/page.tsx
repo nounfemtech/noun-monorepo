@@ -4,7 +4,7 @@ import { createSupabaseServer } from '@/lib/supabase-server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PeriodoFilter } from './periodo-filter'
+import { PeriodoFilter } from '@/components/periodo-filter'
 import {
   Table,
   TableBody,
@@ -173,7 +173,7 @@ async function FinanceiroContent({ searchParams }: PageProps) {
       </div>
 
       {/* Seletor de período */}
-      <PeriodoFilter value={periodo} />
+      <PeriodoFilter value={periodo} basePath="/financeiro" />
 
       {/* Cards métricas */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
