@@ -10,6 +10,7 @@ export interface AdminProfile {
   tenant_id: string | null
   email: string | null
   created_at: string
+  avatar_url: string | null
 }
 
 export interface AdminSession {
