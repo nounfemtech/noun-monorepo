@@ -298,7 +298,7 @@ function SettingsRow({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex gap-8 py-6 px-6">
+    <div className="flex gap-8 py-6">
       <div className="w-64 shrink-0">
         <p className="text-sm font-medium">{title}</p>
         <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
@@ -312,7 +312,7 @@ function SettingsRow({
 
 function PlaceholderTab({ label }: { label: string }) {
   return (
-    <div className="px-6 py-12 text-center text-sm text-muted-foreground">
+    <div className="py-12 text-center text-sm text-muted-foreground">
       {label} — em breve.
     </div>
   )
@@ -320,7 +320,7 @@ function PlaceholderTab({ label }: { label: string }) {
 
 function GroupLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="pt-6 pb-1 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+    <p className="pt-6 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
       {children}
     </p>
   )
@@ -342,12 +342,10 @@ function RegiaoTab() {
 
   return (
     <div className="mt-6">
-      <div className="px-6">
-        <h2 className="text-base font-medium">Região</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Configure fuso horário, idioma e preferências regionais do painel.
-        </p>
-      </div>
+      <h2 className="text-base font-medium">Região</h2>
+      <p className="text-sm text-muted-foreground mt-0.5">
+        Configure fuso horário, idioma e preferências regionais do painel.
+      </p>
 
       {/* ── Fuso Horário ── */}
       <Separator className="mt-6" />
@@ -578,8 +576,8 @@ function RegiaoTab() {
 
 export default function ConfiguracoesPage() {
   return (
-    <div className="py-6 max-w-4xl">
-      <div className="px-6">
+    <div className="p-6">
+      <div>
         <h1 className="text-xl font-semibold tracking-tight">Configurações</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Gerencie as preferências do seu workspace.
@@ -587,7 +585,7 @@ export default function ConfiguracoesPage() {
       </div>
 
       <Tabs defaultValue="aparencia" className="mt-6">
-        <TabsList variant="underline" className="px-6">
+        <TabsList variant="underline">
           <TabsTrigger value="geral"         variant="underline">Geral</TabsTrigger>
           <TabsTrigger value="time"          variant="underline">Time</TabsTrigger>
           <TabsTrigger value="aparencia"     variant="underline">Aparência</TabsTrigger>
@@ -606,12 +604,10 @@ export default function ConfiguracoesPage() {
 
         <TabsContent value="aparencia">
           <div className="mt-6">
-            <div className="px-6">
-              <h2 className="text-base font-medium">Aparência</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Mude a aparência e a experiência do painel.
-              </p>
-            </div>
+            <h2 className="text-base font-medium">Aparência</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Mude a aparência e a experiência do painel.
+            </p>
 
             <Separator className="mt-6" />
 
