@@ -278,7 +278,7 @@ async function DashboardContent() {
 
         {/* Últimas transações */}
         <Card>
-          <CardHeader>
+          <CardHeader className="px-4">
             <CardTitle className="text-base">Últimas transações</CardTitle>
           </CardHeader>
           <CardContent className="p-0">

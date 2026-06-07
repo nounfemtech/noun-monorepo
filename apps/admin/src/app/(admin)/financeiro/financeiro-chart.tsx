@@ -73,7 +73,7 @@ export function FinanceiroChart({ data }: FinanceiroChartProps) {
         <YAxis tickFormatter={formatYAxis} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} width={60} />
         <Tooltip content={<CustomTooltip />} />
         <Legend formatter={(value) => value === 'gmv' ? 'GMV' : 'Receita Noun'} />
-        <Bar dataKey="gmv" name="gmv" fill={colorGmv} radius={[3, 3, 0, 0]} />
+        <Bar dataKey="gmv" name="gmv" fill={colorGmv} radius={[3, 3, 0, 0]} legendType="line" />
         <Line
           type="monotone"
           dataKey="receitaNoun"

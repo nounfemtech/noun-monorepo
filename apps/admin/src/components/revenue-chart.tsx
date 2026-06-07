@@ -84,8 +84,8 @@ export function RevenueChart({ data }: RevenueChartProps) {
             return labels[value] ?? value
           }}
         />
-        <Bar dataKey="gmvClinico"  name="gmvClinico"  fill={colorClinico}  radius={[3, 3, 0, 0]} />
-        <Bar dataKey="gmvFarmacia" name="gmvFarmacia" fill={colorFarmacia} radius={[3, 3, 0, 0]} />
+        <Bar dataKey="gmvClinico"  name="gmvClinico"  fill={colorClinico}  radius={[3, 3, 0, 0]} legendType="line" />
+        <Bar dataKey="gmvFarmacia" name="gmvFarmacia" fill={colorFarmacia} radius={[3, 3, 0, 0]} legendType="line" />
         <Line
           type="monotone"
           dataKey="receitaNoun"
