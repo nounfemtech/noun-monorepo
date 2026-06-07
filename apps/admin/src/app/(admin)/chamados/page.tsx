@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { StatsCard } from '@/components/stats-card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -129,24 +130,9 @@ async function ChamadosContent({ searchParams }: PageProps) {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-4 pb-4">
-            <p className="text-xs text-muted-foreground">Abertos</p>
-            <p className="text-2xl font-bold text-yellow-600">{abertos}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4 pb-4">
-            <p className="text-xs text-muted-foreground">Em andamento</p>
-            <p className="text-2xl font-bold text-blue-600">{emAndamento}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4 pb-4">
-            <p className="text-xs text-muted-foreground">Resolvidos</p>
-            <p className="text-2xl font-bold text-green-600">{resolvidos}</p>
-          </CardContent>
-        </Card>
+        <StatsCard title="Abertos" value={abertos} />
+        <StatsCard title="Em andamento" value={emAndamento} />
+        <StatsCard title="Resolvidos" value={resolvidos} />
       </div>
 
       {/* Tabela */}
