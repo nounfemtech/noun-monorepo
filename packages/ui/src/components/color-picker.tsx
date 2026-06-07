@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { IconCheck } from '@tabler/icons-react'
 import { useColorTheme } from '../providers/color-theme-provider'
 import {
   CHROMATIC_NAMES,
@@ -62,6 +63,7 @@ function ColorItem({
         style={{ backgroundColor: dotColor }}
       />
       <span className="truncate leading-none">{label}</span>
+      {isActive && <IconCheck size={14} className="ml-auto flex-shrink-0" />}
     </button>
   )
 }
