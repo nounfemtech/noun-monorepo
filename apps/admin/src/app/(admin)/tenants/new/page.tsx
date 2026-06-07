@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { IconArrowLeft } from '@tabler/icons-react'
 
 function validateCNPJ(cnpj: string): boolean {
@@ -172,15 +173,15 @@ export default function NewTenantPage() {
             {/* Tipo */}
             <div className="space-y-2">
               <Label htmlFor="type">Tipo *</Label>
-              <select
-                id="type"
-                value={type}
-                onChange={(e) => handleTypeChange(e.target.value as 'clinic' | 'pharmacy')}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                <option value="clinic">Clínica</option>
-                <option value="pharmacy">Farmácia</option>
-              </select>
+              <Select value={type} onValueChange={(v) => handleTypeChange(v as 'clinic' | 'pharmacy')}>
+                <SelectTrigger id="type" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="clinic">Clínica</SelectItem>
+                  <SelectItem value="pharmacy">Farmácia</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* CRM ou CRF */}

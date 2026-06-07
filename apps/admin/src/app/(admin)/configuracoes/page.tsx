@@ -7,6 +7,7 @@ import type { Theme } from '@space-man/react-theme-animation'
 import { IconSun, IconMoon, IconDeviceDesktop } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 const MODES: { value: Theme; label: string; Icon: React.FC<{ size?: number }> }[] = [
   { value: 'light',  label: 'Claro',   Icon: IconSun },
@@ -30,22 +31,25 @@ function ThemeModeSwitcher() {
       {MODES.map(({ value, label, Icon }) => {
         const active = theme === value
         return (
-          <button
-            key={value}
-            onClick={(e) => switchThemeFromElement(value, e.currentTarget)}
-            aria-pressed={active}
-            title={label}
-            className={cn(
-              'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-              'focus-visible:outline-none',
-              active
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground',
-            )}
-          >
-            <Icon size={15} />
-            <span className="hidden sm:inline">{label}</span>
-          </button>
+          <Tooltip key={value}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={(e) => switchThemeFromElement(value, e.currentTarget)}
+                aria-pressed={active}
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                  'focus-visible:outline-none',
+                  active
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                <Icon size={15} />
+                <span className="hidden sm:inline">{label}</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{label}</TooltipContent>
+          </Tooltip>
         )
       })}
     </div>

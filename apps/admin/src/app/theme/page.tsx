@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -79,12 +80,15 @@ export default function ThemePage() {
               <div key={color} className="flex items-center gap-1">
                 <span className="w-20 font-mono text-xs text-muted-foreground capitalize">{color}</span>
                 {([50,100,200,300,400,500,600,700,800,900,950] as const).map((shade) => (
-                  <div
-                    key={shade}
-                    title={`${color}-${shade}`}
-                    className="h-8 w-8 rounded-md border border-black/5 shadow-sm"
-                    style={{ backgroundColor: `var(--color-${color}-${shade}, currentColor)` }}
-                  />
+                  <Tooltip key={shade}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className="h-8 w-8 rounded-md border border-black/5 shadow-sm cursor-default"
+                        style={{ backgroundColor: `var(--color-${color}-${shade}, currentColor)` }}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>{color}-{shade}</TooltipContent>
+                  </Tooltip>
                 ))}
               </div>
             ))}
