@@ -130,9 +130,9 @@ async function ChamadosContent({ searchParams }: PageProps) {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <StatsCard title="Abertos" value={abertos} />
-        <StatsCard title="Em andamento" value={emAndamento} />
-        <StatsCard title="Resolvidos" value={resolvidos} />
+        <StatsCard title="Abertos" value={abertos} description="Aguardando atendimento" />
+        <StatsCard title="Em andamento" value={emAndamento} description="Em tratamento pela equipe" />
+        <StatsCard title="Resolvidos" value={resolvidos} description="Chamados concluídos" />
       </div>
 
       {/* Tabela */}
