@@ -109,7 +109,7 @@ async function ChamadosContent({ searchParams }: PageProps) {
       .select('id, title, category, priority, status, source, created_at, profiles(full_name), tenants(name)')
       .eq('source', tab)
       .order('created_at', { ascending: false })
-    tickets = (data ?? []) as TicketRow[]
+    tickets = (data ?? []) as unknown as TicketRow[]
   } catch {
     // sem dados
   }

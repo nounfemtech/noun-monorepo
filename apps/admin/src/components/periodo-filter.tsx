@@ -18,7 +18,7 @@ export function PeriodoFilter({ value, basePath }: { value: string; basePath: st
       {periodos.map((p, i) => (
         <button
           key={p.value}
-          onClick={() => router.push(`${basePath}?periodo=${p.value}`)}
+          onClick={() => router.push(`${basePath}?periodo=${p.value}` as never)}
           className={cn(
             'px-3 h-8 text-sm font-medium transition-colors',
             i < periodos.length - 1 && 'border-r',
