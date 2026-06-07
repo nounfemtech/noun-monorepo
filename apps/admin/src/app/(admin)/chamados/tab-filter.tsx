@@ -4,8 +4,11 @@ import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const tabs = [
-  { value: 'parceiro', label: 'Parceiros' },
-  { value: 'usuario',  label: 'Usuárias'  },
+  { value: 'usuario',       label: 'Usuários'       },
+  { value: 'farmacia',      label: 'Farmácias'      },
+  { value: 'medico',        label: 'Médicos'        },
+  { value: 'psicologo',     label: 'Psicólogos'     },
+  { value: 'nutricionista', label: 'Nutricionistas' },
 ]
 
 export function TabFilter({ current }: { current: string }) {

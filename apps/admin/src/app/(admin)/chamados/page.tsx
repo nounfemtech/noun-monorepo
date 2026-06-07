@@ -82,9 +82,22 @@ interface PageProps {
   searchParams: Promise<{ tab?: string }>
 }
 
+const VALID_TABS = ['usuario', 'farmacia', 'medico', 'psicologo', 'nutricionista'] as const
+type TabValue = typeof VALID_TABS[number]
+
+const TAB_LABELS: Record<TabValue, string> = {
+  usuario:       'Usuários',
+  farmacia:      'Farmácias',
+  medico:        'Médicos',
+  psicologo:     'Psicólogos',
+  nutricionista: 'Nutricionistas',
+}
+
 async function ChamadosContent({ searchParams }: PageProps) {
   const params = await searchParams
-  const tab = params.tab === 'usuario' ? 'usuario' : 'parceiro'
+  const tab: TabValue = VALID_TABS.includes(params.tab as TabValue)
+    ? (params.tab as TabValue)
+    : 'usuario'
 
   const supabase = await createSupabaseServer()
 
@@ -109,7 +122,7 @@ async function ChamadosContent({ searchParams }: PageProps) {
       {/* Header */}
       <div>
         <h1 className="text-xl font-bold">Chamados</h1>
-        <p className="text-sm text-muted-foreground">Suporte a parceiros e usuárias do app</p>
+        <p className="text-sm text-muted-foreground">Suporte a usuários e profissionais de saúde</p>
       </div>
 
       <TabFilter current={tab} />
@@ -140,7 +153,7 @@ async function ChamadosContent({ searchParams }: PageProps) {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            {tab === 'parceiro' ? 'Chamados de Parceiros' : 'Chamados de Usuárias'}
+            Chamados de {TAB_LABELS[tab]}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -152,9 +165,7 @@ async function ChamadosContent({ searchParams }: PageProps) {
                 </EmptyMedia>
                 <EmptyTitle>Nenhum chamado</EmptyTitle>
                 <EmptyDescription>
-                  {tab === 'parceiro'
-                    ? 'Chamados abertos por parceiros aparecerão aqui.'
-                    : 'Chamados abertos por usuárias do app aparecerão aqui.'}
+                  Chamados abertos por {TAB_LABELS[tab].toLowerCase()} aparecerão aqui.
                 </EmptyDescription>
               </EmptyHeader>
             </Empty>
@@ -163,7 +174,7 @@ async function ChamadosContent({ searchParams }: PageProps) {
               <TableHeader>
                 <TableRow>
                   <TableHead>Assunto</TableHead>
-                  <TableHead>{tab === 'parceiro' ? 'Parceiro' : 'Usuária'}</TableHead>
+                  <TableHead>Nome</TableHead>
                   <TableHead>Categoria</TableHead>
                   <TableHead>Prioridade</TableHead>
                   <TableHead>Status</TableHead>
