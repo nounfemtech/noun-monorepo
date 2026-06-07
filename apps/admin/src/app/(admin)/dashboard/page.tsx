@@ -14,6 +14,7 @@ import { StatsCard } from '@/components/stats-card'
 import { RevenueChart } from '@/components/revenue-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { TransactionsEmpty } from './transactions-empty'
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -275,7 +276,7 @@ async function DashboardContent() {
           </CardHeader>
           <CardContent className="p-0">
             {lastTransactions.length === 0 ? (
-              <p className="px-4 py-6 text-sm text-muted-foreground text-center">Nenhuma transação encontrada.</p>
+              <TransactionsEmpty />
             ) : null}
             <div>
               {lastTransactions.map((item, index) => (

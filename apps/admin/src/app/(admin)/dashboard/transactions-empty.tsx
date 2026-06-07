@@ -1,0 +1,37 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { RefreshCcwIcon } from 'lucide-react'
+import { IconReceipt } from '@tabler/icons-react'
+import { Button } from '@/components/ui/button'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
+
+export function TransactionsEmpty() {
+  const router = useRouter()
+  return (
+    <Empty className="h-full bg-gradient-to-b from-muted/50 from-30% to-background">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <IconReceipt />
+        </EmptyMedia>
+        <EmptyTitle>Nenhuma transação</EmptyTitle>
+        <EmptyDescription>
+          As transações recentes aparecerão aqui.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button variant="outline" size="sm" onClick={() => router.refresh()}>
+          <RefreshCcwIcon />
+          Atualizar
+        </Button>
+      </EmptyContent>
+    </Empty>
+  )
+}
