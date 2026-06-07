@@ -88,7 +88,7 @@ export default function ConfiguracoesPage() {
         <div className="space-y-2">
           <div>
             <p className="text-sm font-medium">Cor primária</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               Define a cor de destaque em botões, links e elementos interativos.
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function ConfiguracoesPage() {
         <div className="space-y-2">
           <div>
             <p className="text-sm font-medium">Tonalidade</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               Intensidade da cor primária selecionada.
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function ConfiguracoesPage() {
         <div className="space-y-2">
           <div>
             <p className="text-sm font-medium">Tons neutros</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               Controla bordas, fundos secundários e textos auxiliares.
             </p>
           </div>
