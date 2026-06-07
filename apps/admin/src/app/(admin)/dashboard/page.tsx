@@ -259,13 +259,7 @@ async function DashboardContent() {
             <p className="text-sm text-muted-foreground">GMV por canal e receita Noun nos últimos 6 meses</p>
           </CardHeader>
           <CardContent>
-            {chartData.some(d => d.gmvClinico > 0 || d.gmvFarmacia > 0) ? (
-              <RevenueChart data={chartData} />
-            ) : (
-              <div className="h-80 flex items-center justify-center text-sm text-muted-foreground">
-                Sem dados disponíveis
-              </div>
-            )}
+            <RevenueChart data={chartData} />
           </CardContent>
         </Card>
 
