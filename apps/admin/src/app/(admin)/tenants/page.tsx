@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -61,8 +62,8 @@ interface PageProps {
 async function TenantsContent({ searchParams }: PageProps) {
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
-  const type = params.type ?? ''
-  const status = params.status ?? ''
+  const type = params.type === 'all' ? '' : (params.type ?? '')
+  const status = params.status === 'all' ? '' : (params.status ?? '')
 
   const supabase = await createSupabaseServer()
   const from = (page - 1) * PAGE_SIZE
@@ -104,27 +105,29 @@ async function TenantsContent({ searchParams }: PageProps) {
       {/* Filtros */}
       <form method="GET" className="flex flex-wrap gap-3 items-end">
         <div>
-          <select
-            name="type"
-            defaultValue={type}
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="">Todos os tipos</option>
-            <option value="clinic">Clínica</option>
-            <option value="pharmacy">Farmácia</option>
-          </select>
+          <Select name="type" defaultValue={type || 'all'}>
+            <SelectTrigger className="h-10 w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os tipos</SelectItem>
+              <SelectItem value="clinic">Clínica</SelectItem>
+              <SelectItem value="pharmacy">Farmácia</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div>
-          <select
-            name="status"
-            defaultValue={status}
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="">Todos os status</option>
-            <option value="active">Ativo</option>
-            <option value="pending_approval">Pendente</option>
-            <option value="suspended">Suspenso</option>
-          </select>
+          <Select name="status" defaultValue={status || 'all'}>
+            <SelectTrigger className="h-10 w-[150px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os status</SelectItem>
+              <SelectItem value="active">Ativo</SelectItem>
+              <SelectItem value="pending_approval">Pendente</SelectItem>
+              <SelectItem value="suspended">Suspenso</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <Button type="submit" variant="secondary">
           Filtrar

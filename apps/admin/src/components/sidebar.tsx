@@ -17,6 +17,7 @@ import { useSpacemanTheme } from '@space-man/react-theme-animation'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { createSupabaseBrowser } from '@/lib/supabase'
 
 interface NavItem {
@@ -145,22 +146,32 @@ export function Sidebar({ adminName }: SidebarProps) {
         </div>
 
         {/* Toggle tema com animação circular */}
-        <button
-          ref={ref}
-          onClick={toggleTheme}
-          className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
-          title={resolvedTheme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-        >
-          {resolvedTheme === 'dark' ? <IconSun size={16} /> : <IconMoon size={16} />}
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              ref={ref}
+              onClick={toggleTheme}
+              className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+            >
+              {resolvedTheme === 'dark' ? <IconSun size={16} /> : <IconMoon size={16} />}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top">
+            {resolvedTheme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+          </TooltipContent>
+        </Tooltip>
 
-        <button
-          onClick={handleLogout}
-          className="text-destructive hover:text-destructive/80 transition-colors p-1 rounded"
-          title="Sair"
-        >
-          <IconLogout size={16} />
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={handleLogout}
+              className="text-destructive hover:text-destructive/80 transition-colors p-1 rounded"
+            >
+              <IconLogout size={16} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top">Sair</TooltipContent>
+        </Tooltip>
       </div>
     </aside>
   )

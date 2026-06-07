@@ -4,6 +4,7 @@ import { createSupabaseServer } from '@/lib/supabase-server'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -66,7 +67,7 @@ interface PageProps {
 async function UsuariosContent({ searchParams }: PageProps) {
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
-  const role = params.role ?? ''
+  const role = params.role === 'all' ? '' : (params.role ?? '')
   const search = params.search ?? ''
 
   const supabase = await createSupabaseServer()
@@ -95,7 +96,7 @@ async function UsuariosContent({ searchParams }: PageProps) {
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   const roles = [
-    { value: '', label: 'Todos os perfis' },
+    { value: 'all', label: 'Todos os perfis' },
     { value: 'patient', label: 'Paciente' },
     { value: 'doctor', label: 'Médico(a)' },
     { value: 'nutritionist', label: 'Nutricionista' },
@@ -127,17 +128,18 @@ async function UsuariosContent({ searchParams }: PageProps) {
           />
         </div>
         <div>
-          <select
-            name="role"
-            defaultValue={role}
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            {roles.map((r) => (
-              <option key={r.value} value={r.value}>
-                {r.label}
-              </option>
-            ))}
-          </select>
+          <Select name="role" defaultValue={role || 'all'}>
+            <SelectTrigger className="h-10 w-[160px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {roles.map((r) => (
+                <SelectItem key={r.value} value={r.value}>
+                  {r.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <Button type="submit" variant="secondary">
           Filtrar
