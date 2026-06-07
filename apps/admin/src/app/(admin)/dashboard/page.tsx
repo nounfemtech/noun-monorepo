@@ -64,6 +64,15 @@ interface TransactionDisplay {
   kind: 'Consulta' | 'Pedido'
 }
 
+const MOCK_CHART_DATA = [
+  { month: 'Jan', gmvClinico: 18400, gmvFarmacia:  9200, receitaNoun: 2760 },
+  { month: 'Fev', gmvClinico: 22100, gmvFarmacia: 11300, receitaNoun: 3315 },
+  { month: 'Mar', gmvClinico: 19800, gmvFarmacia: 13700, receitaNoun: 3375 },
+  { month: 'Abr', gmvClinico: 26500, gmvFarmacia: 10900, receitaNoun: 4125 },
+  { month: 'Mai', gmvClinico: 31200, gmvFarmacia: 15600, receitaNoun: 5310 },
+  { month: 'Jun', gmvClinico: 28900, gmvFarmacia: 18200, receitaNoun: 5115 },
+]
+
 async function DashboardContent() {
   const supabase = await createSupabaseServer()
 
@@ -259,13 +268,7 @@ async function DashboardContent() {
             <p className="text-sm text-muted-foreground">GMV por canal e receita Noun nos últimos 6 meses</p>
           </CardHeader>
           <CardContent>
-            {chartData.length > 0 ? (
-              <RevenueChart data={chartData} />
-            ) : (
-              <div className="h-80 flex items-center justify-center text-muted-foreground text-sm">
-                Sem dados disponíveis
-              </div>
-            )}
+            <RevenueChart data={chartData.length > 0 ? chartData : MOCK_CHART_DATA} />
           </CardContent>
         </Card>
 
