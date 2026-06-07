@@ -9,6 +9,7 @@ import {
   IconUsers,
   IconBuilding,
   IconCurrencyReal,
+  IconTicket,
   IconSettings,
   IconLogout,
   IconSun,
@@ -45,6 +46,7 @@ const navItems = [
   { href: '/usuarios',      label: 'Usuários',      icon: IconUsers },
   { href: '/tenants',       label: 'Tenants',       icon: IconBuilding },
   { href: '/financeiro',    label: 'Financeiro',    icon: IconCurrencyReal },
+  { href: '/chamados',      label: 'Chamados',      icon: IconTicket },
   { href: '/configuracoes', label: 'Configurações', icon: IconSettings },
 ]
 
