@@ -12,19 +12,16 @@ import {
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { StatsCard } from '@/components/stats-card'
 import { RevenueChart } from '@/components/revenue-chart'
-import { PeriodoFilter } from '@/components/periodo-filter'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
+function formatDateTime(dateStr: string) {
+  const d = new Date(dateStr)
+  const date = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+  const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  return `${date} ${time}`
 }
 
 function getMonthRange(offset = 0) {
@@ -38,24 +35,6 @@ function getMonthLabel(offset: number) {
   const now = new Date()
   const d = new Date(now.getFullYear(), now.getMonth() - offset, 1)
   return d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')
-}
-
-function getChartMonthCount(periodo: string): number {
-  switch (periodo) {
-    case 'mes':    return 1
-    case '3meses': return 3
-    case 'ano':    return new Date().getMonth() + 1
-    default:       return 6
-  }
-}
-
-function getChartPeriodLabel(periodo: string): string {
-  switch (periodo) {
-    case 'mes':    return 'Este mês'
-    case '3meses': return 'Últimos 3 meses'
-    case 'ano':    return 'Este ano'
-    default:       return 'Últimos 6 meses'
-  }
 }
 
 interface AppointmentRow {
@@ -75,26 +54,24 @@ interface OrderRow {
   patient_id: string | null
 }
 
-type TransactionItem =
-  | (AppointmentRow & { kind: 'Consulta' })
-  | (OrderRow & { kind: 'Pedido' })
-
-const MOCK_TRANSACTIONS: TransactionItem[] = [
-  { id: 'mock-1', price: 250.00, paid_at: null, status: 'completed', created_at: '2026-06-05T10:30:00Z', patient_id: null, kind: 'Consulta' },
-  { id: 'mock-2', total_price: 189.90, status: 'completed', created_at: '2026-06-05T08:15:00Z', patient_id: null, kind: 'Pedido' },
-  { id: 'mock-3', price: 300.00, paid_at: null, status: 'completed', created_at: '2026-06-04T14:00:00Z', patient_id: null, kind: 'Consulta' },
-  { id: 'mock-4', total_price: 450.50, status: 'pending', created_at: '2026-06-03T16:45:00Z', patient_id: null, kind: 'Pedido' },
-  { id: 'mock-5', price: 175.00, paid_at: null, status: 'scheduled', created_at: '2026-06-02T11:20:00Z', patient_id: null, kind: 'Consulta' },
-]
-
-interface PageProps {
-  searchParams: Promise<{ periodo?: string }>
+interface TransactionDisplay {
+  id: string
+  name: string
+  paymentMethod: 'Pix' | 'Crédito' | 'Débito'
+  value: number
+  date: string
+  kind: 'Consulta' | 'Pedido'
 }
 
-async function DashboardContent({ searchParams }: PageProps) {
-  const params = await searchParams
-  const periodo = params.periodo ?? '6meses'
+const MOCK_TRANSACTIONS: TransactionDisplay[] = [
+  { id: 'mock-1', name: 'Dr. Ana Lima',        paymentMethod: 'Pix',     value: 250.00, date: '2026-06-05T10:30:00Z', kind: 'Consulta' },
+  { id: 'mock-2', name: 'Farmácia São Lucas',  paymentMethod: 'Crédito', value: 189.90, date: '2026-06-05T08:15:00Z', kind: 'Pedido'   },
+  { id: 'mock-3', name: 'Dr. Carlos Mendes',   paymentMethod: 'Pix',     value: 300.00, date: '2026-06-04T14:00:00Z', kind: 'Consulta' },
+  { id: 'mock-4', name: 'Farmácia Bem Estar',  paymentMethod: 'Débito',  value: 450.50, date: '2026-06-03T16:45:00Z', kind: 'Pedido'   },
+  { id: 'mock-5', name: 'Dra. Marina Costa',   paymentMethod: 'Pix',     value: 175.00, date: '2026-06-02T11:20:00Z', kind: 'Consulta' },
+]
 
+async function DashboardContent() {
   const supabase = await createSupabaseServer()
 
   const { start: monthStart, end: monthEnd } = getMonthRange(0)
@@ -110,7 +87,7 @@ async function DashboardContent({ searchParams }: PageProps) {
   let monthGmvOrders = 0
   let monthRevenue = 0
   const chartData: Array<{ month: string; gmvClinico: number; gmvFarmacia: number; receitaNoun: number }> = []
-  let lastTransactions: TransactionItem[] = []
+  let lastTransactions: TransactionDisplay[] = MOCK_TRANSACTIONS
 
   try {
     const [
@@ -156,17 +133,30 @@ async function DashboardContent({ searchParams }: PageProps) {
     // Últimas transações — usa mocks se não houver dados reais
     const appts = (recentAppointmentsRes.data ?? []) as AppointmentRow[]
     const orders = (recentOrdersRes.data ?? []) as OrderRow[]
-    const combined: TransactionItem[] = [
-      ...appts.map((a) => ({ ...a, kind: 'Consulta' as const })),
-      ...orders.map((o) => ({ ...o, kind: 'Pedido' as const })),
+    const combined: TransactionDisplay[] = [
+      ...appts.map((a) => ({
+        id: a.id,
+        name: 'Consulta médica',
+        paymentMethod: 'Pix' as const,
+        value: a.price ?? 0,
+        date: a.created_at,
+        kind: 'Consulta' as const,
+      })),
+      ...orders.map((o) => ({
+        id: o.id,
+        name: 'Pedido farmácia',
+        paymentMethod: 'Pix' as const,
+        value: o.total_price ?? 0,
+        date: o.created_at,
+        kind: 'Pedido' as const,
+      })),
     ]
-    combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    lastTransactions = combined.length > 0 ? combined.slice(0, 5) : MOCK_TRANSACTIONS
+    combined.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    if (combined.length > 0) lastTransactions = combined.slice(0, 5)
 
-    // Chart — period-aware
-    const nMonths = getChartMonthCount(periodo)
+    // Chart — últimos 6 meses fixo
     const chartMonths = await Promise.all(
-      Array.from({ length: nMonths }, (_, i) => nMonths - 1 - i).map(async (offset) => {
+      Array.from({ length: 6 }, (_, i) => 5 - i).map(async (offset) => {
         const { start, end } = getMonthRange(offset)
         const label = getMonthLabel(offset)
 
@@ -186,7 +176,7 @@ async function DashboardContent({ searchParams }: PageProps) {
     )
     chartData.push(...chartMonths)
   } catch {
-    lastTransactions = MOCK_TRANSACTIONS
+    // usa defaults
   }
 
   const totalGmv = totalGmvAppointments + totalGmvOrders
@@ -198,30 +188,6 @@ async function DashboardContent({ searchParams }: PageProps) {
     month: 'long',
     year: 'numeric',
   })
-
-  function getStatusBadge(status: string | null, kind: string) {
-    if (kind === 'Consulta') {
-      switch (status) {
-        case 'completed': return <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">Concluída</Badge>
-        case 'scheduled':  return <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs">Agendada</Badge>
-        case 'cancelled':  return <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Cancelada</Badge>
-        default:           return <Badge variant="secondary" className="text-xs">{status ?? '—'}</Badge>
-      }
-    }
-    switch (status) {
-      case 'completed':  return <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">Concluído</Badge>
-      case 'pending':    return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 text-xs">Pendente</Badge>
-      case 'processing': return <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs">Processando</Badge>
-      case 'cancelled':  return <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Cancelado</Badge>
-      default:           return <Badge variant="secondary" className="text-xs">{status ?? '—'}</Badge>
-    }
-  }
-
-  function getTransactionValue(item: TransactionItem): number {
-    return item.kind === 'Consulta'
-      ? (item as AppointmentRow).price ?? 0
-      : (item as OrderRow).total_price ?? 0
-  }
 
   return (
     <div className="p-6 space-y-6">
@@ -296,19 +262,14 @@ async function DashboardContent({ searchParams }: PageProps) {
         {/* Gráfico */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div>
-                <CardTitle className="text-base">Evolução de GMV e Receita</CardTitle>
-                <p className="text-sm text-muted-foreground mt-0.5">{getChartPeriodLabel(periodo)}</p>
-              </div>
-              <PeriodoFilter value={periodo} basePath="/dashboard" />
-            </div>
+            <CardTitle className="text-base">Evolução de GMV e Receita</CardTitle>
+            <p className="text-sm text-muted-foreground">GMV por canal e receita Noun nos últimos 6 meses</p>
           </CardHeader>
           <CardContent>
             {chartData.length > 0 ? (
               <RevenueChart data={chartData} />
             ) : (
-              <div className="h-80 flex items-center justify-center text-muted-foreground">
+              <div className="h-80 flex items-center justify-center text-muted-foreground text-sm">
                 Sem dados disponíveis
               </div>
             )}
@@ -323,26 +284,14 @@ async function DashboardContent({ searchParams }: PageProps) {
           <CardContent className="p-0">
             <div className="divide-y">
               {lastTransactions.map((item) => (
-                <div key={item.id} className="px-4 py-3 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <Badge
-                      className={
-                        item.kind === 'Consulta'
-                          ? 'bg-blue-100 text-blue-700 border-blue-200 text-xs'
-                          : 'bg-orange-100 text-orange-700 border-orange-200 text-xs'
-                      }
-                    >
-                      {item.kind}
-                    </Badge>
-                    <span className="text-sm font-semibold">
-                      {brl.format(getTransactionValue(item))}
-                    </span>
+                <div key={item.id} className="px-4 py-3 flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.name}</p>
+                    <p className="text-xs text-muted-foreground">{item.paymentMethod}</p>
                   </div>
-                  <div className="flex items-center justify-between">
-                    {getStatusBadge(item.status, item.kind)}
-                    <span className="text-xs text-muted-foreground">
-                      {formatDate(item.created_at)}
-                    </span>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-semibold">{brl.format(item.value)}</p>
+                    <p className="text-xs text-muted-foreground">{formatDateTime(item.date)}</p>
                   </div>
                 </div>
               ))}
@@ -354,7 +303,7 @@ async function DashboardContent({ searchParams }: PageProps) {
   )
 }
 
-export default function DashboardPage(props: PageProps) {
+export default function DashboardPage() {
   return (
     <Suspense
       fallback={
@@ -374,7 +323,7 @@ export default function DashboardPage(props: PageProps) {
         </div>
       }
     >
-      <DashboardContent {...props} />
+      <DashboardContent />
     </Suspense>
   )
 }

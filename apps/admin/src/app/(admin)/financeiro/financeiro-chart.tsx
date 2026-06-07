@@ -12,6 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
+import { useColorTheme, colors } from '@noun/ui'
 
 interface ChartDataPoint {
   label: string
@@ -58,28 +59,11 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   )
 }
 
-function useCssColor(varName: string, fallback: string): string {
-  const [color, setColor] = React.useState(fallback)
-  React.useEffect(() => {
-    function update() {
-      const val = getComputedStyle(document.documentElement)
-        .getPropertyValue(varName)
-        .trim()
-      setColor(val ? `hsl(${val})` : fallback)
-    }
-    update()
-    const obs = new MutationObserver(update)
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['style', 'class'],
-    })
-    return () => obs.disconnect()
-  }, [varName, fallback])
-  return color
-}
-
 export function FinanceiroChart({ data }: FinanceiroChartProps) {
-  const primaryColor = useCssColor('--primary', '#eab308')
+  const { primary } = useColorTheme()
+
+  const colorGmv     = colors[primary.palette][700]
+  const colorReceita = colors[primary.palette][400]
 
   return (
     <ResponsiveContainer width="100%" height={280}>
@@ -89,15 +73,14 @@ export function FinanceiroChart({ data }: FinanceiroChartProps) {
         <YAxis tickFormatter={formatYAxis} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} width={60} />
         <Tooltip content={<CustomTooltip />} />
         <Legend formatter={(value) => value === 'gmv' ? 'GMV' : 'Receita Noun'} />
-        <Bar dataKey="gmv" name="gmv" fill={primaryColor} radius={[3, 3, 0, 0]} />
+        <Bar dataKey="gmv" name="gmv" fill={colorGmv} radius={[3, 3, 0, 0]} />
         <Line
           type="monotone"
           dataKey="receitaNoun"
           name="receitaNoun"
-          stroke={primaryColor}
+          stroke={colorReceita}
           strokeWidth={2}
-          strokeOpacity={0.65}
-          dot={{ fill: primaryColor, r: 3 }}
+          dot={{ fill: colorReceita, r: 3 }}
         />
       </ComposedChart>
     </ResponsiveContainer>

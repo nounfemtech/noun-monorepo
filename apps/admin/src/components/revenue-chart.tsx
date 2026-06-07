@@ -12,6 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
+import { useColorTheme, colors } from '@noun/ui'
 
 interface RevenueDataPoint {
   month: string
@@ -59,29 +60,12 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   )
 }
 
-/** Lê uma CSS var computada e devolve a cor como string hsl(...) */
-function useCssColor(varName: string, fallback: string): string {
-  const [color, setColor] = React.useState(fallback)
-  React.useEffect(() => {
-    function update() {
-      const val = getComputedStyle(document.documentElement)
-        .getPropertyValue(varName)
-        .trim()
-      setColor(val ? `hsl(${val})` : fallback)
-    }
-    update()
-    const obs = new MutationObserver(update)
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['style', 'class'],
-    })
-    return () => obs.disconnect()
-  }, [varName, fallback])
-  return color
-}
-
 export function RevenueChart({ data }: RevenueChartProps) {
-  const primaryColor = useCssColor('--primary', '#eab308')
+  const { primary } = useColorTheme()
+
+  const colorClinico  = colors[primary.palette][700]
+  const colorFarmacia = colors[primary.palette][400]
+  const colorReceita  = colors[primary.palette][600]
 
   return (
     <ResponsiveContainer width="100%" height={320}>
@@ -93,23 +77,22 @@ export function RevenueChart({ data }: RevenueChartProps) {
         <Legend
           formatter={(value) => {
             const labels: Record<string, string> = {
-              gmvClinico: 'GMV Clínico',
+              gmvClinico:  'GMV Clínico',
               gmvFarmacia: 'GMV Farmácia',
               receitaNoun: 'Receita Noun',
             }
             return labels[value] ?? value
           }}
         />
-        <Bar dataKey="gmvClinico"  name="gmvClinico"  fill={primaryColor} radius={[3, 3, 0, 0]} />
-        <Bar dataKey="gmvFarmacia" name="gmvFarmacia" fill={primaryColor} radius={[3, 3, 0, 0]} opacity={0.4} />
+        <Bar dataKey="gmvClinico"  name="gmvClinico"  fill={colorClinico}  radius={[3, 3, 0, 0]} />
+        <Bar dataKey="gmvFarmacia" name="gmvFarmacia" fill={colorFarmacia} radius={[3, 3, 0, 0]} />
         <Line
           type="monotone"
           dataKey="receitaNoun"
           name="receitaNoun"
-          stroke={primaryColor}
+          stroke={colorReceita}
           strokeWidth={2}
-          strokeOpacity={0.75}
-          dot={{ fill: primaryColor, r: 3 }}
+          dot={{ fill: colorReceita, r: 3 }}
         />
       </ComposedChart>
     </ResponsiveContainer>
