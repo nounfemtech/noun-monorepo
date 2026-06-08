@@ -319,7 +319,7 @@ function ShadeHintPopover() {
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-72 p-4 space-y-3 text-xs"
+        className="w-96 p-4 space-y-3 text-xs"
         side="top"
         align="start"
         sideOffset={6}
