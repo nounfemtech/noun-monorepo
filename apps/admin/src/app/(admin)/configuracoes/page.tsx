@@ -331,26 +331,26 @@ function ShadeHintPopover() {
 
         <div className="space-y-1">
           <p className="font-medium text-foreground">Tema claro</p>
-          <p className="text-muted-foreground"><span className="font-medium text-foreground">500–700:</span> melhor contraste em botões e elementos interativos.</p>
-          <p className="text-muted-foreground"><span className="font-medium text-foreground">300–400:</span> mais sutis, funcionam melhor em contextos de destaque leve.</p>
-          <p className="text-muted-foreground"><span className="font-medium text-foreground">800:</span> muito saturado no claro, use com cautela.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Vivo, Sólido e Forte:</span> melhor contraste em botões e elementos interativos.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Tênue e Suave:</span> mais sutis, ideais para destaques leves ou ícones secundários.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Intenso:</span> muito saturado no claro, use com cautela.</p>
         </div>
 
         <div className="space-y-1">
           <p className="font-medium text-foreground">Tema escuro</p>
-          <p className="text-muted-foreground"><span className="font-medium text-foreground">300–500:</span> se destacam sobre fundos escuros sem forçar a vista.</p>
-          <p className="text-muted-foreground"><span className="font-medium text-foreground">700–800:</span> escuros demais, tendem a se perder no fundo.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Tênue, Suave e Vivo:</span> se destacam sobre fundos escuros sem forçar a vista.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Forte e Intenso:</span> escuros demais, tendem a se perder no fundo.</p>
         </div>
 
         <div className="space-y-1">
           <p className="font-medium text-foreground">Tons versáteis</p>
-          <p className="text-muted-foreground"><span className="font-medium text-foreground">400–600:</span> funcionam bem nos dois modos. A escolha mais segura.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Suave, Vivo e Sólido:</span> funcionam bem nos dois modos. A escolha mais segura.</p>
         </div>
 
         <div className="space-y-1">
           <p className="font-medium text-foreground">Por família de cor</p>
-          <p className="text-muted-foreground"><span className="font-medium text-foreground">Quentes</span> (yellow, amber, orange, lime): preferir 500–600 no tema claro para garantir contraste.</p>
-          <p className="text-muted-foreground"><span className="font-medium text-foreground">Frias</span> (blue, indigo, violet, purple): funcionam bem em 400–500 nos dois modos.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Quentes</span> (yellow, amber, orange, lime): preferir Vivo ou Sólido no tema claro para garantir contraste.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Frias</span> (blue, indigo, violet, purple): funcionam bem em Suave ou Vivo nos dois modos.</p>
         </div>
 
         <div className="rounded-md bg-muted px-2.5 py-2 space-y-0.5">
