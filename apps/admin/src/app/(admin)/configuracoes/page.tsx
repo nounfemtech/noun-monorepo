@@ -621,7 +621,7 @@ export default function ConfiguracoesPage() {
             <Separator />
 
             <SettingsRow
-              title="Modo"
+              title="Tema"
               description="Tema claro, escuro ou sincronizado com o sistema."
             >
               <ThemeModeSwitcher />
