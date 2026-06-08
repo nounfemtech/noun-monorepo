@@ -294,49 +294,69 @@ function AvatarUpload() {
 // ---------------------------------------------------------------------------
 
 function ShadeHintPopover() {
+  const [open, setOpen] = React.useState(false)
+  const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function scheduleClose() {
+    closeTimer.current = setTimeout(() => setOpen(false), 120)
+  }
+
+  function cancelClose() {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+  }
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           type="button"
+          onMouseEnter={() => { cancelClose(); setOpen(true) }}
+          onMouseLeave={scheduleClose}
           className="text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none"
           aria-label="Dicas de tonalidade"
         >
           <IconHelp size={14} />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-76 p-4 space-y-3.5 text-xs" side="right" align="start">
+      <PopoverContent
+        className="w-72 p-4 space-y-3.5 text-xs"
+        side="right"
+        align="center"
+        sideOffset={8}
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
+      >
         <p className="text-sm font-semibold leading-none">Guia de tonalidades</p>
 
         <div className="space-y-1.5">
           <p className="font-medium text-foreground">Tema claro</p>
-          <ul className="space-y-1 text-muted-foreground">
-            <li><span className="font-medium text-foreground">500–700</span> — melhor equilíbrio entre contraste e vivacidade.</li>
-            <li><span className="font-medium text-foreground">100–200</span> — tons muito claros ficam quase invisíveis em botões, barras de progresso e outros componentes sobre fundo branco.</li>
+          <ul className="space-y-1 text-muted-foreground list-none">
+            <li><span className="font-medium text-foreground">500–700:</span> melhor equilíbrio entre contraste e vivacidade.</li>
+            <li><span className="font-medium text-foreground">100–200:</span> tons muito claros ficam quase invisíveis em botões e barras de progresso sobre fundo branco.</li>
           </ul>
         </div>
 
         <div className="space-y-1.5">
           <p className="font-medium text-foreground">Tema escuro</p>
-          <ul className="space-y-1 text-muted-foreground">
-            <li><span className="font-medium text-foreground">300–500</span> — se destacam sobre fundos escuros sem forçar a vista.</li>
-            <li><span className="font-medium text-foreground">800–900</span> — escuros demais para se distinguir do fundo, prejudicando a visibilidade de componentes.</li>
+          <ul className="space-y-1 text-muted-foreground list-none">
+            <li><span className="font-medium text-foreground">300–500:</span> se destacam sobre fundos escuros sem forçar a vista.</li>
+            <li><span className="font-medium text-foreground">800–900:</span> escuros demais para se distinguir do fundo, reduzindo o contraste dos componentes.</li>
           </ul>
         </div>
 
         <div className="space-y-1.5">
           <p className="font-medium text-foreground">Tons versáteis</p>
-          <p className="text-muted-foreground"><span className="font-medium text-foreground">400–600</span> — funcionam bem em ambos os modos. A escolha mais segura se você alterna entre claro e escuro.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">400–600:</span> funcionam bem nos dois modos. A escolha mais segura ao alternar entre claro e escuro.</p>
         </div>
 
         <div className="space-y-1.5">
           <p className="font-medium text-foreground">Cores quentes (yellow, amber, orange, lime)</p>
-          <p className="text-muted-foreground">Naturalmente claras e de alto brilho. No modo claro, prefira tons <span className="font-medium text-foreground">500–600</span> para garantir contraste suficiente em texto e ícones sobre o primary.</p>
+          <p className="text-muted-foreground">São naturalmente claras. No tema claro prefira <span className="font-medium text-foreground">500–600</span> para garantir contraste em textos e ícones sobre o primary.</p>
         </div>
 
         <div className="space-y-1.5">
           <p className="font-medium text-foreground">Cores frias (blue, indigo, violet, purple)</p>
-          <p className="text-muted-foreground">Naturalmente mais escuras. Funcionam bem em tons <span className="font-medium text-foreground">400–500</span> em ambos os modos sem perder legibilidade.</p>
+          <p className="text-muted-foreground">São naturalmente mais escuras. Funcionam bem em <span className="font-medium text-foreground">400–500</span> nos dois modos sem perder legibilidade.</p>
         </div>
       </PopoverContent>
     </Popover>
