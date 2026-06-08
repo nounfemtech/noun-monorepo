@@ -32,6 +32,15 @@ const NEUTRAL_LABELS: Record<NeutralName, string> = {
 // Shades expostos no picker — 100, 200, 900, 950 removidos
 const PICKER_SHADES = [300, 400, 500, 600, 700, 800] as const
 
+const SHADE_NAMES: Record<typeof PICKER_SHADES[number], string> = {
+  300: 'Tênue',
+  400: 'Suave',
+  500: 'Vivo',
+  600: 'Sólido',
+  700: 'Forte',
+  800: 'Intenso',
+}
+
 // ---------------------------------------------------------------------------
 // ColorItem — retângulo com dot colorido + label (base de todos os pickers)
 // ---------------------------------------------------------------------------
@@ -110,7 +119,7 @@ export function ShadeColorPicker({ className }: { className?: string }) {
       {PICKER_SHADES.map((shade) => (
         <ColorItem
           key={shade}
-          label={String(shade)}
+          label={SHADE_NAMES[shade]}
           dotColor={colors[primary.palette][shade]}
           isActive={primary.shade === shade}
           onClick={() => setPrimary({ ...primary, shade: shade as ColorShadeValue })}
