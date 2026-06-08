@@ -323,7 +323,7 @@ function ThemeHintPopover() {
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-72 p-3 space-y-2.5 text-xs"
+        className="w-80 p-3 space-y-2.5 text-xs"
         side="top"
         align="start"
         sideOffset={6}
@@ -387,7 +387,7 @@ function PrimaryHintPopover() {
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-72 p-3 space-y-2.5 text-xs"
+        className="w-80 p-3 space-y-2.5 text-xs"
         side="top"
         align="start"
         sideOffset={6}
@@ -461,7 +461,7 @@ function ShadeHintPopover() {
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-72 p-3 space-y-2.5 text-xs"
+        className="w-80 p-3 space-y-2.5 text-xs"
         side="top"
         align="start"
         sideOffset={6}
@@ -534,7 +534,7 @@ function NeutralHintPopover() {
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-72 p-3 space-y-2.5 text-xs"
+        className="w-80 p-3 space-y-2.5 text-xs"
         side="top"
         align="start"
         sideOffset={6}
