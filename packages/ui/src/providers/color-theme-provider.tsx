@@ -56,9 +56,7 @@ function bestFgShade(palette: ColorName, bgShade: ColorShadeValue): ColorShadeVa
 
 // Shades banidos do picker — remap automático para o mais próximo válido
 const REMOVED_SHADE_REMAP: Partial<Record<number, ColorShadeValue>> = {
-  100: 200,
-  900: 800,
-  950: 800,
+  950: 900,
 }
 
 /** Reads a PaletteSelection from localStorage, falls back to defaultVal */

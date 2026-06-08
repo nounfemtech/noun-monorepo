@@ -29,8 +29,8 @@ const NEUTRAL_LABELS: Record<NeutralName, string> = {
   taupe: 'Taupe', mauve: 'Mauve', mist: 'Mist', olive: 'Olive',
 }
 
-// Shades expostos no picker — 100, 900 e 950 removidos (contraste insuficiente)
-const PICKER_SHADES = [200, 300, 400, 500, 600, 700, 800] as const
+// Shades expostos no picker — 950 removido (contraste insuficiente em dark mode)
+const PICKER_SHADES = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const
 
 // ---------------------------------------------------------------------------
 // ColorItem — retângulo com dot colorido + label (base de todos os pickers)
