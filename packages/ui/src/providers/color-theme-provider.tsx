@@ -54,6 +54,13 @@ function bestFgShade(palette: ColorName, bgShade: ColorShadeValue): ColorShadeVa
   return c950 >= c50 ? 950 : 50
 }
 
+// Shades banidos do picker — remap automático para o mais próximo válido
+const REMOVED_SHADE_REMAP: Partial<Record<number, ColorShadeValue>> = {
+  100: 200,
+  900: 800,
+  950: 800,
+}
+
 /** Reads a PaletteSelection from localStorage, falls back to defaultVal */
 function readStorage(key: string, defaultVal: PaletteSelection): PaletteSelection {
   try {
@@ -68,6 +75,10 @@ function readStorage(key: string, defaultVal: PaletteSelection): PaletteSelectio
       (COLOR_SHADES as unknown as number[]).includes(parsed.shade) &&
       colors[parsed.palette as ColorName]
     ) {
+      // Migra shades removidos para o mais próximo permitido
+      if (parsed.shade in REMOVED_SHADE_REMAP) {
+        parsed.shade = REMOVED_SHADE_REMAP[parsed.shade]
+      }
       return parsed as PaletteSelection
     }
   } catch {
