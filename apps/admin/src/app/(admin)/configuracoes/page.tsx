@@ -327,7 +327,7 @@ function ShadeHintPopover() {
         onMouseEnter={cancelClose}
         onMouseLeave={scheduleClose}
       >
-        <p className="text-[11px] font-semibold text-muted-foreground">Guia de tonalidades</p>
+        <p className="text-sm font-semibold text-muted-foreground">Guia de tonalidades</p>
 
         <div className="space-y-1">
           <p className="font-medium text-foreground">Tema claro</p>
