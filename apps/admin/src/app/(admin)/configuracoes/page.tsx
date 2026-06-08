@@ -4,7 +4,7 @@ import * as React from 'react'
 import { PrimaryColorPicker, ShadeColorPicker, NeutralColorPicker, useColorTheme, colors } from '@noun/ui'
 import { useSpacemanTheme } from '@space-man/react-theme-animation'
 import type { Theme } from '@space-man/react-theme-animation'
-import { IconCheck } from '@tabler/icons-react'
+import { IconCheck, IconHelp } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createSupabaseBrowser } from '@/lib/supabase'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 // ---------------------------------------------------------------------------
 // Mini dashboard mockups (hardcoded colors — não mudam com o tema)
@@ -288,19 +289,78 @@ function AvatarUpload() {
 // Layout helpers
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Popover de dicas de tonalidade
+// ---------------------------------------------------------------------------
+
+function ShadeHintPopover() {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none"
+          aria-label="Dicas de tonalidade"
+        >
+          <IconHelp size={14} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-76 p-4 space-y-3.5 text-xs" side="right" align="start">
+        <p className="text-sm font-semibold leading-none">Guia de tonalidades</p>
+
+        <div className="space-y-1.5">
+          <p className="font-medium text-foreground">Tema claro</p>
+          <ul className="space-y-1 text-muted-foreground">
+            <li><span className="font-medium text-foreground">500–700</span> — melhor equilíbrio entre contraste e vivacidade.</li>
+            <li><span className="font-medium text-foreground">100–200</span> — tons muito claros ficam quase invisíveis em botões, barras de progresso e outros componentes sobre fundo branco.</li>
+          </ul>
+        </div>
+
+        <div className="space-y-1.5">
+          <p className="font-medium text-foreground">Tema escuro</p>
+          <ul className="space-y-1 text-muted-foreground">
+            <li><span className="font-medium text-foreground">300–500</span> — se destacam sobre fundos escuros sem forçar a vista.</li>
+            <li><span className="font-medium text-foreground">800–900</span> — escuros demais para se distinguir do fundo, prejudicando a visibilidade de componentes.</li>
+          </ul>
+        </div>
+
+        <div className="space-y-1.5">
+          <p className="font-medium text-foreground">Tons versáteis</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">400–600</span> — funcionam bem em ambos os modos. A escolha mais segura se você alterna entre claro e escuro.</p>
+        </div>
+
+        <div className="space-y-1.5">
+          <p className="font-medium text-foreground">Cores quentes (yellow, amber, orange, lime)</p>
+          <p className="text-muted-foreground">Naturalmente claras e de alto brilho. No modo claro, prefira tons <span className="font-medium text-foreground">500–600</span> para garantir contraste suficiente em texto e ícones sobre o primary.</p>
+        </div>
+
+        <div className="space-y-1.5">
+          <p className="font-medium text-foreground">Cores frias (blue, indigo, violet, purple)</p>
+          <p className="text-muted-foreground">Naturalmente mais escuras. Funcionam bem em tons <span className="font-medium text-foreground">400–500</span> em ambos os modos sem perder legibilidade.</p>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 function SettingsRow({
   title,
   description,
+  titleExtra,
   children,
 }: {
   title: string
   description: string
+  titleExtra?: React.ReactNode
   children: React.ReactNode
 }) {
   return (
     <div className="flex gap-8 py-6">
       <div className="w-64 shrink-0">
-        <p className="text-sm font-medium">{title}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-sm font-medium">{title}</p>
+          {titleExtra}
+        </div>
         <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
       </div>
       <div className="flex-1">
@@ -641,6 +701,7 @@ export default function ConfiguracoesPage() {
             <SettingsRow
               title="Tonalidade"
               description="Intensidade da cor primária selecionada."
+              titleExtra={<ShadeHintPopover />}
             >
               <ShadeColorPicker />
             </SettingsRow>
