@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { PrimaryColorPicker, ShadeColorPicker, NeutralColorPicker, useColorTheme, colors } from '@noun/ui'
+import { PrimaryColorPicker, NeutralColorPicker, useColorTheme, colors } from '@noun/ui'
 import { useSpacemanTheme } from '@space-man/react-theme-animation'
 import type { Theme } from '@space-man/react-theme-animation'
 import { IconCheck, IconHelp } from '@tabler/icons-react'
@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createSupabaseBrowser } from '@/lib/supabase'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Slider } from '@/components/ui/slider'
 
 // ---------------------------------------------------------------------------
 // Mini dashboard mockups (hardcoded colors — não mudam com o tema)
@@ -359,6 +360,68 @@ function ShadeHintPopover() {
         </div>
       </PopoverContent>
     </Popover>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// ShadeSliderPicker — slider com 6 stops nomeados (300→800)
+// ---------------------------------------------------------------------------
+
+const SHADE_STOPS = [
+  { value: 300 as const, label: 'Tênue'   },
+  { value: 400 as const, label: 'Suave'   },
+  { value: 500 as const, label: 'Vivo'    },
+  { value: 600 as const, label: 'Sólido'  },
+  { value: 700 as const, label: 'Forte'   },
+  { value: 800 as const, label: 'Intenso' },
+]
+
+function ShadeSliderPicker() {
+  const { primary, setPrimary } = useColorTheme()
+  const idx = SHADE_STOPS.findIndex(s => s.value === primary.shade)
+  const currentIdx = idx >= 0 ? idx : 2 // fallback: Vivo (500)
+
+  return (
+    <div className="w-full max-w-sm pt-1 pb-6 px-0.5">
+      <Slider
+        min={0}
+        max={SHADE_STOPS.length - 1}
+        step={1}
+        value={[currentIdx]}
+        onValueChange={(vals) => {
+          const i = vals[0] ?? 0
+          const stop = SHADE_STOPS[i]
+          if (stop) setPrimary({ ...primary, shade: stop.value })
+        }}
+      />
+      <div className="relative mt-3" style={{ height: '1rem' }}>
+        {SHADE_STOPS.map((stop, i) => {
+          const pct = (i / (SHADE_STOPS.length - 1)) * 100
+          const isActive = currentIdx === i
+          return (
+            <div
+              key={stop.value}
+              className="absolute top-0"
+              style={{
+                left: `${pct}%`,
+                transform: i === 0
+                  ? 'translateX(0%)'
+                  : i === SHADE_STOPS.length - 1
+                  ? 'translateX(-100%)'
+                  : 'translateX(-50%)',
+              }}
+            >
+              <span className={cn(
+                'text-[10px] leading-none whitespace-nowrap font-medium',
+                isActive ? 'text-foreground' : 'text-muted-foreground',
+              )}>
+                {stop.label}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
@@ -722,7 +785,7 @@ export default function ConfiguracoesPage() {
               description="Intensidade da cor primária selecionada."
               titleExtra={<ShadeHintPopover />}
             >
-              <ShadeColorPicker />
+              <ShadeSliderPicker />
             </SettingsRow>
 
             <Separator />
