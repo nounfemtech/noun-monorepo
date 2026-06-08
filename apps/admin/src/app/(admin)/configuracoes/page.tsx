@@ -358,6 +358,11 @@ function ShadeHintPopover() {
           <p className="font-medium text-foreground">Cores frias (blue, indigo, violet, purple)</p>
           <p className="text-muted-foreground">São naturalmente mais escuras. Funcionam bem em <span className="font-medium text-foreground">400–500</span> nos dois modos sem perder legibilidade.</p>
         </div>
+
+        <div className="rounded-md bg-muted px-3 py-2 space-y-0.5">
+          <p className="font-medium text-foreground">Dica</p>
+          <p className="text-muted-foreground">As miniaturas de tema na seção acima são interativas. Ao trocar a tonalidade, elas refletem a cor em tempo real e mostram uma prévia de como os componentes vão aparecer no tema claro e escuro.</p>
+        </div>
       </PopoverContent>
     </Popover>
   )
