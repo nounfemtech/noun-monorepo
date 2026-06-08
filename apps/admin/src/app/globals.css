@@ -77,11 +77,11 @@
     --primary-foreground:  222.2 84% 4.9%;
     --ring:                47.9 95.8% 53.1%;
 
-    /* Neutros — Zinc (dark) */
-    --muted:               240 4% 16%;
+    /* Neutros — Zinc (dark) — espelha capLightness do ColorThemeProvider */
+    --muted:               240 4% 18%;
     --muted-foreground:    240 5% 62%;
-    --border:              240 4% 22%;
-    --input:               240 4% 22%;
+    --border:              240 4% 14%;
+    --input:               240 4% 14%;
 
     /* Sidebar dark — mesmo tom do background para superfície unificada */
     --sidebar-background:          240 6% 8%;
@@ -90,7 +90,7 @@
     --sidebar-primary-foreground:          0 0% 100%;
     --sidebar-accent:          240 4% 16%;
     --sidebar-accent-foreground:          240 4.8% 95.9%;
-    --sidebar-border:          240 4% 14%;
+    --sidebar-border:          240 4% 12%;
     --sidebar-ring:          217.2 91.2% 59.8%;
   }
 }

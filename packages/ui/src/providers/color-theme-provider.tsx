@@ -28,6 +28,18 @@ function getHsl(palette: ColorName, shade: ColorShadeValue): string {
   return hexToHsl(colors[palette][shade])
 }
 
+/**
+ * Recebe uma string HSL no formato "H S% L%" e limita a lightness a maxL.
+ * Usado no dark mode para garantir bordas suaves independente do neutro escolhido:
+ * preserva o hue e a saturação da paleta, mas impede que a lightness
+ * fique acima do teto, evitando divisores muito marcantes num fundo escuro.
+ */
+function capLightness(hsl: string, maxL: number): string {
+  const parts = hsl.split(' ')
+  const l = parseFloat(parts[2] ?? '0')
+  return l <= maxL ? hsl : `${parts[0]} ${parts[1]} ${maxL}%`
+}
+
 // ---------------------------------------------------------------------------
 // WCAG contrast utilities
 // ---------------------------------------------------------------------------
@@ -110,9 +122,14 @@ export function applyPrimary(sel: PaletteSelection): void {
 
 // ---------------------------------------------------------------------------
 // Apply neutral CSS vars
-// Shades seguem o padrão Tailwind v4: 100/500/200 no light, 800/400/700 no dark.
-// Controla: --muted (fundo secundário), --muted-foreground (texto auxiliar),
-//           --border (bordas), --input (bordas de input)
+//
+// Light: shades fixos (100 / 500 / 200).
+// Dark:  usa capLightness para preservar hue+sat de cada neutro mas limitar
+//        a lightness a um teto, evitando bordas muito marcantes num fundo
+//        escuro (~8% lightness). Tetos calibrados por tipo de variável:
+//   --muted           ≤ 18%  (fundos de hover/badge — precisam de alguma visibilidade)
+//   --border / --input ≤ 14%  (divisores — sutis, ~6 pp acima do fundo)
+//   --sidebar-border  ≤ 12%  (linha da sidebar — quase imperceptível)
 // ---------------------------------------------------------------------------
 
 export function applyNeutral(sel: PaletteSelection): void {
@@ -120,11 +137,11 @@ export function applyNeutral(sel: PaletteSelection): void {
   const isDark = root.classList.contains('dark')
 
   if (isDark) {
-    root.style.setProperty('--muted',            getHsl(sel.palette, 800))
+    root.style.setProperty('--muted',            capLightness(getHsl(sel.palette, 700), 18))
     root.style.setProperty('--muted-foreground', getHsl(sel.palette, 400))
-    root.style.setProperty('--border',           getHsl(sel.palette, 700))
-    root.style.setProperty('--input',            getHsl(sel.palette, 700))
-    root.style.setProperty('--sidebar-border',   getHsl(sel.palette, 700))
+    root.style.setProperty('--border',           capLightness(getHsl(sel.palette, 700), 14))
+    root.style.setProperty('--input',            capLightness(getHsl(sel.palette, 700), 14))
+    root.style.setProperty('--sidebar-border',   capLightness(getHsl(sel.palette, 700), 12))
   } else {
     root.style.setProperty('--muted',            getHsl(sel.palette, 100))
     root.style.setProperty('--muted-foreground', getHsl(sel.palette, 500))
