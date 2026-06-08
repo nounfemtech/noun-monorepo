@@ -42,45 +42,22 @@ const STATE_NAMES: Record<string, string> = {
   SP:'São Paulo',           SE:'Sergipe',             TO:'Tocantins',
 }
 
-// Tons por região usando color-mix com muted-foreground como âncora de contraste.
-// Isso garante que qualquer tom de primary — incluindo amarelos claros, brancos
-// ou cores de baixo contraste — sempre produza um fill visível em light e dark mode.
+// Tons do primary por região — mesmo matiz (hue), opacidade crescente por região.
+// Opacidades altas o suficiente para garantir contraste mesmo com primaries claros.
 //
-// dim   → quase puro muted (estados fora do filtro ativo)
-// base  → primary misturado com muted-foreground (sempre legível)
-// active → mais primary, para hover/seleção
+// dim    → estados fora do filtro ativo (quase imperceptível)
+// base   → estado padrão visível
+// active → hover / selecionado
 const REGION_TONES: Record<RegionId, { dim: string; base: string; active: string }> = {
-  Norte: {
-    dim:    'color-mix(in srgb, hsl(var(--primary))  5%, hsl(var(--muted)))',
-    base:   'color-mix(in srgb, hsl(var(--primary)) 30%, hsl(var(--muted-foreground)))',
-    active: 'color-mix(in srgb, hsl(var(--primary)) 62%, hsl(var(--muted-foreground)))',
-  },
-  Nordeste: {
-    dim:    'color-mix(in srgb, hsl(var(--primary))  5%, hsl(var(--muted)))',
-    base:   'color-mix(in srgb, hsl(var(--primary)) 42%, hsl(var(--muted-foreground)))',
-    active: 'color-mix(in srgb, hsl(var(--primary)) 72%, hsl(var(--muted-foreground)))',
-  },
-  'Centro-Oeste': {
-    dim:    'color-mix(in srgb, hsl(var(--primary))  5%, hsl(var(--muted)))',
-    base:   'color-mix(in srgb, hsl(var(--primary)) 54%, hsl(var(--muted-foreground)))',
-    active: 'color-mix(in srgb, hsl(var(--primary)) 80%, hsl(var(--muted-foreground)))',
-  },
-  Sudeste: {
-    dim:    'color-mix(in srgb, hsl(var(--primary))  5%, hsl(var(--muted)))',
-    base:   'color-mix(in srgb, hsl(var(--primary)) 66%, hsl(var(--muted-foreground)))',
-    active: 'color-mix(in srgb, hsl(var(--primary)) 88%, hsl(var(--muted-foreground)))',
-  },
-  Sul: {
-    dim:    'color-mix(in srgb, hsl(var(--primary))  5%, hsl(var(--muted)))',
-    base:   'color-mix(in srgb, hsl(var(--primary)) 47%, hsl(var(--muted-foreground)))',
-    active: 'color-mix(in srgb, hsl(var(--primary)) 76%, hsl(var(--muted-foreground)))',
-  },
+  Norte:          { dim: 'hsl(var(--primary) / .10)', base: 'hsl(var(--primary) / .35)', active: 'hsl(var(--primary) / .62)' },
+  Nordeste:       { dim: 'hsl(var(--primary) / .11)', base: 'hsl(var(--primary) / .45)', active: 'hsl(var(--primary) / .70)' },
+  'Centro-Oeste': { dim: 'hsl(var(--primary) / .12)', base: 'hsl(var(--primary) / .55)', active: 'hsl(var(--primary) / .78)' },
+  Sudeste:        { dim: 'hsl(var(--primary) / .12)', base: 'hsl(var(--primary) / .65)', active: 'hsl(var(--primary) / .86)' },
+  Sul:            { dim: 'hsl(var(--primary) / .11)', base: 'hsl(var(--primary) / .50)', active: 'hsl(var(--primary) / .74)' },
 }
 
-// Dots de cidade e barras — primary misturado com foreground para garantir
-// visibilidade mesmo em primaries de baixo contraste (ex.: amarelo claro)
-const DOT_COLOR    = 'color-mix(in srgb, hsl(var(--primary)) 75%, hsl(var(--foreground)))'
-const DOT_SELECTED = 'color-mix(in srgb, hsl(var(--primary)) 82%, hsl(var(--foreground)))'
+const DOT_COLOR    = 'hsl(var(--primary))'
+const DOT_SELECTED = 'hsl(var(--primary) / .90)'
 
 // ─── Tipos públicos ───────────────────────────────────────────────────────────
 export interface CityPoint {
