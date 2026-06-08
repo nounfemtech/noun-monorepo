@@ -362,6 +362,81 @@ function ShadeHintPopover() {
   )
 }
 
+// ---------------------------------------------------------------------------
+// Popover de dicas de tons neutros
+// ---------------------------------------------------------------------------
+
+function NeutralHintPopover() {
+  const [open, setOpen] = React.useState(false)
+  const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function scheduleClose() {
+    closeTimer.current = setTimeout(() => setOpen(false), 120)
+  }
+
+  function cancelClose() {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onMouseEnter={() => { cancelClose(); setOpen(true) }}
+          onMouseLeave={scheduleClose}
+          className="text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none"
+          aria-label="Dicas de tons neutros"
+        >
+          <IconHelp size={14} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-72 p-3 space-y-2.5 text-xs"
+        side="top"
+        align="start"
+        sideOffset={6}
+        collisionPadding={16}
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
+      >
+        <p className="text-sm font-semibold text-muted-foreground">Guia de tons neutros</p>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">O que os neutros controlam</p>
+          <p className="text-muted-foreground">Bordas, fundos de cartões e seções secundárias, e a cor do texto auxiliar. A escolha certa suaviza a interface e complementa a cor primária.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Tom frio</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Slate, Zinc e Mist:</span> leve toque azulado. Combinam bem com primárias frias como blue, indigo, violet e purple.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Tom quente</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Stone e Taupe:</span> toque terroso e bege. Combinam bem com yellow, amber, orange e green.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Tom rosado e orgânico</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Mauve:</span> neutro com toque rosado e violeta. Funciona bem com pink, fuchsia e rose.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Olive:</span> neutro esverdeado, combina com paletas de lime, teal e emerald.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Tom universal</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Gray e Neutral:</span> sem tinting perceptível. Funcionam com qualquer cor primária e são a escolha mais segura se houver dúvida.</p>
+        </div>
+
+        <div className="rounded-md bg-muted px-2.5 py-2 space-y-0.5">
+          <p className="font-medium text-foreground">Dica</p>
+          <p className="text-muted-foreground">Alinhe a temperatura do neutro à da primária: frios com frios, quentes com quentes. O contraste entre temperaturas pode funcionar, mas exige mais cuidado.</p>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 function SettingsRow({
   title,
   description,
@@ -730,6 +805,7 @@ export default function ConfiguracoesPage() {
             <SettingsRow
               title="Tons neutros"
               description="Controla bordas, fundos secundários e textos auxiliares."
+              titleExtra={<NeutralHintPopover />}
             >
               <NeutralColorPicker />
             </SettingsRow>
