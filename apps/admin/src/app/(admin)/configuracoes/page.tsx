@@ -293,6 +293,148 @@ function AvatarUpload() {
 // Popover de dicas de tonalidade
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Popover de dicas de tema
+// ---------------------------------------------------------------------------
+
+function ThemeHintPopover() {
+  const [open, setOpen] = React.useState(false)
+  const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function scheduleClose() {
+    closeTimer.current = setTimeout(() => setOpen(false), 120)
+  }
+
+  function cancelClose() {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onMouseEnter={() => { cancelClose(); setOpen(true) }}
+          onMouseLeave={scheduleClose}
+          className="text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none"
+          aria-label="Dicas de tema"
+        >
+          <IconHelp size={14} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-72 p-3 space-y-2.5 text-xs"
+        side="top"
+        align="start"
+        sideOffset={6}
+        collisionPadding={16}
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
+      >
+        <p className="text-sm font-semibold text-muted-foreground">Guia de tema</p>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Sistema</p>
+          <p className="text-muted-foreground">Sincroniza automaticamente com a preferência do sistema operacional. Ideal para quem alterna entre os modos com frequência, sem precisar ajustar manualmente.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Claro</p>
+          <p className="text-muted-foreground">Fundos brancos e neutros claros. Recomendado para ambientes bem iluminados e para quem prefere alto contraste no texto.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Escuro</p>
+          <p className="text-muted-foreground">Fundos escuros reduzem o cansaço visual em ambientes com pouca luz e são preferidos em sessões noturnas longas.</p>
+        </div>
+
+        <div className="rounded-md bg-muted px-2.5 py-2 space-y-0.5">
+          <p className="font-medium text-foreground">Dica</p>
+          <p className="text-muted-foreground">A cor primária pode se comportar de forma diferente em cada modo. Use as miniaturas acima para comparar em tempo real antes de decidir.</p>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Popover de dicas de cor primária
+// ---------------------------------------------------------------------------
+
+function PrimaryHintPopover() {
+  const [open, setOpen] = React.useState(false)
+  const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function scheduleClose() {
+    closeTimer.current = setTimeout(() => setOpen(false), 120)
+  }
+
+  function cancelClose() {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onMouseEnter={() => { cancelClose(); setOpen(true) }}
+          onMouseLeave={scheduleClose}
+          className="text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none"
+          aria-label="Dicas de cor primária"
+        >
+          <IconHelp size={14} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-72 p-3 space-y-2.5 text-xs"
+        side="top"
+        align="start"
+        sideOffset={6}
+        collisionPadding={16}
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
+      >
+        <p className="text-sm font-semibold text-muted-foreground">Guia de cor primária</p>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">O que a cor primária afeta</p>
+          <p className="text-muted-foreground">Botões, links, indicadores ativos, bordas de foco e elementos interativos em geral. É a cor de maior destaque da interface.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Cores quentes</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Yellow, amber, orange, red e lime:</span> transmitem energia e atenção. No tema claro, prefira Vivo ou Sólido para garantir contraste suficiente.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Cores frias</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Blue, indigo, violet, purple, cyan, sky e teal:</span> passam confiança e profissionalismo. Versáteis e funcionam bem em qualquer tonalidade.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Cores expressivas</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Pink, fuchsia, rose, emerald e green:</span> ideais para marcas com identidade visual marcante e diferenciada.</p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Black</p>
+          <p className="text-muted-foreground">Neutro absoluto, funciona em qualquer contexto. No tema escuro pode se confundir com o fundo — prefira as tonalidades Tênue ou Suave para manter a diferenciação.</p>
+        </div>
+
+        <div className="rounded-md bg-muted px-2.5 py-2 space-y-0.5">
+          <p className="font-medium text-foreground">Dica</p>
+          <p className="text-muted-foreground">Escolha uma cor alinhada à identidade visual da sua marca. Combine com um tom neutro de temperatura próxima para uma interface coesa.</p>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Popover de dicas de tonalidade
+// ---------------------------------------------------------------------------
+
 function ShadeHintPopover() {
   const [open, setOpen] = React.useState(false)
   const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -777,6 +919,7 @@ export default function ConfiguracoesPage() {
             <SettingsRow
               title="Tema"
               description="Tema claro, escuro ou sincronizado com o sistema."
+              titleExtra={<ThemeHintPopover />}
             >
               <ThemeModeSwitcher />
             </SettingsRow>
@@ -786,6 +929,7 @@ export default function ConfiguracoesPage() {
             <SettingsRow
               title="Cor primária"
               description="Define a cor de destaque em botões, links e elementos interativos."
+              titleExtra={<PrimaryHintPopover />}
             >
               <PrimaryColorPicker />
             </SettingsRow>
