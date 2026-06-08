@@ -49,7 +49,7 @@ const tabsTriggerVariants = cva(
         default:
           "rounded-sm px-3 py-1.5 ring-offset-background data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
         underline:
-          "rounded-none px-3 h-10 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none -mb-px",
+          "rounded-none px-3 h-10 border-b-2 border-transparent hover:text-foreground hover:border-border data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none -mb-px",
       },
     },
     defaultVariants: { variant: "default" },
