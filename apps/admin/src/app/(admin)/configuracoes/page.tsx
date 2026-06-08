@@ -319,7 +319,7 @@ function ShadeHintPopover() {
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-96 p-4 space-y-3 text-xs"
+        className="w-72 p-3 space-y-2.5 text-xs"
         side="top"
         align="start"
         sideOffset={6}
@@ -329,46 +329,32 @@ function ShadeHintPopover() {
       >
         <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Guia de tonalidades</p>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <p className="font-medium text-foreground">Tema claro</p>
-          <p className="text-muted-foreground leading-relaxed">
-            <span className="font-medium text-foreground">500–700:</span> melhor equilíbrio entre contraste e vivacidade em botões, links e elementos interativos.
-          </p>
-          <p className="text-muted-foreground leading-relaxed">
-            <span className="font-medium text-foreground">100–200:</span> tons muito claros ficam quase invisíveis sobre fundo branco, prejudicando botões, barras de progresso e ícones.
-          </p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">500–700:</span> ideal para contraste e vivacidade.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">100–200:</span> quase invisíveis sobre fundo branco.</p>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <p className="font-medium text-foreground">Tema escuro</p>
-          <p className="text-muted-foreground leading-relaxed">
-            <span className="font-medium text-foreground">300–500:</span> se destacam sobre fundos escuros com boa leitura e sem forçar a vista.
-          </p>
-          <p className="text-muted-foreground leading-relaxed">
-            <span className="font-medium text-foreground">800–900:</span> escuros demais para se distinguir do fundo, o que reduz o contraste de componentes como botões e badges.
-          </p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">300–500:</span> se destacam sem forçar a vista.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">800–900:</span> se perdem no fundo escuro.</p>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <p className="font-medium text-foreground">Tons versáteis</p>
-          <p className="text-muted-foreground leading-relaxed">
-            <span className="font-medium text-foreground">400–600:</span> funcionam bem nos dois modos. A escolha mais segura para quem alterna entre tema claro e escuro com frequência.
-          </p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">400–600:</span> funcionam nos dois modos.</p>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <p className="font-medium text-foreground">Por família de cor</p>
-          <p className="text-muted-foreground leading-relaxed">
-            <span className="font-medium text-foreground">Quentes</span> (yellow, amber, orange, lime) são naturalmente claras e brilhantes. No tema claro prefira <span className="font-medium text-foreground">500–600</span> para garantir contraste suficiente em textos e ícones sobre o primary.
-          </p>
-          <p className="text-muted-foreground leading-relaxed">
-            <span className="font-medium text-foreground">Frias</span> (blue, indigo, violet, purple) são naturalmente mais saturadas e escuras. Funcionam bem em <span className="font-medium text-foreground">400–500</span> nos dois modos sem perder legibilidade.
-          </p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Quentes</span> (yellow, amber, lime): preferir 500–600 no claro.</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">Frias</span> (blue, indigo, violet): 400–500 funcionam nos dois modos.</p>
         </div>
 
-        <div className="rounded-md bg-muted px-3 py-2.5 space-y-1">
+        <div className="rounded-md bg-muted px-2.5 py-2 space-y-0.5">
           <p className="font-medium text-foreground">Dica</p>
-          <p className="text-muted-foreground leading-relaxed">As miniaturas de tema na seção acima são interativas e refletem a tonalidade em tempo real. Use-as para ter uma prévia de como os componentes vão aparecer antes de decidir.</p>
+          <p className="text-muted-foreground">As miniaturas de tema acima são interativas e refletem a tonalidade em tempo real, úteis para comparar antes de decidir.</p>
         </div>
       </PopoverContent>
     </Popover>
