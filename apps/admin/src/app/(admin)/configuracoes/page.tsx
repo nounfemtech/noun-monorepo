@@ -117,18 +117,31 @@ function ThemeModeSwitcher() {
 
   const primaryHex = colors[primary.palette][primary.shade]
 
-  function handleThemeClick(value: Theme, element: HTMLButtonElement) {
-    if (value === 'system') {
-      const osTheme: Theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      if (osTheme !== resolvedTheme) {
-        // OS preference differs from current: animate the visual change, then store 'system'
-        switchThemeFromElement(osTheme, element).then(() => setTheme('system'))
-      } else {
-        // OS preference already matches: no visual change, just store 'system'
-        switchThemeFromElement('system', element)
-      }
-    } else {
+  async function handleThemeClick(value: Theme, element: HTMLButtonElement) {
+    if (value !== 'system') {
       switchThemeFromElement(value, element)
+      return
+    }
+
+    const osTheme: 'light' | 'dark' = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+
+    // OS preference already matches the visible theme: no transition needed,
+    // just persist 'system' so the card becomes the active one.
+    if (osTheme === resolvedTheme) {
+      setTheme('system')
+      return
+    }
+
+    // OS preference differs: animate to the OS theme for the visual change, then
+    // persist 'system'. The finally guarantees the preference is stored even if
+    // the view transition is skipped/interrupted (its .ready promise can reject),
+    // which is what previously left `theme` stuck and the card border inactive.
+    try {
+      await switchThemeFromElement(osTheme, element)
+    } catch {
+      // transition skipped/interrupted — ignore, preference is set below
+    } finally {
+      setTheme('system')
     }
   }
 
