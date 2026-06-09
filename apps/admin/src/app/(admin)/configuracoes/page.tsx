@@ -108,7 +108,7 @@ const THEME_CARDS: { value: Theme; label: string; Mockup: React.FC<{ primary: st
 ]
 
 function ThemeModeSwitcher() {
-  const { theme, switchThemeFromElement } = useSpacemanTheme()
+  const { theme, resolvedTheme, setTheme, switchThemeFromElement } = useSpacemanTheme()
   const { primary } = useColorTheme()
   const [mounted, setMounted] = React.useState(false)
 
@@ -117,6 +117,21 @@ function ThemeModeSwitcher() {
 
   const primaryHex = colors[primary.palette][primary.shade]
 
+  function handleThemeClick(value: Theme, element: HTMLButtonElement) {
+    if (value === 'system') {
+      const osTheme: Theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      if (osTheme !== resolvedTheme) {
+        // OS preference differs from current: animate the visual change, then store 'system'
+        switchThemeFromElement(osTheme, element).then(() => setTheme('system'))
+      } else {
+        // OS preference already matches: no visual change, just store 'system'
+        switchThemeFromElement('system', element)
+      }
+    } else {
+      switchThemeFromElement(value, element)
+    }
+  }
+
   return (
     <div className="flex gap-4">
       {THEME_CARDS.map(({ value, label, Mockup }) => {
@@ -124,7 +139,7 @@ function ThemeModeSwitcher() {
         return (
           <button
             key={value}
-            onClick={(e) => switchThemeFromElement(value, e.currentTarget)}
+            onClick={(e) => handleThemeClick(value, e.currentTarget as HTMLButtonElement)}
             className="flex flex-col items-start gap-2 focus-visible:outline-none group"
           >
             <div
