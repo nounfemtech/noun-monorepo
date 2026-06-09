@@ -14,7 +14,7 @@ const inputVariants = cva(
         lg:      "h-10 px-4 py-2 text-base file:text-base",
       },
     },
-    defaultVariants: { size: "xs" },
+    defaultVariants: { size: "sm" },
   }
 )
 

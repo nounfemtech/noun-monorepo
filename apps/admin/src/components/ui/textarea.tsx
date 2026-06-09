@@ -14,7 +14,7 @@ const textareaVariants = cva(
         lg:      "min-h-[96px] px-4 py-3 text-base",
       },
     },
-    defaultVariants: { size: "xs" },
+    defaultVariants: { size: "sm" },
   }
 )
 
