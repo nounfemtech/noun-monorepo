@@ -110,7 +110,7 @@ export default async function UsuarioDetailPage({ params }: PageProps) {
     <div className="p-6 space-y-6 max-w-4xl">
       {/* Voltar */}
       <Link href="/usuarios">
-        <Button variant="ghost" size="sm" className="gap-2">
+        <Button variant="ghost" className="gap-2">
           <IconArrowLeft size={16} />
           Voltar para Usuários
         </Button>
@@ -231,7 +231,7 @@ export default async function UsuarioDetailPage({ params }: PageProps) {
                 </div>
                 <div className="pt-2">
                   <Link href={`/tenants/${profile.tenants.id}`}>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline">
                       Ver tenant
                     </Button>
                   </Link>

@@ -106,7 +106,7 @@ async function TenantsContent({ searchParams }: PageProps) {
       <form method="GET" className="flex flex-wrap gap-3 items-end">
         <div>
           <Select name="type" defaultValue={type || 'all'}>
-            <SelectTrigger className="h-10 w-[140px]">
+            <SelectTrigger className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -118,7 +118,7 @@ async function TenantsContent({ searchParams }: PageProps) {
         </div>
         <div>
           <Select name="status" defaultValue={status || 'all'}>
-            <SelectTrigger className="h-10 w-[150px]">
+            <SelectTrigger className="w-[150px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -185,7 +185,7 @@ async function TenantsContent({ searchParams }: PageProps) {
                   </TableCell>
                   <TableCell>
                     <Link href={`/tenants/${tenant.id}`}>
-                      <Button variant="ghost" size="sm" className="text-xs">
+                      <Button variant="ghost" className="text-xs">
                         Ver
                       </Button>
                     </Link>
@@ -208,14 +208,14 @@ async function TenantsContent({ searchParams }: PageProps) {
               <Link
                 href={`/tenants?page=${page - 1}${type ? `&type=${type}` : ''}${status ? `&status=${status}` : ''}`}
               >
-                <Button variant="outline" size="sm">Anterior</Button>
+                <Button variant="outline">Anterior</Button>
               </Link>
             )}
             {page < totalPages && (
               <Link
                 href={`/tenants?page=${page + 1}${type ? `&type=${type}` : ''}${status ? `&status=${status}` : ''}`}
               >
-                <Button variant="outline" size="sm">Próxima</Button>
+                <Button variant="outline">Próxima</Button>
               </Link>
             )}
           </div>

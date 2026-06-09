@@ -122,7 +122,7 @@ export default function NewTenantPage() {
   return (
     <div className="p-6 max-w-2xl space-y-6">
       <Link href="/tenants">
-        <Button variant="ghost" size="sm" className="gap-2">
+        <Button variant="ghost" className="gap-2">
           <IconArrowLeft size={16} />
           Voltar para Tenants
         </Button>

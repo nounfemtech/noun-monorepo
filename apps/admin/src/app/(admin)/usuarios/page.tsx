@@ -129,7 +129,7 @@ async function UsuariosContent({ searchParams }: PageProps) {
         </div>
         <div>
           <Select name="role" defaultValue={role || 'all'}>
-            <SelectTrigger className="h-10 w-[160px]">
+            <SelectTrigger className="w-[160px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -208,7 +208,7 @@ async function UsuariosContent({ searchParams }: PageProps) {
                   </TableCell>
                   <TableCell>
                     <Link href={`/usuarios/${profile.id}`}>
-                      <Button variant="ghost" size="sm" className="text-xs">
+                      <Button variant="ghost" className="text-xs">
                         Ver
                       </Button>
                     </Link>
@@ -231,7 +231,7 @@ async function UsuariosContent({ searchParams }: PageProps) {
               <Link
                 href={`/usuarios?page=${page - 1}${role ? `&role=${role}` : ''}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
               >
-                <Button variant="outline" size="sm">
+                <Button variant="outline">
                   Anterior
                 </Button>
               </Link>
@@ -240,7 +240,7 @@ async function UsuariosContent({ searchParams }: PageProps) {
               <Link
                 href={`/usuarios?page=${page + 1}${role ? `&role=${role}` : ''}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
               >
-                <Button variant="outline" size="sm">
+                <Button variant="outline">
                   Próxima
                 </Button>
               </Link>

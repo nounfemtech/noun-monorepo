@@ -59,7 +59,6 @@ export function TenantActions({ tenantId, currentStatus, currentCommissionRate }
           onClick={() => updateStatus('active')}
           disabled={loading}
           className="bg-green-600 hover:bg-green-700 text-white"
-          size="sm"
         >
           Aprovar
         </Button>
@@ -69,7 +68,6 @@ export function TenantActions({ tenantId, currentStatus, currentCommissionRate }
           onClick={() => updateStatus('suspended')}
           disabled={loading}
           variant="destructive"
-          size="sm"
         >
           Suspender
         </Button>
@@ -79,14 +77,12 @@ export function TenantActions({ tenantId, currentStatus, currentCommissionRate }
           onClick={() => updateStatus('active')}
           disabled={loading}
           className="bg-green-600 hover:bg-green-700 text-white"
-          size="sm"
         >
           Reativar
         </Button>
       )}
       <Button
         variant="outline"
-        size="sm"
         onClick={() => setDialogOpen(true)}
       >
         Editar taxa de comissão

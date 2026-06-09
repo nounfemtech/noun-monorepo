@@ -113,7 +113,7 @@ export default async function TenantDetailPage({ params }: PageProps) {
     <div className="p-6 space-y-6 max-w-4xl">
       {/* Voltar */}
       <Link href="/tenants">
-        <Button variant="ghost" size="sm" className="gap-2">
+        <Button variant="ghost" className="gap-2">
           <IconArrowLeft size={16} />
           Voltar para Tenants
         </Button>
@@ -264,7 +264,7 @@ export default async function TenantDetailPage({ params }: PageProps) {
                     <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Inativo</Badge>
                   )}
                   <Link href={`/usuarios/${pro.id}`}>
-                    <Button variant="ghost" size="sm" className="text-xs">Ver</Button>
+                    <Button variant="ghost" className="text-xs">Ver</Button>
                   </Link>
                 </div>
               ))}

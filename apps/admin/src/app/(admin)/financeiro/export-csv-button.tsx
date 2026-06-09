@@ -44,7 +44,7 @@ export function ExportCSVButton({ data }: ExportCSVButtonProps) {
   }
 
   return (
-    <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
+    <Button variant="outline" className="gap-2" onClick={handleExport}>
       <IconDownload size={16} />
       Exportar CSV
     </Button>

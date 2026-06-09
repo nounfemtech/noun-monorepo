@@ -31,7 +31,7 @@ export function ReplyForm({ ticketId }: { ticketId: string }) {
         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 resize-none"
       />
       <div className="flex justify-end">
-        <Button type="submit" size="sm" disabled={pending}>
+        <Button type="submit" disabled={pending}>
           <IconSend size={14} />
           {pending ? 'Enviando...' : 'Responder'}
         </Button>
