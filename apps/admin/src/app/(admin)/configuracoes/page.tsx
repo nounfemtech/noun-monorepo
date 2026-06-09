@@ -259,7 +259,6 @@ function AvatarUpload() {
           <Button
             type="button"
             variant="outline"
-            size="sm"
             disabled={busy}
             onClick={() => inputRef.current?.click()}
           >
@@ -269,7 +268,6 @@ function AvatarUpload() {
             <Button
               type="button"
               variant="ghost"
-              size="sm"
               disabled={busy}
               onClick={handleRemove}
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
