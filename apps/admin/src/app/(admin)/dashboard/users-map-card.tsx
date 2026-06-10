@@ -188,11 +188,6 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
               Distribuição geográfica de endereços cadastrados
             </p>
           </div>
-          {isMock && (
-            <span className="rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground">
-              Dados de exemplo
-            </span>
-          )}
         </div>
       </CardHeader>
 
