@@ -27,7 +27,7 @@ export function TransactionsEmpty() {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button variant="outline" onClick={() => router.refresh()}>
+        <Button variant="outline" size="xs" onClick={() => router.refresh()}>
           <RefreshCcwIcon />
           Atualizar
         </Button>
