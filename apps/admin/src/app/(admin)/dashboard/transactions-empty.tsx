@@ -18,8 +18,8 @@ export function TransactionsEmpty() {
   return (
     <Empty>
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <IconReceipt size={32} />
+        <EmptyMedia variant="icon" className="size-8">
+          <IconReceipt className="size-5" />
         </EmptyMedia>
         <EmptyTitle>Nenhuma transação</EmptyTitle>
         <EmptyDescription>
