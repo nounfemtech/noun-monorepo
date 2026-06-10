@@ -89,7 +89,7 @@ async function TenantsContent({ searchParams }: PageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold">Tenants</h1>
+          <h1 className="text-base font-bold">Tenants</h1>
           <p className="text-muted-foreground text-sm">
             {total.toLocaleString('pt-BR')} tenant{total !== 1 ? 's' : ''} cadastrado{total !== 1 ? 's' : ''}
           </p>

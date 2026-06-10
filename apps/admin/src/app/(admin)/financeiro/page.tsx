@@ -166,7 +166,7 @@ async function FinanceiroContent({ searchParams }: PageProps) {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold">Financeiro</h1>
+          <h1 className="text-base font-bold">Financeiro</h1>
           <p className="text-muted-foreground text-sm">Receita e transações da plataforma</p>
         </div>
         <ExportCSVButton data={breakdown} />
