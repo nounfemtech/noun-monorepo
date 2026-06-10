@@ -6,7 +6,7 @@ import { createSupabaseBrowser } from '@/lib/supabase'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { useColorTheme, colors, hexToHsl } from '@noun/ui'
+import { useColorTheme, colors, hexToHsl, COLOR_SHADES } from '@noun/ui'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -17,10 +17,13 @@ export default function LoginPage() {
   const { primary } = useColorTheme()
 
   const coverGradient = useMemo(() => {
-    const hslStr = hexToHsl(colors[primary.palette][primary.shade])
-    const [hRaw = '0', sPct = '0%', lPct = '0%'] = hslStr.split(' ')
-    const h = parseFloat(hRaw)
-    return `linear-gradient(135deg, hsl(${(h - 30 + 360) % 360} ${sPct} ${lPct}) 0%, hsl(${h} ${sPct} ${lPct}) 50%, hsl(${(h + 45) % 360} ${sPct} ${lPct}) 100%)`
+    const idx = COLOR_SHADES.indexOf(primary.shade)
+    const fromShade = COLOR_SHADES[Math.min(idx + 2, COLOR_SHADES.length - 1)] ?? primary.shade
+    const toShade   = COLOR_SHADES[Math.max(idx - 2, 0)] ?? primary.shade
+    const from = hexToHsl(colors[primary.palette][fromShade])
+    const mid  = hexToHsl(colors[primary.palette][primary.shade])
+    const to   = hexToHsl(colors[primary.palette][toShade])
+    return `linear-gradient(135deg, hsl(${from}) 0%, hsl(${mid}) 50%, hsl(${to}) 100%)`
   }, [primary])
 
   async function handleSubmit(e: React.FormEvent) {
