@@ -129,16 +129,19 @@ export default function LoginPage() {
       </div>
 
       {/* Coluna direita — visual de capa (hidden em mobile) */}
-      <div className="relative hidden lg:flex flex-col bg-gradient-to-br from-violet-600 via-purple-500 to-pink-400">
+      <div
+        className="relative hidden lg:flex flex-col"
+        style={{ background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.65) 100%)' }}
+      >
         <div className="flex-1" />
 
         {/* Quote no canto inferior */}
-        <div className="p-10 text-white space-y-2">
-          <blockquote className="text-sm leading-relaxed text-white/90">
+        <div className="p-10 text-primary-foreground space-y-2">
+          <blockquote className="text-sm leading-relaxed opacity-90">
             &ldquo;Nomeada a primeira supervisora negra da NASA, Dorothy Vaughan
             foi pioneira na computação científica.&rdquo;
           </blockquote>
-          <p className="text-xs text-white/60 font-medium">
+          <p className="text-xs opacity-60 font-medium">
             Dorothy Vaughan, 1910 &mdash; 2008
           </p>
         </div>
