@@ -19,7 +19,7 @@ export function TransactionsEmpty() {
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <IconReceipt />
+          <IconReceipt size={32} />
         </EmptyMedia>
         <EmptyTitle>Nenhuma transação</EmptyTitle>
         <EmptyDescription>
