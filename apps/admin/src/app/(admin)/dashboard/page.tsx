@@ -210,7 +210,7 @@ async function DashboardContent() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-base font-bold">Dashboard</h1>
+        <h1 className="text-xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground text-sm capitalize">{today}</p>
       </div>
 
