@@ -18,7 +18,7 @@ export default function LoginPage() {
 
   const coverGradient = useMemo(() => {
     const hslStr = hexToHsl(colors[primary.palette][primary.shade])
-    const [hRaw, sPct, lPct] = hslStr.split(' ')
+    const [hRaw = '0', sPct = '0%', lPct = '0%'] = hslStr.split(' ')
     const h = parseFloat(hRaw)
     return `linear-gradient(135deg, hsl(${(h - 30 + 360) % 360} ${sPct} ${lPct}) 0%, hsl(${h} ${sPct} ${lPct}) 50%, hsl(${(h + 45) % 360} ${sPct} ${lPct}) 100%)`
   }, [primary])
