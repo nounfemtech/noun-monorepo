@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSupabaseBrowser } from '@/lib/supabase'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { useColorTheme, colors, hexToHsl } from '@noun/ui'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -13,6 +14,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { primary } = useColorTheme()
+
+  const coverGradient = useMemo(() => {
+    const hslStr = hexToHsl(colors[primary.palette][primary.shade])
+    const [hRaw, sPct, lPct] = hslStr.split(' ')
+    const h = parseFloat(hRaw)
+    return `linear-gradient(135deg, hsl(${(h - 30 + 360) % 360} ${sPct} ${lPct}) 0%, hsl(${h} ${sPct} ${lPct}) 50%, hsl(${(h + 45) % 360} ${sPct} ${lPct}) 100%)`
+  }, [primary])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -131,7 +140,7 @@ export default function LoginPage() {
       {/* Coluna direita — visual de capa (hidden em mobile) */}
       <div
         className="relative hidden lg:flex flex-col"
-        style={{ background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.65) 100%)' }}
+        style={{ background: coverGradient }}
       >
         <div className="flex-1" />
 
