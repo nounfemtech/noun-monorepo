@@ -290,7 +290,7 @@ async function DashboardContent() {
         {/* Últimas transações */}
         <Card>
           <CardHeader className="px-4">
-            <CardTitle className="text-xs">Últimas transações</CardTitle>
+            <CardTitle className="text-base">Últimas transações</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {lastTransactions.length === 0 ? (
