@@ -155,15 +155,15 @@ function ThemeModeSwitcher() {
             onClick={(e) => handleThemeClick(value, e.currentTarget as HTMLButtonElement)}
             className="flex flex-col items-start gap-2 focus-visible:outline-none group"
           >
-            <div
-              className={cn(
-                'relative w-36 h-24 rounded-xl transition-all',
-                active
-                  ? 'outline outline-2 outline-primary'
-                  : 'outline outline-1 outline-border group-hover:outline-muted-foreground/40',
-              )}
-            >
-              <div className="absolute inset-0 rounded-[16px] overflow-hidden">
+            <div className="relative w-36 h-24 rounded-lg transition-all">
+              <div
+                className={cn(
+                  'absolute inset-0 rounded-lg overflow-hidden',
+                  active
+                    ? 'outline outline-[3px] outline-primary'
+                    : 'outline outline-1 outline-border group-hover:outline-muted-foreground/40',
+                )}
+              >
                 <Mockup primary={primaryHex} />
                 {active && (
                   <div className="absolute bottom-2 left-2 size-4 shrink-0 aspect-square rounded-full bg-primary flex items-center justify-center">

@@ -16,7 +16,7 @@ import {
 export function TransactionsEmpty() {
   const router = useRouter()
   return (
-    <Empty className="h-full">
+    <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <IconReceipt />
