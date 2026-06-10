@@ -122,7 +122,7 @@ async function ChamadosContent({ searchParams }: PageProps) {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold">Chamados</h1>
+        <h1 className="text-xl font-semibold">Chamados</h1>
         <p className="text-sm text-muted-foreground">Suporte a usuários e profissionais de saúde</p>
       </div>
 

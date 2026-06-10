@@ -125,7 +125,7 @@ export default async function TenantDetailPage({ params }: PageProps) {
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h2 className="text-xl font-bold">{tenant.name}</h2>
+                <h2 className="text-xl font-semibold">{tenant.name}</h2>
                 <Badge
                   className={
                     tenant.type === 'clinic'

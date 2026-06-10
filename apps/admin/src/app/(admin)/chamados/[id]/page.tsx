@@ -96,7 +96,7 @@ async function ChamadoContent({ params }: PageProps) {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="space-y-1">
-          <h1 className="text-xl font-bold">{t.title}</h1>
+          <h1 className="text-xl font-semibold">{t.title}</h1>
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="outline" className="text-xs">{CATEGORY_LABELS[t.category] ?? t.category}</Badge>
             {priorityBadge(t.priority)}

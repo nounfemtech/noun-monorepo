@@ -127,7 +127,7 @@ export default async function UsuarioDetailPage({ params }: PageProps) {
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-3 flex-wrap">
-                <h2 className="text-xl font-bold">{profile.full_name ?? 'Sem nome'}</h2>
+                <h2 className="text-xl font-semibold">{profile.full_name ?? 'Sem nome'}</h2>
                 {roleBadge(profile.role)}
                 {profile.is_active !== false ? (
                   <Badge className="bg-green-100 text-green-700 border-green-200">Ativo</Badge>
