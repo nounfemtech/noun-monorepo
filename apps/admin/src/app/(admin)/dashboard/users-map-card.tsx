@@ -185,7 +185,7 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
           <div>
             <CardTitle className="text-base">Usuários por região</CardTitle>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Distribuição geográfica de endereços cadastrados
+              Distribuição geográfica de pacientes cadastrados
             </p>
           </div>
         </div>
@@ -316,7 +316,7 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
                     {total.toLocaleString('pt-BR')}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {isMock ? 'usuários (exemplo)' : 'usuários com endereço'}
+                    {isMock ? 'usuários (exemplo)' : 'pacientes com endereço'}
                   </p>
                 </div>
 

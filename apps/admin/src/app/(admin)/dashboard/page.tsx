@@ -98,7 +98,7 @@ async function DashboardContent() {
       monthEarningsRes,
       recentAppointmentsRes,
       recentOrdersRes,
-      addressesRes,
+      cityDistRes,
     ] = await Promise.all([
       supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'patient'),
       supabase.from('profiles').select('id', { count: 'exact', head: true }).in('role', ['doctor', 'nutritionist', 'psychologist', 'pharmacist']).eq('is_active', true),
@@ -112,7 +112,7 @@ async function DashboardContent() {
       supabase.from('professional_earnings').select('noun_fee').gte('created_at', monthStart).lte('created_at', monthEnd),
       supabase.from('appointments').select('id, price, paid_at, status, created_at, patient_id').order('created_at', { ascending: false }).limit(5),
       supabase.from('orders').select('id, total_price, status, created_at, patient_id').order('created_at', { ascending: false }).limit(5),
-      supabase.from('addresses').select('city, state, latitude, longitude').eq('is_active', true),
+      supabase.rpc('get_patient_city_distribution'),
     ])
 
     patientsCount = patientsRes.count ?? 0
@@ -173,25 +173,13 @@ async function DashboardContent() {
     )
     chartData.push(...chartMonths)
 
-    // Agrupa endereços por cidade para o mapa
-    const cityMap: Record<string, { state: string; count: number; lat: number; lng: number }> = {}
-    for (const row of (addressesRes.data ?? [])) {
-      if (!row.city || !row.state || row.latitude == null || row.longitude == null) continue
-      const key = row.city
-      if (cityMap[key]) {
-        cityMap[key].count++
-      } else {
-        cityMap[key] = { state: row.state, count: 1, lat: row.latitude, lng: row.longitude }
-      }
-    }
-    mapCities = Object.entries(cityMap)
-      .map(([city, { state, count, lat, lng }]) => ({
-        city,
-        state,
-        count,
-        coordinates: [lng, lat] as [number, number],
-      }))
-      .sort((a, b) => b.count - a.count)
+    // Pacientes por cidade via RPC (join profiles + addresses)
+    mapCities = (cityDistRes.data ?? []).map(row => ({
+      city:        row.city,
+      state:       row.state,
+      count:       Number(row.user_count),
+      coordinates: [Number(row.longitude), Number(row.latitude)] as [number, number],
+    }))
   } catch {
     // usa defaults
   }
