@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const periodos = [
@@ -10,15 +10,28 @@ const periodos = [
   { value: 'ano',    label: 'Este ano' },
 ]
 
-export function PeriodoFilter({ value, basePath }: { value: string; basePath: string }) {
+export function PeriodoFilter({
+  value,
+  paramName = 'periodo',
+  basePath: _basePath,
+}: {
+  value: string
+  paramName?: string
+  basePath?: string
+}) {
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   return (
     <div className="inline-flex border rounded-md overflow-hidden w-fit">
       {periodos.map((p, i) => (
         <button
           key={p.value}
-          onClick={() => router.push(`${basePath}?periodo=${p.value}` as never)}
+          onClick={() => {
+            const next = new URLSearchParams(searchParams.toString())
+            next.set(paramName, p.value)
+            router.push(`?${next.toString()}`)
+          }}
           className={cn(
             'px-3 h-8 text-sm font-medium transition-colors',
             i < periodos.length - 1 && 'border-r',

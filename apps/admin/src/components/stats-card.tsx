@@ -11,27 +11,26 @@ interface StatsCardProps {
   title: string
   value: string | number
   description?: string
-  footer?: string
   trend?: TrendInfo
   className?: string
   // backward-compat — ignored in new design
   icon?: React.ReactNode
   highlight?: boolean
+  footer?: string
 }
 
 export function StatsCard({
   title,
   value,
   description,
-  footer,
   trend,
   className,
 }: StatsCardProps) {
   const isPositive = trend ? trend.value >= 0 : null
 
   return (
-    <Card className={cn('overflow-hidden', className)}>
-      <CardContent className="px-4 pt-4 pb-4">
+    <Card className={cn('overflow-hidden flex flex-col', className)}>
+      <CardContent className="px-4 pt-4 pb-4 flex-1">
         <div className="flex items-start justify-between gap-2">
           <p className="text-sm text-muted-foreground">{title}</p>
           {trend && (
@@ -53,21 +52,16 @@ export function StatsCard({
         <p className="text-2xl font-bold mt-2 tabular-nums">{value}</p>
       </CardContent>
 
-      {(description || footer) && (
+      {description && (
         <div className="border-t bg-muted/40 px-4 py-3">
-          {description && (
-            <p className="flex items-center gap-1.5 text-sm font-semibold">
-              {trend && (
-                isPositive
-                  ? <IconTrendingUp size={14} className="text-green-600 shrink-0" />
-                  : <IconTrendingDown size={14} className="text-red-500 shrink-0" />
-              )}
-              {description}
-            </p>
-          )}
-          {footer && (
-            <p className="text-xs text-muted-foreground mt-0.5">{footer}</p>
-          )}
+          <p className="flex items-center gap-1.5 text-sm font-semibold">
+            {trend && (
+              isPositive
+                ? <IconTrendingUp size={14} className="text-green-600 shrink-0" />
+                : <IconTrendingDown size={14} className="text-red-500 shrink-0" />
+            )}
+            {description}
+          </p>
         </div>
       )}
     </Card>
