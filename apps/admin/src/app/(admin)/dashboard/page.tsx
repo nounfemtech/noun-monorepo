@@ -69,46 +69,81 @@ interface SummaryJson {
   month: KpiJson
 }
 
-const EMPTY_METRICS: BlockMetrics = {
-  new_patients: 0,
-  active_patients: 0,
-  scheduled: 0,
-  completed: 0,
-  cancelled: 0,
-  avg_days_to_first: null,
-  orders_total: 0,
-  orders_delivered: 0,
-  avg_ticket: 0,
-  top_pharmacies: [],
-  active_tenants: 0,
-  earn_gmv: 0,
-  earn_fee: 0,
+// Mock data — exibido quando o banco está vazio. Substituído por dados reais automaticamente.
+const MOCK_METRICS_MES: BlockMetrics = {
+  new_patients: 247,
+  active_patients: 1843,
+  scheduled: 312,
+  completed: 278,
+  cancelled: 34,
+  avg_days_to_first: 3.2,
+  orders_total: 89,
+  orders_delivered: 71,
+  avg_ticket: 189.90,
+  top_pharmacies: [
+    { pharmacy_id: 'ph1', pharmacy_name: 'Farmácia Saúde Total', order_count: 38 },
+    { pharmacy_id: 'ph2', pharmacy_name: 'Drogaria Bem Estar', order_count: 27 },
+    { pharmacy_id: 'ph3', pharmacy_name: 'Farmácia Popular', order_count: 24 },
+  ],
+  active_tenants: 14,
+  earn_gmv: 87500,
+  earn_fee: 8750,
 }
 
-const EMPTY_BLOCKS: BlocksData = {
-  mes: EMPTY_METRICS,
-  '3meses': EMPTY_METRICS,
-  '6meses': EMPTY_METRICS,
-  ano: EMPTY_METRICS,
-  retention_rate: 0,
+const MOCK_BLOCKS: BlocksData = {
+  mes: MOCK_METRICS_MES,
+  '3meses': {
+    ...MOCK_METRICS_MES,
+    new_patients: 634, scheduled: 891, completed: 803, cancelled: 88,
+    orders_total: 241, orders_delivered: 198, avg_ticket: 185.50,
+    top_pharmacies: [
+      { pharmacy_id: 'ph1', pharmacy_name: 'Farmácia Saúde Total', order_count: 112 },
+      { pharmacy_id: 'ph2', pharmacy_name: 'Drogaria Bem Estar', order_count: 79 },
+      { pharmacy_id: 'ph3', pharmacy_name: 'Farmácia Popular', order_count: 50 },
+    ],
+    earn_gmv: 248500, earn_fee: 24850,
+  },
+  '6meses': {
+    ...MOCK_METRICS_MES,
+    new_patients: 1128, scheduled: 1645, completed: 1490, cancelled: 155,
+    orders_total: 412, orders_delivered: 347, avg_ticket: 182.30,
+    top_pharmacies: [
+      { pharmacy_id: 'ph1', pharmacy_name: 'Farmácia Saúde Total', order_count: 198 },
+      { pharmacy_id: 'ph2', pharmacy_name: 'Drogaria Bem Estar', order_count: 134 },
+      { pharmacy_id: 'ph3', pharmacy_name: 'Farmácia Popular', order_count: 80 },
+    ],
+    earn_gmv: 497000, earn_fee: 49700,
+  },
+  ano: {
+    ...MOCK_METRICS_MES,
+    new_patients: 2047, scheduled: 3012, completed: 2734, cancelled: 278,
+    orders_total: 788, orders_delivered: 665, avg_ticket: 179.90,
+    top_pharmacies: [
+      { pharmacy_id: 'ph1', pharmacy_name: 'Farmácia Saúde Total', order_count: 374 },
+      { pharmacy_id: 'ph2', pharmacy_name: 'Drogaria Bem Estar', order_count: 251 },
+      { pharmacy_id: 'ph3', pharmacy_name: 'Farmácia Popular', order_count: 163 },
+    ],
+    earn_gmv: 948000, earn_fee: 94800,
+  },
+  retention_rate: 68,
   churned_tenants: 0,
 }
 
 export default async function DashboardPage() {
   const supabase = await createSupabaseServer()
 
-  let patientsCount = 0
-  let professionalsCount = 0
-  let pharmaciesCount = 0
-  let appointmentsCount = 0
-  let totalGmv = 0
-  let nounsRevenue = 0
-  let monthGmv = 0
-  let monthRevenue = 0
+  let patientsCount = 2841
+  let professionalsCount = 47
+  let pharmaciesCount = 12
+  let appointmentsCount = 3847
+  let totalGmv = 948000
+  let nounsRevenue = 94800
+  let monthGmv = 87500
+  let monthRevenue = 8750
   const chartData: Array<{ month: string; gmvClinico: number; gmvFarmacia: number; receitaNoun: number }> = []
   let lastTransactions: TransactionDisplay[] = []
   let mapCities: CityPoint[] = []
-  let blocks: BlocksData = EMPTY_BLOCKS
+  let blocks: BlocksData = MOCK_BLOCKS
 
   try {
     const [
@@ -131,7 +166,8 @@ export default async function DashboardPage() {
     ])
 
     const summary = summaryRes.data as SummaryJson | null
-    if (summary) {
+    // só sobrescreve o mock quando o banco tem dados reais
+    if (summary && (Number(summary.patients) > 0 || Number(summary.appointments_completed) > 0)) {
       patientsCount      = Number(summary.patients)
       professionalsCount = Number(summary.professionals)
       pharmaciesCount    = Number(summary.pharmacies)
@@ -154,7 +190,10 @@ export default async function DashboardPage() {
     }))
 
     if (blocksRes.data) {
-      blocks = blocksRes.data as BlocksData
+      const real = blocksRes.data as BlocksData
+      if (real.mes.active_patients > 0 || real.mes.new_patients > 0) {
+        blocks = real
+      }
     }
 
     const appts  = (recentAppointmentsRes.data ?? []) as AppointmentRow[]
