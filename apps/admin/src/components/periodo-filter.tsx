@@ -30,7 +30,7 @@ export function PeriodoFilter({
           onClick={() => {
             const next = new URLSearchParams(searchParams.toString())
             next.set(paramName, p.value)
-            router.push(`?${next.toString()}`)
+            router.replace(`?${next.toString()}`, { scroll: false })
           }}
           className={cn(
             'px-3 h-8 text-sm font-medium transition-colors',
