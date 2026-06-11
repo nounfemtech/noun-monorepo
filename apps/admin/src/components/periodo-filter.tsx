@@ -1,5 +1,6 @@
 'use client'
 
+import { useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
@@ -21,16 +22,22 @@ export function PeriodoFilter({
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
 
   return (
-    <div className="inline-flex border rounded-md overflow-hidden w-fit">
+    <div className={cn(
+      'inline-flex border rounded-md overflow-hidden w-fit transition-opacity duration-150',
+      isPending && 'opacity-50 pointer-events-none',
+    )}>
       {periodos.map((p, i) => (
         <button
           key={p.value}
           onClick={() => {
             const next = new URLSearchParams(searchParams.toString())
             next.set(paramName, p.value)
-            router.replace(`?${next.toString()}`, { scroll: false })
+            startTransition(() => {
+              router.replace(`?${next.toString()}`, { scroll: false })
+            })
           }}
           className={cn(
             'px-3 h-8 text-sm font-medium transition-colors',
