@@ -88,6 +88,8 @@ const MOCK_METRICS_MES: BlockMetrics = {
   active_tenants: 14,
   earn_gmv: 87500,
   earn_fee: 8750,
+  earn_fee_farmacia: 3200,
+  professionals_with_schedule: 31,
 }
 
 const MOCK_BLOCKS: BlocksData = {
@@ -101,7 +103,7 @@ const MOCK_BLOCKS: BlocksData = {
       { pharmacy_id: 'ph2', pharmacy_name: 'Drogaria Bem Estar', order_count: 79 },
       { pharmacy_id: 'ph3', pharmacy_name: 'Farmácia Popular', order_count: 50 },
     ],
-    earn_gmv: 248500, earn_fee: 24850,
+    earn_gmv: 248500, earn_fee: 24850, earn_fee_farmacia: 9000, professionals_with_schedule: 43,
   },
   '6meses': {
     ...MOCK_METRICS_MES,
@@ -112,7 +114,7 @@ const MOCK_BLOCKS: BlocksData = {
       { pharmacy_id: 'ph2', pharmacy_name: 'Drogaria Bem Estar', order_count: 134 },
       { pharmacy_id: 'ph3', pharmacy_name: 'Farmácia Popular', order_count: 80 },
     ],
-    earn_gmv: 497000, earn_fee: 49700,
+    earn_gmv: 497000, earn_fee: 49700, earn_fee_farmacia: 16100, professionals_with_schedule: 45,
   },
   ano: {
     ...MOCK_METRICS_MES,
@@ -123,7 +125,7 @@ const MOCK_BLOCKS: BlocksData = {
       { pharmacy_id: 'ph2', pharmacy_name: 'Drogaria Bem Estar', order_count: 251 },
       { pharmacy_id: 'ph3', pharmacy_name: 'Farmácia Popular', order_count: 163 },
     ],
-    earn_gmv: 948000, earn_fee: 94800,
+    earn_gmv: 948000, earn_fee: 94800, earn_fee_farmacia: 28800, professionals_with_schedule: 47,
   },
   retention_rate: 68,
   churned_tenants: 0,
