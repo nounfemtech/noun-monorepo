@@ -282,6 +282,13 @@ export function DashboardBlocks({
 
   const totalCanal = b5.earn_fee + farmaciaRevenue || 1
 
+  const projectionDesc: Record<PeriodKey, string> = {
+    mes: `Dia ${daysElapsed} de ${daysInMonth}, estimativa ao final do mês`,
+    '3meses': 'Estimativa para o mês atual, com base nos últimos 3 meses',
+    '6meses': 'Estimativa para o mês atual, com base nos últimos 6 meses',
+    ano: 'Estimativa para o mês atual, com base no histórico anual',
+  }
+
   // hex colors via @noun/ui (funciona como atributos SVG em recharts)
   const c700 = colors[primary.palette][700]
   const c500 = colors[primary.palette][500]
@@ -376,10 +383,11 @@ export function DashboardBlocks({
             filter={<PeriodoFilter value={p2} onChange={(v) => setP2(v as PeriodKey)} />}
           />
 
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
-            <div>
-              <div className="rounded-lg border overflow-hidden">
-                <div className="flex items-stretch">
+          <div className="grid lg:grid-cols-2 gap-8 items-stretch">
+            <div className="flex flex-col">
+              <p className="text-sm font-medium text-muted-foreground mb-3">Consultas no período</p>
+              <div className="rounded-lg border overflow-hidden flex flex-col flex-1">
+                <div className="flex-1 flex items-stretch min-h-[148px]">
                   <div className="flex-1 flex flex-col items-center justify-center py-9 px-4">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Agendadas</p>
                     <p className="text-4xl font-bold tabular-nums">{b2.scheduled.toLocaleString('pt-BR')}</p>
@@ -398,12 +406,12 @@ export function DashboardBlocks({
                     <p className="text-4xl font-bold tabular-nums text-destructive">{b2.cancelled.toLocaleString('pt-BR')}</p>
                   </div>
                 </div>
-                <div className="border-t bg-muted/40 px-5 py-3 flex items-center gap-2">
+                <div className="border-t bg-muted/40 px-5 py-3 flex items-center gap-2 shrink-0">
                   <p className="text-sm text-muted-foreground">Tempo médio até a 1ª consulta:</p>
                   <p className="text-sm font-semibold">
                     {b2.avg_days_to_first !== null
                       ? `${b2.avg_days_to_first.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} dias`
-                      : '—'}
+                      : 'N/A'}
                   </p>
                 </div>
               </div>
@@ -467,7 +475,7 @@ export function DashboardBlocks({
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
                     <XAxis type="number" tick={tick} />
                     <YAxis type="category" dataKey="name" tick={tick} width={150} tickLine={false} axisLine={false} />
-                    <Tooltip content={<ChartTooltip formatValue={(v) => `${v} pedidos`} labelMap={{ pedidos: 'Pedidos' }} />} />
+                    <Tooltip cursor={false} content={<ChartTooltip formatValue={(v) => `${v} pedidos`} labelMap={{ pedidos: 'Pedidos' }} />} />
                     <Bar dataKey="pedidos" fill={c500} radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -520,7 +528,7 @@ export function DashboardBlocks({
                   {grid}
                   <XAxis dataKey="t" tick={tick} />
                   <YAxis tick={tick} />
-                  <Tooltip content={<ChartTooltip formatValue={(v) => v.toLocaleString('pt-BR')} labelMap={{ tenants: 'Tenants', profis: 'Profissionais' }} />} />
+                  <Tooltip cursor={false} content={<ChartTooltip formatValue={(v) => v.toLocaleString('pt-BR')} labelMap={{ tenants: 'Tenants', profis: 'Profissionais' }} />} />
                   <Bar dataKey="tenants" fill={c700} radius={[3, 3, 0, 0]} />
                   <Bar dataKey="profis"  fill={c400} radius={[3, 3, 0, 0]} />
                 </BarChart>
@@ -563,7 +571,7 @@ export function DashboardBlocks({
                     <span className="font-semibold tabular-nums">{brl.format(b5.earn_fee)}</span>
                   </div>
                   <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: 'hsl(var(--border))' }}>
-                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(b5.earn_fee / totalCanal) * 100}%`, backgroundColor: c700 }} />
+                    <div className="h-full rounded-full" style={{ width: `${(b5.earn_fee / totalCanal) * 100}%`, backgroundColor: c700 }} />
                   </div>
                 </div>
                 <div>
@@ -572,7 +580,7 @@ export function DashboardBlocks({
                     <span className="font-semibold tabular-nums">{brl.format(farmaciaRevenue)}</span>
                   </div>
                   <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: 'hsl(var(--border))' }}>
-                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(farmaciaRevenue / totalCanal) * 100}%`, backgroundColor: c400 }} />
+                    <div className="h-full rounded-full" style={{ width: `${(farmaciaRevenue / totalCanal) * 100}%`, backgroundColor: c400 }} />
                   </div>
                 </div>
               </div>
@@ -603,7 +611,7 @@ export function DashboardBlocks({
             <div>
               <p className="text-sm font-semibold">Projeção do mês</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Dia {daysElapsed} de {daysInMonth} — estimativa de receita ao final do mês
+                {projectionDesc[p5]}
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">

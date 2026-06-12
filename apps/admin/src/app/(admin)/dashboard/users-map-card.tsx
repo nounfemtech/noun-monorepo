@@ -284,22 +284,15 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+      <CardHeader className="pb-4">
+        <div className="flex items-start justify-between gap-4">
           <div>
             <CardTitle className="text-base">Usuários por região</CardTitle>
             <p className="text-sm text-muted-foreground mt-0.5">
               Distribuição geográfica de pacientes cadastrados
             </p>
           </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-0">
-
-        {/* ── Filtro por região — ButtonGroup ───────────────────────────────── */}
-        <div className="px-4 pt-3 pb-2 border-b overflow-x-auto">
-          <div className="inline-flex border rounded-md overflow-hidden whitespace-nowrap">
+          <div className="inline-flex border rounded-md overflow-hidden whitespace-nowrap shrink-0">
             <button
               onClick={clearAll}
               className={cn(
@@ -311,7 +304,6 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
             >
               Todas
             </button>
-
             {REGIONS.map((r, i) => (
               <button
                 key={r.id}
@@ -329,6 +321,9 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
             ))}
           </div>
         </div>
+      </CardHeader>
+
+      <CardContent className="p-0">
 
         <div className="flex min-h-[320px]">
 
