@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -14,11 +14,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { IconBuilding, IconPlus } from '@tabler/icons-react'
+import { StatsCard } from '@/components/stats-card'
+import { StatusFilter } from './status-filter'
+import { SearchInput } from './search-input'
 
 const PAGE_SIZE = 20
 
 interface TenantRow {
   id: string
+  code: string
   name: string
   legal_name: string | null
   cnpj: string | null
@@ -36,7 +40,7 @@ function formatCNPJ(cnpj: string | null): string {
 
 function typeBadge(type: string) {
   return type === 'clinic' ? (
-    <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs">Clínica</Badge>
+    <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs whitespace-nowrap">Profissional de saúde</Badge>
   ) : (
     <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">Farmácia</Badge>
   )
@@ -56,14 +60,14 @@ function statusBadge(status: string) {
 }
 
 interface PageProps {
-  searchParams: Promise<{ page?: string; type?: string; status?: string }>
+  searchParams: Promise<{ page?: string; status?: string; q?: string }>
 }
 
 async function TenantsContent({ searchParams }: PageProps) {
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
-  const type = params.type === 'all' ? '' : (params.type ?? '')
   const status = params.status === 'all' ? '' : (params.status ?? '')
+  const q = (params.q ?? '').trim()
 
   const supabase = await createSupabaseServer()
   const from = (page - 1) * PAGE_SIZE
@@ -71,14 +75,55 @@ async function TenantsContent({ searchParams }: PageProps) {
 
   let query = supabase
     .from('tenants')
-    .select('id, name, legal_name, cnpj, type, status, created_at', { count: 'exact' })
+    .select('id, code, name, legal_name, cnpj, type, status, created_at', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(from, to)
 
-  if (type) query = query.eq('type', type)
   if (status) query = query.eq('status', status)
 
+  if (q) {
+    // Data no formato dd/mm/yyyy filtra pelo dia de cadastro
+    const dateMatch = q.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+    if (dateMatch) {
+      const [, d, m, y] = dateMatch
+      const start = Date.UTC(Number(y), Number(m) - 1, Number(d))
+      const end = start + 24 * 60 * 60 * 1000
+      query = query
+        .gte('created_at', new Date(start).toISOString())
+        .lt('created_at', new Date(end).toISOString())
+    } else {
+      // Texto busca em ID (code), nome, razão social e CNPJ
+      const term = q.replace(/[,()%]/g, '')
+      const conditions = [
+        `code.ilike.%${term}%`,
+        `name.ilike.%${term}%`,
+        `legal_name.ilike.%${term}%`,
+        `cnpj.ilike.%${term}%`,
+      ]
+      const digits = term.replace(/\D/g, '')
+      if (digits && digits !== term) conditions.push(`cnpj.ilike.%${digits}%`)
+      query = query.or(conditions.join(','))
+    }
+  }
+
   const { data, count } = await query
+
+  // Contagens de monitoramento (toda a base, independente do filtro)
+  const statusCount = (st: string) =>
+    supabase
+      .from('tenants')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', st)
+
+  const [ativosRes, pendentesRes, suspensosRes] = await Promise.all([
+    statusCount('active'),
+    statusCount('pending_approval'),
+    statusCount('suspended'),
+  ])
+
+  const ativos = ativosRes.count ?? 0
+  const pendentes = pendentesRes.count ?? 0
+  const suspensos = suspensosRes.count ?? 0
 
   const tenants = (data ?? []) as TenantRow[]
   const total = count ?? 0
@@ -91,7 +136,7 @@ async function TenantsContent({ searchParams }: PageProps) {
         <div>
           <h1 className="text-xl font-semibold">Tenants</h1>
           <p className="text-muted-foreground text-sm">
-            {total.toLocaleString('pt-BR')} tenant{total !== 1 ? 's' : ''} cadastrado{total !== 1 ? 's' : ''}
+            Gerencie cadastros, aprovações e status dos profissionais de saúde e farmácias parceiros
           </p>
         </div>
         <Link href="/tenants/new">
@@ -102,56 +147,38 @@ async function TenantsContent({ searchParams }: PageProps) {
         </Link>
       </div>
 
-      {/* Filtros */}
-      <form method="GET" className="flex flex-wrap gap-3 items-end">
-        <div>
-          <Select name="type" defaultValue={type || 'all'}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os tipos</SelectItem>
-              <SelectItem value="clinic">Clínica</SelectItem>
-              <SelectItem value="pharmacy">Farmácia</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Select name="status" defaultValue={status || 'all'}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os status</SelectItem>
-              <SelectItem value="active">Ativo</SelectItem>
-              <SelectItem value="pending_approval">Pendente</SelectItem>
-              <SelectItem value="suspended">Suspenso</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Button type="submit" variant="secondary">
-          Filtrar
-        </Button>
-        {(type || status) && (
-          <Link href="/tenants">
-            <Button variant="ghost" type="button">
-              Limpar
-            </Button>
-          </Link>
-        )}
-      </form>
+      {/* Cards de monitoramento */}
+      <div className="grid grid-cols-3 gap-4">
+        <StatsCard title="Ativos" value={ativos} description="Operando normalmente" />
+        <StatsCard title="Pendentes" value={pendentes} description="Aguardando aprovação" />
+        <StatsCard title="Suspensos" value={suspensos} description="Acesso bloqueado" />
+      </div>
 
       {/* Tabela */}
-      {tenants.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-          <IconBuilding size={40} className="mb-3 opacity-40" />
-          <p className="text-sm">Nenhum tenant encontrado</p>
+      <Card className="overflow-hidden">
+        <CardHeader className="space-y-1 border-b py-4">
+          <CardTitle className="text-base">Tenants cadastrados</CardTitle>
+          <CardDescription>
+            Profissionais de saúde e farmácias parceiros da plataforma
+          </CardDescription>
+        </CardHeader>
+
+        {/* Action section: filtros */}
+        <div className="border-b px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+          <StatusFilter current={status} q={q} />
+          <SearchInput initial={q} status={status} />
         </div>
-      ) : (
-        <div className="rounded-md border">
-          <Table>
+
+        {tenants.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+            <IconBuilding size={40} className="mb-3 opacity-40" />
+            <p className="text-sm">Nenhum tenant encontrado</p>
+          </div>
+        ) : (
+          <Table className="[&_tr>*:first-child]:pl-6 [&_tr>*:last-child]:pr-6">
             <TableHeader>
               <TableRow>
+                <TableHead>ID</TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>CNPJ</TableHead>
                 <TableHead>Tipo</TableHead>
@@ -163,6 +190,11 @@ async function TenantsContent({ searchParams }: PageProps) {
             <TableBody>
               {tenants.map((tenant) => (
                 <TableRow key={tenant.id}>
+                  <TableCell>
+                    <span className="text-sm font-mono text-muted-foreground">
+                      {tenant.code}
+                    </span>
+                  </TableCell>
                   <TableCell>
                     <div>
                       <p className="text-sm font-medium">{tenant.name}</p>
@@ -194,8 +226,8 @@ async function TenantsContent({ searchParams }: PageProps) {
               ))}
             </TableBody>
           </Table>
-        </div>
-      )}
+        )}
+      </Card>
 
       {/* Paginação */}
       {totalPages > 1 && (
@@ -206,14 +238,14 @@ async function TenantsContent({ searchParams }: PageProps) {
           <div className="flex gap-2">
             {page > 1 && (
               <Link
-                href={`/tenants?page=${page - 1}${type ? `&type=${type}` : ''}${status ? `&status=${status}` : ''}`}
+                href={`/tenants?page=${page - 1}${status ? `&status=${status}` : ''}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
               >
                 <Button variant="outline">Anterior</Button>
               </Link>
             )}
             {page < totalPages && (
               <Link
-                href={`/tenants?page=${page + 1}${type ? `&type=${type}` : ''}${status ? `&status=${status}` : ''}`}
+                href={`/tenants?page=${page + 1}${status ? `&status=${status}` : ''}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
               >
                 <Button variant="outline">Próxima</Button>
               </Link>

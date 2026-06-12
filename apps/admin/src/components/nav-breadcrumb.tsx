@@ -12,7 +12,6 @@ import {
 
 const labels: Record<string, string> = {
   dashboard:     'Dashboard',
-  usuarios:      'Usuários',
   tenants:       'Tenants',
   financeiro:    'Financeiro',
   configuracoes: 'Configurações',

@@ -216,7 +216,7 @@ export default function ThemePage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Total de Pacientes</CardTitle>
+                <CardTitle>Total de Usuários</CardTitle>
                 <CardDescription>Últimos 30 dias</CardDescription>
               </CardHeader>
               <CardContent>
@@ -279,7 +279,7 @@ export default function ThemePage() {
             <TableCaption>Consultas recentes</TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead>Paciente</TableHead>
+                <TableHead>Usuário</TableHead>
                 <TableHead>Médico</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Tipo</TableHead>

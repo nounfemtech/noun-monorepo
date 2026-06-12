@@ -12,7 +12,7 @@ import {
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { StatsCard } from '@/components/stats-card'
 import { RevenueChart } from '@/components/revenue-chart'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { TransactionsEmpty } from './transactions-empty'
 import { UsersMapCard, type CityPoint } from './users-map-card'
 import { DashboardBlocks, type BlocksData, type BlockMetrics } from './dashboard-blocks'
@@ -252,23 +252,20 @@ export default async function DashboardPage() {
 
       {/* ROW 3 — Gráfico + Últimas transações */}
       <div className="grid lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardContent className="pt-6">
-            <p className="text-base font-semibold">Evolução de GMV e Receita</p>
-            <p className="text-sm text-muted-foreground mb-4">GMV por canal e receita Noun nos últimos 6 meses</p>
-            <RevenueChart data={chartData} />
-          </CardContent>
-        </Card>
+        <RevenueChart data={chartData} className="lg:col-span-2" />
 
         <Card>
+          <CardHeader className="py-4 border-b">
+            <CardTitle className="text-base">Últimas transações</CardTitle>
+            <CardDescription>Consultas e pedidos mais recentes</CardDescription>
+          </CardHeader>
           <CardContent className="p-0">
-            <p className="text-base font-semibold px-4 pt-4 pb-3">Últimas transações</p>
             {lastTransactions.length === 0 ? <TransactionsEmpty /> : null}
             <div>
               {lastTransactions.map((item, index) => (
                 <Fragment key={item.id}>
-                  {index > 0 && <div className="mx-4 border-t border-border" />}
-                  <div className="px-4 py-3 flex items-center gap-3">
+                  {index > 0 && <div className="mx-6 border-t border-border" />}
+                  <div className="px-6 py-3 flex items-center gap-3">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{item.name}</p>
                       <p className="text-xs text-muted-foreground">{item.paymentMethod}</p>

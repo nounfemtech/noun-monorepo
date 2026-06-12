@@ -118,6 +118,13 @@ export function applyPrimary(sel: PaletteSelection): void {
   root.style.setProperty('--sidebar-ring', primaryHsl)
   root.style.setProperty('--sidebar-accent', primaryHsl)
   root.style.setProperty('--sidebar-accent-foreground', fgHsl)
+
+  // Shadcn chart vars — mesmas tonalidades usadas nos gráficos do dashboard
+  root.style.setProperty('--chart-1', colors[sel.palette][500])
+  root.style.setProperty('--chart-2', colors[sel.palette][700])
+  root.style.setProperty('--chart-3', colors[sel.palette][400])
+  root.style.setProperty('--chart-4', colors[sel.palette][300])
+  root.style.setProperty('--chart-5', colors[sel.palette][600])
 }
 
 // ---------------------------------------------------------------------------

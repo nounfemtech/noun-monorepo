@@ -1,20 +1,23 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import {
   AreaChart, Area,
-  LineChart, Line,
   BarChart, Bar,
-  PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer,
+  PieChart, Pie, Label,
+  XAxis, CartesianGrid,
 } from 'recharts'
-import { IconArrowRight, IconArrowUpRight } from '@tabler/icons-react'
-import { useColorTheme, colors } from '@noun/ui'
-import { Card, CardContent } from '@/components/ui/card'
+import { IconTrendingUp } from '@tabler/icons-react'
+import {
+  Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
+} from '@/components/ui/card'
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '@/components/ui/chart'
 import { PeriodoFilter } from '@/components/periodo-filter'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -81,45 +84,39 @@ const GROWTH_DATA: Record<PeriodKey, { t: string; novos: number; ativos: number 
   ],
 }
 
-const CONVERSION_DATA: Record<PeriodKey, { t: string; taxa: number }[]> = {
+const FUNNEL_DATA: Record<PeriodKey, { t: string; realizadas: number; canceladas: number }[]> = {
   mes: [
-    { t: 'S1', taxa: 87 }, { t: 'S2', taxa: 91 },
-    { t: 'S3', taxa: 88 }, { t: 'S4', taxa: 89 },
-  ],
-  '3meses': [{ t: 'Jan', taxa: 85 }, { t: 'Fev', taxa: 90 }, { t: 'Mar', taxa: 89 }],
-  '6meses': [
-    { t: 'Out', taxa: 82 }, { t: 'Nov', taxa: 84 }, { t: 'Dez', taxa: 87 },
-    { t: 'Jan', taxa: 85 }, { t: 'Fev', taxa: 90 }, { t: 'Mar', taxa: 89 },
-  ],
-  ano: [
-    { t: 'Abr', taxa: 80 }, { t: 'Mai', taxa: 78 }, { t: 'Jun', taxa: 82 },
-    { t: 'Jul', taxa: 84 }, { t: 'Ago', taxa: 86 }, { t: 'Set', taxa: 87 },
-    { t: 'Out', taxa: 82 }, { t: 'Nov', taxa: 84 }, { t: 'Dez', taxa: 88 },
-    { t: 'Jan', taxa: 85 }, { t: 'Fev', taxa: 90 }, { t: 'Mar', taxa: 89 },
-  ],
-}
-
-const TENANTS_DATA: Record<PeriodKey, { t: string; tenants: number; profis: number }[]> = {
-  mes: [
-    { t: 'S1', tenants: 13, profis: 41 }, { t: 'S2', tenants: 13, profis: 43 },
-    { t: 'S3', tenants: 14, profis: 44 }, { t: 'S4', tenants: 14, profis: 47 },
+    { t: 'S1', realizadas: 62, canceladas: 8 },
+    { t: 'S2', realizadas: 68, canceladas: 7 },
+    { t: 'S3', realizadas: 70, canceladas: 9 },
+    { t: 'S4', realizadas: 78, canceladas: 10 },
   ],
   '3meses': [
-    { t: 'Jan', tenants: 12, profis: 38 }, { t: 'Fev', tenants: 13, profis: 43 },
-    { t: 'Mar', tenants: 14, profis: 47 },
+    { t: 'Jan', realizadas: 248, canceladas: 28 },
+    { t: 'Fev', realizadas: 270, canceladas: 28 },
+    { t: 'Mar', realizadas: 285, canceladas: 32 },
   ],
   '6meses': [
-    { t: 'Out', tenants: 10, profis: 31 }, { t: 'Nov', tenants: 11, profis: 35 },
-    { t: 'Dez', tenants: 11, profis: 37 }, { t: 'Jan', tenants: 12, profis: 38 },
-    { t: 'Fev', tenants: 13, profis: 43 }, { t: 'Mar', tenants: 14, profis: 47 },
+    { t: 'Out', realizadas: 219, canceladas: 27 },
+    { t: 'Nov', realizadas: 235, canceladas: 26 },
+    { t: 'Dez', realizadas: 258, canceladas: 28 },
+    { t: 'Jan', realizadas: 248, canceladas: 28 },
+    { t: 'Fev', realizadas: 270, canceladas: 26 },
+    { t: 'Mar', realizadas: 260, canceladas: 20 },
   ],
   ano: [
-    { t: 'Abr', tenants: 7, profis: 22 }, { t: 'Mai', tenants: 8, profis: 25 },
-    { t: 'Jun', tenants: 9, profis: 28 }, { t: 'Jul', tenants: 9, profis: 29 },
-    { t: 'Ago', tenants: 10, profis: 31 }, { t: 'Set', tenants: 10, profis: 33 },
-    { t: 'Out', tenants: 10, profis: 31 }, { t: 'Nov', tenants: 11, profis: 35 },
-    { t: 'Dez', tenants: 12, profis: 39 }, { t: 'Jan', tenants: 12, profis: 38 },
-    { t: 'Fev', tenants: 13, profis: 43 }, { t: 'Mar', tenants: 14, profis: 47 },
+    { t: 'Abr', realizadas: 189, canceladas: 19 },
+    { t: 'Mai', realizadas: 195, canceladas: 20 },
+    { t: 'Jun', realizadas: 210, canceladas: 20 },
+    { t: 'Jul', realizadas: 218, canceladas: 22 },
+    { t: 'Ago', realizadas: 228, canceladas: 23 },
+    { t: 'Set', realizadas: 232, canceladas: 22 },
+    { t: 'Out', realizadas: 219, canceladas: 25 },
+    { t: 'Nov', realizadas: 235, canceladas: 24 },
+    { t: 'Dez', realizadas: 258, canceladas: 26 },
+    { t: 'Jan', realizadas: 248, canceladas: 25 },
+    { t: 'Fev', realizadas: 270, canceladas: 24 },
+    { t: 'Mar', realizadas: 232, canceladas: 28 },
   ],
 }
 
@@ -147,96 +144,41 @@ const REVENUE_TREND: Record<PeriodKey, { t: string; clinico: number; farmacia: n
   ],
 }
 
-// ---- status semaphore ----------------------------------------------------------
+// ---- chart configs (fora do componente — referências estáveis) ------------------
 
-type StatusLevel = 'healthy' | 'warning' | 'critical' | 'inactive'
+const chartConfigGrowth = {
+  novos:  { label: 'Novos usuários',  color: 'var(--chart-1)' },
+  ativos: { label: 'Usuários ativos', color: 'var(--chart-2)' },
+} satisfies ChartConfig
 
-const STATUS: Record<StatusLevel, { dot: string; badge: string; label: string }> = {
-  healthy:  { dot: 'bg-green-500',  badge: 'border-green-300 bg-green-50 text-green-700 dark:bg-green-950/30 dark:border-green-800 dark:text-green-400', label: 'Saudável' },
-  warning:  { dot: 'bg-yellow-400', badge: 'border-yellow-300 bg-yellow-50 text-yellow-700 dark:bg-yellow-950/30 dark:border-yellow-800 dark:text-yellow-400', label: 'Atenção' },
-  critical: { dot: 'bg-red-500',    badge: 'border-red-300 bg-red-50 text-red-700 dark:bg-red-950/30 dark:border-red-800 dark:text-red-400', label: 'Crítico' },
-  inactive: { dot: 'bg-border',     badge: '', label: 'Inativo' },
+const chartConfigFunnel = {
+  realizadas: { label: 'Realizadas', color: 'var(--chart-1)' },
+  canceladas: { label: 'Canceladas', color: 'var(--chart-2)' },
+} satisfies ChartConfig
+
+const chartConfigOrders = {
+  entregues: { label: 'Entregues', color: 'var(--chart-1)' },
+  pendentes: { label: 'Pendentes', color: 'var(--chart-2)' },
+} satisfies ChartConfig
+
+const chartConfigPlatform = {
+  medicos:   { label: 'Médicos',                color: 'var(--chart-2)' },
+  saude:     { label: 'Profissionais de saúde', color: 'var(--chart-1)' },
+  farmacias: { label: 'Farmácias',              color: 'var(--chart-4)' },
+} satisfies ChartConfig
+
+// composição de tenants ativos por tipo (mock, varia por período)
+const TENANT_TYPES: Record<PeriodKey, { medicos: number; saude: number; farmacias: number }> = {
+  mes:      { medicos: 7,  saude: 4, farmacias: 3 },
+  '3meses': { medicos: 9,  saude: 5, farmacias: 4 },
+  '6meses': { medicos: 12, saude: 7, farmacias: 5 },
+  ano:      { medicos: 16, saude: 9, farmacias: 6 },
 }
 
-// ---- sub-components ------------------------------------------------------------
-
-function BlockHeader({ title, description, filter }: { title: string; description: string; filter: ReactNode }) {
-  return (
-    <div className="flex items-start justify-between gap-4 mb-6">
-      <div>
-        <h2 className="text-base font-semibold">{title}</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
-      </div>
-      {filter}
-    </div>
-  )
-}
-
-function ArcGauge({ pct }: { pct: number }) {
-  const c = Math.min(100, Math.max(0, pct))
-  const θ = Math.PI * (1 - c / 100)
-  const ex = (60 + 50 * Math.cos(θ)).toFixed(2)
-  const ey = (60 - 50 * Math.sin(θ)).toFixed(2)
-  return (
-    <svg viewBox="0 0 120 68" className="w-44 h-28" aria-hidden>
-      <path d="M 10,60 A 50,50 0 0,1 110,60" fill="none" strokeLinecap="round" strokeWidth="10" style={{ stroke: 'hsl(var(--border))' }} />
-      {c > 0.5 && (
-        <path d={`M 10,60 A 50,50 0 0,1 ${ex},${ey}`} fill="none" strokeLinecap="round" strokeWidth="10" style={{ stroke: 'hsl(var(--primary))' }} />
-      )}
-    </svg>
-  )
-}
-
-function SemaphoreItem({ value, label, status }: { value: string; label: string; status: StatusLevel }) {
-  const s = STATUS[status]
-  return (
-    <div className="flex items-center gap-4 rounded-lg border bg-card px-5 py-4">
-      <div className={cn('h-3.5 w-3.5 shrink-0 rounded-full', s.dot)} />
-      <div className="flex-1 min-w-0">
-        <p className="text-2xl font-bold tabular-nums">{value}</p>
-        <p className="text-sm text-muted-foreground">{label}</p>
-      </div>
-      {s.badge
-        ? <Badge variant="outline" className={cn('shrink-0 text-xs', s.badge)}>{s.label}</Badge>
-        : <Badge variant="outline" className="shrink-0 text-xs text-muted-foreground">{s.label}</Badge>
-      }
-    </div>
-  )
-}
-
-interface ChartTooltipProps {
-  active?: boolean
-  payload?: Array<{ name: string; value: number; color: string }>
-  label?: string
-  formatValue?: (v: number, name: string) => string
-  labelMap?: Record<string, string>
-}
-
-function ChartTooltip({ active, payload, label, formatValue, labelMap }: ChartTooltipProps) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="bg-background border border-border rounded-lg px-3 py-2 shadow-md text-sm min-w-[140px]">
-      {label && <p className="font-semibold mb-1.5">{label}</p>}
-      {payload.map((e) => (
-        <div key={e.name} className="flex items-center gap-2 mb-0.5">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ backgroundColor: e.color }} />
-          <span className="text-muted-foreground">{labelMap?.[e.name] ?? e.name}:</span>
-          <span className="font-medium ml-auto pl-2">{formatValue ? formatValue(e.value, e.name) : e.value}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function ColorSwatch({ color, label, value }: { color: string; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-1.5 text-sm">
-      <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ backgroundColor: color }} />
-      <span className="text-muted-foreground">{label}</span>
-      {value && <span className="font-semibold tabular-nums ml-1">{value}</span>}
-    </div>
-  )
-}
+const chartConfigRevenue = {
+  clinico:  { label: 'Canal clínico',  color: 'var(--chart-1)' },
+  farmacia: { label: 'Canal farmácia', color: 'var(--chart-2)' },
+} satisfies ChartConfig
 
 // ---- main component ------------------------------------------------------------
 
@@ -251,377 +193,383 @@ export function DashboardBlocks({
   daysElapsed: number
   daysInMonth: number
 }) {
-  const { primary } = useColorTheme()
-
   const [p1, setP1] = useState<PeriodKey>('mes')
   const [p2, setP2] = useState<PeriodKey>('mes')
   const [p3, setP3] = useState<PeriodKey>('mes')
   const [p4, setP4] = useState<PeriodKey>('mes')
   const [p5, setP5] = useState<PeriodKey>('mes')
 
+  const [activeGrowth,  setActiveGrowth]  = useState<'novos' | 'ativos'>('novos')
+  const [activeFunnel,  setActiveFunnel]  = useState<'realizadas' | 'canceladas'>('realizadas')
+  const [activeRevenue, setActiveRevenue] = useState<'clinico' | 'farmacia'>('clinico')
+
   const b1 = data[p1]
   const b2 = data[p2]
   const b3 = data[p3]
-  const b4 = data[p4]
   const b5 = data[p5]
 
-  const conversionRate        = b2.scheduled > 0 ? Math.round((b2.completed / b2.scheduled) * 1000) / 10 : 0
-  const takeRate              = b5.earn_gmv > 0  ? Math.round((b5.earn_fee / b5.earn_gmv) * 1000) / 10   : 0
-  const farmaciaRevenue       = b5.earn_fee_farmacia ?? 0
-  const profisWithSchedule    = b4.professionals_with_schedule ?? 0
+  const conversionRate     = b2.scheduled > 0 ? Math.round((b2.completed / b2.scheduled) * 1000) / 10 : 0
+  const takeRate           = b5.earn_gmv > 0  ? Math.round((b5.earn_fee  / b5.earn_gmv)  * 1000) / 10 : 0
+  const farmaciaRevenue    = b5.earn_fee_farmacia ?? 0
+  const pending            = Math.max(0, b3.orders_total - b3.orders_delivered)
 
-  const tenantsStatus: StatusLevel = b4.active_tenants > 0 ? 'healthy' : 'inactive'
-  const profisStatus:  StatusLevel =
-    profisWithSchedule === 0 ? 'inactive' : profisWithSchedule < 3 ? 'warning' : 'healthy'
-  const churnStatus:   StatusLevel = data.churned_tenants > 0 ? 'critical' : 'healthy'
+  const growthTotals  = { novos: b1.new_patients,  ativos: b1.active_patients }
+  const funnelTotals  = { realizadas: b2.completed, canceladas: b2.cancelled }
+  const revenueTotals = { clinico: b5.earn_fee,    farmacia: farmaciaRevenue }
 
-  const delivered   = b3.orders_delivered
-  const pending     = Math.max(0, b3.orders_total - b3.orders_delivered)
-  const orderPie    = [{ name: 'entregues', value: delivered }, { name: 'pendentes', value: pending }]
-  const pharmaBar   = b3.top_pharmacies.map((p) => ({ name: p.pharmacy_name, pedidos: p.order_count }))
+  const ordersData = [
+    { name: 'entregues', value: b3.orders_delivered, fill: 'var(--color-entregues)' },
+    { name: 'pendentes', value: pending,             fill: 'var(--color-pendentes)' },
+  ]
 
-  const totalCanal = b5.earn_fee + farmaciaRevenue || 1
-
-  const projectionDesc: Record<PeriodKey, string> = {
-    mes: `Dia ${daysElapsed} de ${daysInMonth}, estimativa ao final do mês`,
-    '3meses': 'Estimativa para o mês atual, com base nos últimos 3 meses',
-    '6meses': 'Estimativa para o mês atual, com base nos últimos 6 meses',
-    ano: 'Estimativa para o mês atual, com base no histórico anual',
-  }
-
-  // hex colors via @noun/ui (funciona como atributos SVG em recharts)
-  const c700 = colors[primary.palette][700]
-  const c500 = colors[primary.palette][500]
-  const c400 = colors[primary.palette][400]
-  const c300 = colors[primary.palette][300]
-
-  const tick = { fontSize: 12, fill: 'hsl(var(--muted-foreground))' }
-  const grid = <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+  const tt = TENANT_TYPES[p4]
+  const platformData = [
+    { name: 'medicos',   value: tt.medicos,   fill: 'var(--color-medicos)' },
+    { name: 'saude',     value: tt.saude,     fill: 'var(--color-saude)' },
+    { name: 'farmacias', value: tt.farmacias, fill: 'var(--color-farmacias)' },
+  ]
+  const platformTotal = tt.medicos + tt.saude + tt.farmacias
 
   return (
     <>
       {/* ================================================================
           BLOCO 1 — Crescimento e engajamento
-          Stat row + dois AreaCharts (novos pacientes / ativos acumulados)
+          Area Chart - Interactive (tabs novos / ativos)
       ================================================================ */}
-      <Card>
-        <CardContent className="p-6">
-          <BlockHeader
-            title="Crescimento e engajamento"
-            description="Evolução da base de pacientes e retenção ao longo do tempo"
-            filter={<PeriodoFilter value={p1} onChange={(v) => setP1(v as PeriodKey)} />}
-          />
-
-          <div className="flex items-stretch mb-8">
-            <div className="flex-1 py-3 text-center">
-              <p className="text-4xl font-bold tabular-nums">{b1.new_patients.toLocaleString('pt-BR')}</p>
-              <p className="text-sm text-muted-foreground mt-1.5">Novos pacientes</p>
-            </div>
-            <Separator orientation="vertical" />
-            <div className="flex-1 py-3 text-center">
-              <p className="text-4xl font-bold tabular-nums">{data.retention_rate}%</p>
-              <p className="text-sm text-muted-foreground mt-1.5">Taxa de retenção</p>
-            </div>
-            <Separator orientation="vertical" />
-            <div className="flex-1 py-3 text-center">
-              <p className="text-4xl font-bold tabular-nums">{b1.active_patients.toLocaleString('pt-BR')}</p>
-              <p className="text-sm text-muted-foreground mt-1.5">Pacientes ativos</p>
-            </div>
+      <Card className="!py-0">
+        <CardHeader className="flex flex-col items-stretch space-y-0 border-b !p-0 sm:flex-row">
+          <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
+            <CardTitle className="text-base">Crescimento e engajamento</CardTitle>
+            <CardDescription>
+              Evolução da base de usuários e retenção ao longo do tempo
+            </CardDescription>
           </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-3">Novos pacientes por período</p>
-              <ResponsiveContainer width="100%" height={240}>
-                <AreaChart data={GROWTH_DATA[p1]} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="gradNovos" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor={c500} stopOpacity={0.4} />
-                      <stop offset="95%" stopColor={c500} stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  {grid}
-                  <XAxis dataKey="t" tick={tick} />
-                  <YAxis tick={tick} />
-                  <Tooltip content={<ChartTooltip formatValue={(v) => v.toLocaleString('pt-BR')} labelMap={{ novos: 'Novos pacientes' }} />} />
-                  <Area type="monotone" dataKey="novos" stroke={c500} fill="url(#gradNovos)" strokeWidth={2} dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-3">Pacientes ativos acumulados</p>
-              <ResponsiveContainer width="100%" height={240}>
-                <AreaChart data={GROWTH_DATA[p1]} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="gradAtivos" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor={c700} stopOpacity={0.35} />
-                      <stop offset="95%" stopColor={c700} stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  {grid}
-                  <XAxis dataKey="t" tick={tick} />
-                  <YAxis tick={tick} domain={['auto', 'auto']} />
-                  <Tooltip content={<ChartTooltip formatValue={(v) => v.toLocaleString('pt-BR')} labelMap={{ ativos: 'Pacientes ativos' }} />} />
-                  <Area type="monotone" dataKey="ativos" stroke={c700} fill="url(#gradAtivos)" strokeWidth={2} dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+          <div className="flex">
+            {(['novos', 'ativos'] as const).map((key) => (
+              <button
+                key={key}
+                data-active={activeGrowth === key}
+                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
+                onClick={() => setActiveGrowth(key)}
+              >
+                <span className="whitespace-nowrap text-xs text-muted-foreground">
+                  {chartConfigGrowth[key].label}
+                </span>
+                <span className="text-lg leading-none font-bold sm:text-3xl">
+                  {growthTotals[key].toLocaleString('pt-BR')}
+                </span>
+              </button>
+            ))}
           </div>
+        </CardHeader>
+        <CardContent className="px-2 sm:p-6">
+          <div className="flex justify-end mb-4">
+            <PeriodoFilter value={p1} onChange={(v) => setP1(v as PeriodKey)} />
+          </div>
+          <ChartContainer config={chartConfigGrowth} className="aspect-auto h-[250px] w-full [&_.recharts-surface]:overflow-visible">
+            <AreaChart data={GROWTH_DATA[p1]} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="fillGrowth" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor={`var(--color-${activeGrowth})`} stopOpacity={0.4} />
+                  <stop offset="95%" stopColor={`var(--color-${activeGrowth})`} stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="t" tickLine={false} axisLine={false} tickMargin={8} interval="preserveStartEnd" />
+              <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
+              <Area
+                type="monotone"
+                dataKey={activeGrowth}
+                stroke={`var(--color-${activeGrowth})`}
+                fill="url(#fillGrowth)"
+                strokeWidth={2}
+                dot={false}
+              />
+            </AreaChart>
+          </ChartContainer>
         </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 leading-none font-medium">
+            Taxa de retenção acumulada: {data.retention_rate}% <IconTrendingUp size={16} />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Base de {b1.active_patients.toLocaleString('pt-BR')} usuários ativos no período selecionado
+          </div>
+        </CardFooter>
       </Card>
 
       {/* ================================================================
           BLOCO 2 — Funil clínico
-          Funil visual + LineChart taxa de conversão
+          Bar Chart - Interactive (tabs realizadas / canceladas)
       ================================================================ */}
-      <Card>
-        <CardContent className="p-6">
-          <BlockHeader
-            title="Funil clínico"
-            description="Conversão de agendamentos em consultas realizadas"
-            filter={<PeriodoFilter value={p2} onChange={(v) => setP2(v as PeriodKey)} />}
-          />
-
-          <div className="grid lg:grid-cols-2 gap-8 items-stretch">
-            <div className="flex flex-col">
-              <p className="text-sm font-medium text-muted-foreground mb-3">Consultas no período</p>
-              <div className="rounded-lg border overflow-hidden flex flex-col flex-1">
-                <div className="flex-1 flex items-stretch min-h-[148px]">
-                  <div className="flex-1 flex flex-col items-center justify-center py-9 px-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Agendadas</p>
-                    <p className="text-4xl font-bold tabular-nums">{b2.scheduled.toLocaleString('pt-BR')}</p>
-                  </div>
-                  <div className="shrink-0 flex flex-col items-center justify-center gap-1 px-2">
-                    <span className="text-xs font-bold text-primary leading-none">{conversionRate}%</span>
-                    <IconArrowRight size={16} className="text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 flex flex-col items-center justify-center py-9 px-4 bg-primary/5">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Realizadas</p>
-                    <p className="text-4xl font-bold tabular-nums">{b2.completed.toLocaleString('pt-BR')}</p>
-                  </div>
-                  <Separator orientation="vertical" className="mx-1" />
-                  <div className="flex-1 flex flex-col items-center justify-center py-9 px-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Canceladas</p>
-                    <p className="text-4xl font-bold tabular-nums text-destructive">{b2.cancelled.toLocaleString('pt-BR')}</p>
-                  </div>
-                </div>
-                <div className="border-t bg-muted/40 px-5 py-3 flex items-center gap-2 shrink-0">
-                  <p className="text-sm text-muted-foreground">Tempo médio até a 1ª consulta:</p>
-                  <p className="text-sm font-semibold">
-                    {b2.avg_days_to_first !== null
-                      ? `${b2.avg_days_to_first.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} dias`
-                      : 'N/A'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-3">Evolução da taxa de conversão</p>
-              <ResponsiveContainer width="100%" height={230}>
-                <LineChart data={CONVERSION_DATA[p2]} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-                  {grid}
-                  <XAxis dataKey="t" tick={tick} />
-                  <YAxis domain={[70, 100]} tick={tick} tickFormatter={(v) => `${v}%`} />
-                  <Tooltip content={<ChartTooltip formatValue={(v) => `${v}%`} labelMap={{ taxa: 'Taxa de conversão' }} />} />
-                  <Line type="monotone" dataKey="taxa" stroke={c500} strokeWidth={2.5} dot={{ fill: c500, r: 4, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+      <Card className="!py-0">
+        <CardHeader className="flex flex-col items-stretch space-y-0 border-b !p-0 sm:flex-row">
+          <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
+            <CardTitle className="text-base">Funil clínico</CardTitle>
+            <CardDescription>
+              Conversão de agendamentos em consultas realizadas
+            </CardDescription>
           </div>
+          <div className="flex">
+            {(['realizadas', 'canceladas'] as const).map((key) => (
+              <button
+                key={key}
+                data-active={activeFunnel === key}
+                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
+                onClick={() => setActiveFunnel(key)}
+              >
+                <span className="text-xs text-muted-foreground">
+                  {chartConfigFunnel[key].label}
+                </span>
+                <span className="text-lg leading-none font-bold sm:text-3xl">
+                  {funnelTotals[key].toLocaleString('pt-BR')}
+                </span>
+              </button>
+            ))}
+          </div>
+        </CardHeader>
+        <CardContent className="px-2 sm:p-6">
+          <div className="flex justify-end mb-4">
+            <PeriodoFilter value={p2} onChange={(v) => setP2(v as PeriodKey)} />
+          </div>
+          <ChartContainer config={chartConfigFunnel} className="aspect-auto h-[250px] w-full [&_.recharts-surface]:overflow-visible">
+            <BarChart data={FUNNEL_DATA[p2]} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="t" tickLine={false} axisLine={false} tickMargin={8} />
+              <ChartTooltip content={<ChartTooltipContent indicator="line" />} cursor={false} />
+              <Bar
+                dataKey={activeFunnel}
+                fill={`var(--color-${activeFunnel})`}
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ChartContainer>
         </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 leading-none font-medium">
+            Taxa de conversão: {conversionRate}% <IconTrendingUp size={16} />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Tempo médio até a 1ª consulta:{' '}
+            {b2.avg_days_to_first !== null
+              ? `${b2.avg_days_to_first.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} dias`
+              : 'N/A'}
+          </div>
+        </CardFooter>
       </Card>
 
       {/* ================================================================
-          BLOCO 3 — Farmácia
-          Stat row + Horizontal BarChart por farmácia + Donut status pedidos
+          BLOCOS 3 e 4 — Farmácia + Saúde da plataforma (mesma linha)
       ================================================================ */}
-      <Card>
-        <CardContent className="p-6">
-          <BlockHeader
-            title="Farmácia"
-            description="Volume de pedidos e performance das farmácias parceiras"
-            filter={<PeriodoFilter value={p3} onChange={(v) => setP3(v as PeriodKey)} />}
-          />
-
-          <div className="flex items-stretch mb-8">
-            <div className="flex-1 py-3 text-center">
-              <p className="text-4xl font-bold tabular-nums">{b3.orders_total.toLocaleString('pt-BR')}</p>
-              <p className="text-sm text-muted-foreground mt-1.5">Pedidos realizados</p>
-            </div>
-            <Separator orientation="vertical" />
-            <div className="flex-1 py-3 text-center">
-              <p className="text-4xl font-bold tabular-nums">{b3.orders_delivered.toLocaleString('pt-BR')}</p>
-              <p className="text-sm text-muted-foreground mt-1.5">Pedidos entregues</p>
-            </div>
-            <Separator orientation="vertical" />
-            <div className="flex-1 py-3 text-center">
-              <p className="text-4xl font-bold tabular-nums">{brl.format(b3.avg_ticket)}</p>
-              <p className="text-sm text-muted-foreground mt-1.5">Ticket médio</p>
-            </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+      {/* ================================================================
+          BLOCO 3 — Farmácia
+          Pie Chart - Donut with Text
+      ================================================================ */}
+      <Card className="flex flex-col">
+        <CardHeader className="py-4 border-b">
+          <CardTitle className="text-base">Farmácia</CardTitle>
+          <CardDescription>
+            Volume de pedidos e status das farmácias parceiras
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 pt-6 pb-0">
+          <div className="flex justify-start mb-4">
+            <PeriodoFilter value={p3} onChange={(v) => setP3(v as PeriodKey)} />
           </div>
-
-          {pharmaBar.length === 0 ? (
-            <div className="rounded-lg border px-6 py-16 text-center">
-              <p className="text-sm text-muted-foreground">Nenhuma farmácia ativa no período</p>
-            </div>
-          ) : (
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground mb-3">Pedidos por farmácia</p>
-                <ResponsiveContainer width="100%" height={Math.max(180, pharmaBar.length * 60)}>
-                  <BarChart data={pharmaBar} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
-                    <XAxis type="number" tick={tick} />
-                    <YAxis type="category" dataKey="name" tick={tick} width={150} tickLine={false} axisLine={false} />
-                    <Tooltip cursor={false} content={<ChartTooltip formatValue={(v) => `${v} pedidos`} labelMap={{ pedidos: 'Pedidos' }} />} />
-                    <Bar dataKey="pedidos" fill={c500} radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-
-              <div className="flex flex-col items-center gap-3">
-                <p className="text-sm font-medium text-muted-foreground">Status dos pedidos</p>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie data={orderPie} cx="50%" cy="50%" innerRadius={58} outerRadius={88} paddingAngle={3} dataKey="value">
-                      <Cell fill={c700} />
-                      <Cell fill={c300} />
-                    </Pie>
-                    <Tooltip content={<ChartTooltip formatValue={(v) => v.toLocaleString('pt-BR')} labelMap={{ entregues: 'Entregues', pendentes: 'Pendentes' }} />} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="flex gap-6">
-                  <ColorSwatch color={c700} label="Entregues" value={delivered.toLocaleString('pt-BR')} />
-                  <ColorSwatch color={c300} label="Pendentes" value={pending.toLocaleString('pt-BR')} />
-                </div>
-              </div>
-            </div>
-          )}
+          <ChartContainer
+            config={chartConfigOrders}
+            className="mx-auto aspect-square max-h-[280px]"
+          >
+            <PieChart>
+              <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" hideLabel />} />
+              <Pie
+                data={ordersData}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={70}
+                strokeWidth={5}
+              >
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                      return (
+                        <text
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                        >
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-3xl font-bold"
+                          >
+                            {b3.orders_total.toLocaleString('pt-BR')}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 24}
+                            className="fill-muted-foreground text-sm"
+                          >
+                            pedidos
+                          </tspan>
+                        </text>
+                      )
+                    }
+                  }}
+                />
+              </Pie>
+            </PieChart>
+          </ChartContainer>
         </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 leading-none font-medium">
+            Ticket médio: {brl.format(b3.avg_ticket)} <IconTrendingUp size={16} />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            {b3.orders_delivered.toLocaleString('pt-BR')} pedidos entregues de{' '}
+            {b3.orders_total.toLocaleString('pt-BR')} realizados
+          </div>
+        </CardFooter>
       </Card>
 
       {/* ================================================================
           BLOCO 4 — Saúde da plataforma
-          Semáforos + Grouped BarChart evolução tenants/profissionais
+          Pie Chart - Donut (tenants ativos por tipo)
       ================================================================ */}
-      <Card>
-        <CardContent className="p-6">
-          <BlockHeader
-            title="Saúde da plataforma"
-            description="Atividade e engajamento dos tenants e profissionais cadastrados"
-            filter={<PeriodoFilter value={p4} onChange={(v) => setP4(v as PeriodKey)} />}
-          />
-
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
-            <div className="grid gap-3">
-              <SemaphoreItem value={b4.active_tenants.toLocaleString('pt-BR')} label="Tenants ativos" status={tenantsStatus} />
-              <SemaphoreItem value={profisWithSchedule.toLocaleString('pt-BR')} label="Profissionais com agenda" status={profisStatus} />
-              <SemaphoreItem value={data.churned_tenants.toLocaleString('pt-BR')} label="Churn de tenants" status={churnStatus} />
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-3">Evolução de tenants e profissionais</p>
-              <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={TENANTS_DATA[p4]} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-                  {grid}
-                  <XAxis dataKey="t" tick={tick} />
-                  <YAxis tick={tick} />
-                  <Tooltip cursor={false} content={<ChartTooltip formatValue={(v) => v.toLocaleString('pt-BR')} labelMap={{ tenants: 'Tenants', profis: 'Profissionais' }} />} />
-                  <Bar dataKey="tenants" fill={c700} radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="profis"  fill={c400} radius={[3, 3, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-              <div className="flex gap-5 justify-center mt-2">
-                <ColorSwatch color={c700} label="Tenants" value="" />
-                <ColorSwatch color={c400} label="Profissionais" value="" />
-              </div>
-            </div>
+      <Card className="flex flex-col">
+        <CardHeader className="py-4 border-b">
+          <CardTitle className="text-base">Saúde da plataforma</CardTitle>
+          <CardDescription>
+            Distribuição dos tenants ativos por tipo
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 pt-6 pb-0">
+          <div className="flex justify-start mb-4">
+            <PeriodoFilter value={p4} onChange={(v) => setP4(v as PeriodKey)} />
           </div>
+          <ChartContainer
+            config={chartConfigPlatform}
+            className="mx-auto aspect-square max-h-[280px]"
+          >
+            <PieChart>
+              <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" hideLabel />} />
+              <Pie
+                data={platformData}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={70}
+                strokeWidth={5}
+              >
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                      return (
+                        <text
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                        >
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-3xl font-bold"
+                          >
+                            {platformTotal.toLocaleString('pt-BR')}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 24}
+                            className="fill-muted-foreground text-sm"
+                          >
+                            tenants
+                          </tspan>
+                        </text>
+                      )
+                    }
+                  }}
+                />
+              </Pie>
+            </PieChart>
+          </ChartContainer>
         </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 leading-none font-medium">
+            {platformTotal} tenants ativos na plataforma <IconTrendingUp size={16} />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            {tt.medicos} médicos, {tt.saude} profissionais de saúde e {tt.farmacias} farmácias
+          </div>
+        </CardFooter>
       </Card>
+      </div>
 
       {/* ================================================================
           BLOCO 5 — Financeiro avançado
-          Arc gauge + barras de canal + LineChart receita por canal + Projeção
+          Line Chart - Interactive (canal clínico vs farmácia)
       ================================================================ */}
-      <Card>
-        <CardContent className="p-6">
-          <BlockHeader
-            title="Financeiro avançado"
-            description="Take rate, receita por canal e projeção para o mês atual"
-            filter={<PeriodoFilter value={p5} onChange={(v) => setP5(v as PeriodKey)} />}
-          />
-
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
-            {/* Arco de take rate + barras de canal */}
-            <div className="flex flex-col items-center text-center">
-              <p className="text-sm font-medium text-muted-foreground">Take rate médio</p>
-              <ArcGauge pct={takeRate} />
-              <p className="text-5xl font-bold tabular-nums -mt-3">{takeRate}%</p>
-              <p className="text-xs text-muted-foreground mt-2 max-w-[200px]">
-                Proporção da receita Noun sobre o GMV clínico
-              </p>
-
-              <div className="w-full mt-8 space-y-4 text-left">
-                <div>
-                  <div className="flex justify-between text-sm mb-1.5">
-                    <span className="font-medium">Canal clínico</span>
-                    <span className="font-semibold tabular-nums">{brl.format(b5.earn_fee)}</span>
-                  </div>
-                  <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: 'hsl(var(--border))' }}>
-                    <div className="h-full rounded-full" style={{ width: `${(b5.earn_fee / totalCanal) * 100}%`, backgroundColor: c700 }} />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1.5">
-                    <span className="font-medium">Canal farmácia</span>
-                    <span className="font-semibold tabular-nums">{brl.format(farmaciaRevenue)}</span>
-                  </div>
-                  <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: 'hsl(var(--border))' }}>
-                    <div className="h-full rounded-full" style={{ width: `${(farmaciaRevenue / totalCanal) * 100}%`, backgroundColor: c400 }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Line chart: receita por canal ao longo do período */}
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-3">Receita por canal ao longo do período</p>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={REVENUE_TREND[p5]} margin={{ top: 4, right: 8, left: 4, bottom: 0 }}>
-                  {grid}
-                  <XAxis dataKey="t" tick={tick} />
-                  <YAxis tick={tick} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} width={56} />
-                  <Tooltip content={<ChartTooltip formatValue={(v) => brl.format(v)} labelMap={{ clinico: 'Canal clínico', farmacia: 'Canal farmácia' }} />} />
-                  <Line type="monotone" dataKey="clinico"  stroke={c700} strokeWidth={2.5} dot={{ fill: c700, r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-                  <Line type="monotone" dataKey="farmacia" stroke={c400} strokeWidth={2}   dot={{ fill: c400, r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} strokeDasharray="5 3" />
-                </LineChart>
-              </ResponsiveContainer>
-              <div className="flex gap-5 justify-center mt-2">
-                <ColorSwatch color={c700} label="Canal clínico"  value={brl.format(b5.earn_fee)} />
-                <ColorSwatch color={c400} label="Canal farmácia" value={brl.format(farmaciaRevenue)} />
-              </div>
-            </div>
+      <Card className="!py-0">
+        <CardHeader className="flex flex-col items-stretch space-y-0 border-b !p-0 sm:flex-row">
+          <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
+            <CardTitle className="text-base">Financeiro avançado</CardTitle>
+            <CardDescription>
+              Take rate e receita por canal ao longo do período selecionado
+            </CardDescription>
           </div>
-
-          {/* Projeção do mês */}
-          <div className="mt-6 rounded-lg border bg-muted/30 px-6 py-5 flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold">Projeção do mês</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {projectionDesc[p5]}
-              </p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <p className="text-3xl font-bold tabular-nums">{brl.format(monthProjection)}</p>
-              {monthProjection > 0
-                ? <IconArrowUpRight size={22} className="text-primary" />
-                : <IconArrowRight   size={22} className="text-muted-foreground" />}
-            </div>
+          <div className="flex">
+            {(['clinico', 'farmacia'] as const).map((key) => (
+              <button
+                key={key}
+                data-active={activeRevenue === key}
+                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
+                onClick={() => setActiveRevenue(key)}
+              >
+                <span className="text-xs text-muted-foreground">
+                  {chartConfigRevenue[key].label}
+                </span>
+                <span className="text-lg leading-none font-bold sm:text-3xl">
+                  {brl.format(revenueTotals[key])}
+                </span>
+              </button>
+            ))}
           </div>
+        </CardHeader>
+        <CardContent className="px-2 sm:p-6">
+          <div className="flex justify-end mb-4">
+            <PeriodoFilter value={p5} onChange={(v) => setP5(v as PeriodKey)} />
+          </div>
+          <ChartContainer config={chartConfigRevenue} className="aspect-auto h-[250px] w-full [&_.recharts-surface]:overflow-visible">
+            <AreaChart data={REVENUE_TREND[p5]} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor={`var(--color-${activeRevenue})`} stopOpacity={0.4} />
+                  <stop offset="95%" stopColor={`var(--color-${activeRevenue})`} stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="t" tickLine={false} axisLine={false} tickMargin={8} interval="preserveStartEnd" />
+              <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
+              <Area
+                type="monotone"
+                dataKey={activeRevenue}
+                stroke={`var(--color-${activeRevenue})`}
+                fill="url(#fillRevenue)"
+                strokeWidth={2}
+                dot={false}
+              />
+            </AreaChart>
+          </ChartContainer>
         </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 leading-none font-medium">
+            Take rate médio: {takeRate}% <IconTrendingUp size={16} />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Projeção do mês: {brl.format(monthProjection)} (dia {daysElapsed} de {daysInMonth})
+          </div>
+        </CardFooter>
       </Card>
     </>
   )

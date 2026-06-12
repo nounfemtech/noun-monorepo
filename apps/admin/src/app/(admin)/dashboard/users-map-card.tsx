@@ -141,7 +141,7 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
       .sort((a, b) => b.count - a.count)
   , [countByRegion])
 
-  // Estados (com pacientes) da região selecionada
+  // Estados (com usuários) da região selecionada
   const statesOfRegion = useMemo(() => {
     if (!selectedRegion) return []
     const states = REGIONS.find(r => r.id === selectedRegion)?.states ?? []
@@ -151,7 +151,7 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
       .sort((a, b) => b.count - a.count)
   }, [selectedRegion, countByState])
 
-  // Cidades (com pacientes) do estado selecionado
+  // Cidades (com usuários) do estado selecionado
   const citiesOfState = useMemo(() => {
     if (!selectedStateId) return []
     return data.filter(c => c.state === selectedStateId).sort((a, b) => b.count - a.count)
@@ -284,14 +284,16 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <Card>
-      <CardHeader className="pb-4">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <CardTitle className="text-base">Usuários por região</CardTitle>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Distribuição geográfica de pacientes cadastrados
-            </p>
-          </div>
+      <CardHeader className="py-4 border-b">
+        <CardTitle className="text-base">Usuários por região</CardTitle>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Distribuição geográfica de usuários cadastrados
+        </p>
+      </CardHeader>
+
+      <CardContent className="px-6 pt-6 pb-6">
+
+        <div className="flex justify-end mb-4">
           <div className="inline-flex border rounded-md overflow-hidden whitespace-nowrap shrink-0">
             <button
               onClick={clearAll}
@@ -321,11 +323,8 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
             ))}
           </div>
         </div>
-      </CardHeader>
 
-      <CardContent className="px-6 pt-0 pb-6">
-
-        <div className="flex min-h-[320px] border rounded-lg overflow-hidden">
+        <div className="flex min-h-[320px]">
 
           {/* ── Mapa SVG ─────────────────────────────────────────────────────── */}
           <div className="flex-1 overflow-hidden p-2">
@@ -410,7 +409,7 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
                     <rect x={tx}     y={ty}         width={tW} height={tH} rx={6 * k} className="fill-popover stroke-border" strokeWidth={0.5 * k} />
                     <text x={tx + 10 * k} y={ty + 17 * k} className="fill-foreground"       fontSize={11 * k} fontWeight={700} fontFamily="inherit">{hoveredCity.city}</text>
                     <text x={tx + 10 * k} y={ty + 33 * k} className="fill-muted-foreground" fontSize={10 * k}                  fontFamily="inherit">
-                      {hoveredCity.count} {hoveredCity.count === 1 ? 'paciente' : 'pacientes'} · {hoveredCity.state}
+                      {hoveredCity.count} {hoveredCity.count === 1 ? 'usuário' : 'usuários'} · {hoveredCity.state}
                     </text>
                   </g>
                 )
@@ -429,7 +428,7 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
                     {total.toLocaleString('pt-BR')}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {isMock ? 'pacientes (exemplo)' : 'pacientes com endereço'}
+                    {isMock ? 'usuários (exemplo)' : 'usuários com endereço'}
                   </p>
                 </div>
 
@@ -454,7 +453,7 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
                         />
                       </div>
                       <p className="text-[10px] text-muted-foreground">
-                        {r.count} {r.count === 1 ? 'paciente' : 'pacientes'}
+                        {r.count} {r.count === 1 ? 'usuário' : 'usuários'}
                       </p>
                     </div>
                   ))}
@@ -477,13 +476,13 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
                   </p>
                   <p className="text-2xl font-bold tabular-nums leading-none mt-1">{regionTotal.toLocaleString('pt-BR')}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {regionTotal === 1 ? 'paciente' : 'pacientes'} na região
+                    {regionTotal === 1 ? 'usuário' : 'usuários'} na região
                   </p>
                 </div>
                 <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
                   {statesOfRegion.length === 0 ? (
                     <p className="text-xs text-muted-foreground text-center pt-4">
-                      Nenhum paciente com endereço nessa região.
+                      Nenhum usuário com endereço nessa região.
                     </p>
                   ) : statesOfRegion.map(st => (
                     <div
@@ -526,13 +525,13 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
                   <p className="text-sm font-semibold leading-snug">{STATE_NAMES[selectedStateId!] ?? selectedStateId}</p>
                   <p className="text-2xl font-bold tabular-nums leading-none mt-1">{stateTotal.toLocaleString('pt-BR')}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {stateTotal === 1 ? 'paciente' : 'pacientes'} no estado
+                    {stateTotal === 1 ? 'usuário' : 'usuários'} no estado
                   </p>
                 </div>
                 <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
                   {citiesOfState.length === 0 ? (
                     <p className="text-xs text-muted-foreground text-center pt-4">
-                      Nenhum paciente com endereço aqui.
+                      Nenhum usuário com endereço aqui.
                     </p>
                   ) : citiesOfState.map(city => (
                     <div
@@ -574,13 +573,13 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
                   <p className="text-sm font-semibold leading-snug">{selectedCity.city}</p>
                   <p className="text-2xl font-bold tabular-nums leading-none mt-1">{selectedCity.count.toLocaleString('pt-BR')}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {selectedCity.count === 1 ? 'paciente' : 'pacientes'} na cidade
+                    {selectedCity.count === 1 ? 'usuário' : 'usuários'} na cidade
                   </p>
                 </div>
                 <div className="flex-1 overflow-y-auto px-5 py-4">
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {stateTotal > 0
-                      ? `${Math.round((selectedCity.count / stateTotal) * 100)}% dos pacientes de ${selectedCity.state}.`
+                      ? `${Math.round((selectedCity.count / stateTotal) * 100)}% dos usuários de ${selectedCity.state}.`
                       : null}
                   </p>
                 </div>

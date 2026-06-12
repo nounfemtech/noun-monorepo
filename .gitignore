@@ -57,4 +57,7 @@ supabase/.branches
 supabase/.temp
 
 # Claude Code — configurações locais (paths pessoais, não commitar)
-.claude/settings.local.json
+.claude/
+
+# Next.js (gerado automaticamente no dev/build)
+next-env.d.ts

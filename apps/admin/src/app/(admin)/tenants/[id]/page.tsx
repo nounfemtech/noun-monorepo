@@ -263,9 +263,6 @@ export default async function TenantDetailPage({ params }: PageProps) {
                   {pro.is_active === false && (
                     <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Inativo</Badge>
                   )}
-                  <Link href={`/usuarios/${pro.id}`}>
-                    <Button variant="ghost" className="text-xs">Ver</Button>
-                  </Link>
                 </div>
               ))}
             </div>

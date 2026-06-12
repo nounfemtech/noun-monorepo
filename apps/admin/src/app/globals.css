@@ -34,6 +34,13 @@
     /* Border radius base */
     --radius: 0.6rem;
 
+    /* Chart colors (yellow-500/700/400/300/600) — sobrescritos pelo ColorThemeProvider */
+    --chart-1: #eab308;
+    --chart-2: #a16207;
+    --chart-3: #facc15;
+    --chart-4: #fde047;
+    --chart-5: #ca8a04;
+
     /* ── Fallbacks SSR — sobrescritos pelo ColorThemeProvider no client ── */
     /* Primária — Yellow 400 */
     --primary:             47.9 95.8% 53.1%;

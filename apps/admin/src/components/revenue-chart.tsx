@@ -1,17 +1,18 @@
 'use client'
 
-import * as React from 'react'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { IconTrendingUp } from '@tabler/icons-react'
 import {
-  ComposedChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts'
-import { useColorTheme, colors } from '@noun/ui'
+  Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
+} from '@/components/ui/card'
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  type ChartConfig,
+} from '@/components/ui/chart'
 
 interface RevenueDataPoint {
   month: string
@@ -20,70 +21,59 @@ interface RevenueDataPoint {
   receitaNoun: number
 }
 
-interface RevenueChartProps {
+const chartConfig = {
+  gmvClinico:  { label: 'GMV Clínico',  color: 'var(--chart-1)' },
+  gmvFarmacia: { label: 'GMV Farmácia', color: 'var(--chart-3)' },
+  receitaNoun: { label: 'Receita Noun', color: 'var(--chart-5)' },
+} satisfies ChartConfig
+
+export function RevenueChart({
+  data,
+  className,
+}: {
   data: RevenueDataPoint[]
-}
-
-const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-
-function formatYAxis(value: number): string {
-  if (value >= 1000) return `R$${(value / 1000).toFixed(0)}k`
-  return `R$${value}`
-}
-
-interface TooltipPayloadItem {
-  name: string
-  value: number
-  color: string
-}
-
-interface CustomTooltipProps {
-  active?: boolean
-  payload?: TooltipPayloadItem[]
-  label?: string
-}
-
-const SERIES_LABELS: Record<string, string> = {
-  gmvClinico:  'GMV Clínico',
-  gmvFarmacia: 'GMV Farmácia',
-  receitaNoun: 'Receita Noun',
-}
-
-function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
-  if (!active || !payload || payload.length === 0) return null
+  className?: string
+}) {
   return (
-    <div className="bg-background border border-border rounded-lg p-3 shadow-md text-sm">
-      <p className="font-semibold mb-2">{label}</p>
-      {payload.map((entry) => (
-        <div key={entry.name} className="flex items-center gap-2 mb-1">
-          <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: entry.color }} />
-          <span className="text-muted-foreground">{SERIES_LABELS[entry.name] ?? entry.name}:</span>
-          <span className="font-medium">{brl.format(entry.value)}</span>
+    <Card className={className}>
+      <CardHeader className="py-4 border-b">
+        <CardTitle className="text-base">Evolução de GMV e Receita</CardTitle>
+        <CardDescription>GMV por canal e receita Noun nos últimos 6 meses</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-6">
+        <ChartContainer config={chartConfig} className="aspect-auto h-[280px] w-full">
+          <BarChart data={data} margin={{ top: 8, right: 12, left: 12, bottom: 0 }}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(v: number) =>
+                v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`
+              }
+            />
+            <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
+            <ChartLegend content={<ChartLegendContent />} />
+            <Bar dataKey="gmvClinico"  fill="var(--color-gmvClinico)"  radius={[3, 3, 0, 0]} />
+            <Bar dataKey="gmvFarmacia" fill="var(--color-gmvFarmacia)" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="receitaNoun" fill="var(--color-receitaNoun)" radius={[3, 3, 0, 0]} />
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className="flex-col gap-2 text-sm">
+        <div className="flex items-center gap-2 leading-none font-medium">
+          Receita cresce junto ao GMV <IconTrendingUp size={16} />
         </div>
-      ))}
-    </div>
-  )
-}
-
-export function RevenueChart({ data }: RevenueChartProps) {
-  const { primary } = useColorTheme()
-
-  const colorClinico  = colors[primary.palette][700]
-  const colorFarmacia = colors[primary.palette][400]
-  const colorReceita  = colors[primary.palette][600]
-
-  return (
-    <ResponsiveContainer width="100%" height={320}>
-      <ComposedChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-        <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
-        <YAxis tickFormatter={formatYAxis} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} width={60} />
-        <Tooltip content={<CustomTooltip />} />
-        <Legend formatter={(value) => SERIES_LABELS[value] ?? value} />
-        <Bar dataKey="gmvClinico"  name="gmvClinico"  fill={colorClinico}  radius={[3, 3, 0, 0]} />
-        <Bar dataKey="gmvFarmacia" name="gmvFarmacia" fill={colorFarmacia} radius={[3, 3, 0, 0]} />
-        <Bar dataKey="receitaNoun" name="receitaNoun" fill={colorReceita}  radius={[3, 3, 0, 0]} />
-      </ComposedChart>
-    </ResponsiveContainer>
+        <div className="leading-none text-muted-foreground">
+          Volume acumulado dos últimos 6 meses por canal
+        </div>
+      </CardFooter>
+    </Card>
   )
 }

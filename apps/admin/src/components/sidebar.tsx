@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   IconLayoutDashboard,
-  IconUsers,
   IconBuilding,
   IconCurrencyReal,
   IconTicket,
@@ -43,7 +42,6 @@ import { createSupabaseBrowser } from '@/lib/supabase'
 
 const navItems = [
   { href: '/dashboard',     label: 'Dashboard',     icon: IconLayoutDashboard },
-  { href: '/usuarios',      label: 'Usuários',      icon: IconUsers },
   { href: '/tenants',       label: 'Tenants',       icon: IconBuilding },
   { href: '/financeiro',    label: 'Financeiro',    icon: IconCurrencyReal },
   { href: '/chamados',      label: 'Chamados',      icon: IconTicket },
