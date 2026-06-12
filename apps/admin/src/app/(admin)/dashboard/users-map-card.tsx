@@ -323,9 +323,9 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
         </div>
       </CardHeader>
 
-      <CardContent className="p-0">
+      <CardContent className="px-6 pt-0 pb-6">
 
-        <div className="flex min-h-[320px]">
+        <div className="flex min-h-[320px] border rounded-lg overflow-hidden">
 
           {/* ── Mapa SVG ─────────────────────────────────────────────────────── */}
           <div className="flex-1 overflow-hidden p-2">
