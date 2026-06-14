@@ -250,13 +250,7 @@ async function FinanceiroContent({ searchParams }: PageProps) {
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        className={
-                          t.type === 'clinic'
-                            ? 'bg-blue-100 text-blue-700 border-blue-200 text-xs'
-                            : 'bg-orange-100 text-orange-700 border-orange-200 text-xs'
-                        }
-                      >
+                      <Badge variant="outline">
                         {t.type === 'clinic' ? 'Clínica' : 'Farmácia'}
                       </Badge>
                     </TableCell>

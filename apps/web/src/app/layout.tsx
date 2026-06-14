@@ -26,7 +26,7 @@ const fontMono = Reddit_Mono({
 // ============================================================
 
 export const metadata: Metadata = {
-  title: 'Noun — Portal',
+  title: 'Noun: Portal',
   description: 'Portal web para médicos, farmácias e administradores',
 }
 

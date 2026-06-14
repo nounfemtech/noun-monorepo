@@ -13,10 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { IconBuilding, IconPlus } from '@tabler/icons-react'
+import { IconBuilding } from '@tabler/icons-react'
 import { StatsCard } from '@/components/stats-card'
 import { StatusFilter } from './status-filter'
 import { SearchInput } from './search-input'
+import { TenantActions } from './tenant-actions'
+import { TenantNewButton } from './tenant-new-button'
 
 const PAGE_SIZE = 20
 
@@ -40,22 +42,22 @@ function formatCNPJ(cnpj: string | null): string {
 
 function typeBadge(type: string) {
   return type === 'clinic' ? (
-    <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs whitespace-nowrap">Profissional de saúde</Badge>
+    <Badge variant="outline" className="whitespace-nowrap">Profissional de saúde</Badge>
   ) : (
-    <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">Farmácia</Badge>
+    <Badge variant="outline">Farmácia</Badge>
   )
 }
 
 function statusBadge(status: string) {
   switch (status) {
     case 'active':
-      return <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">Ativo</Badge>
-    case 'pending_approval':
-      return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 text-xs">Pendente</Badge>
+      return <Badge variant="success">Ativo</Badge>
+    case 'pending':
+      return <Badge variant="warning">Pendente</Badge>
     case 'suspended':
-      return <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Suspenso</Badge>
+      return <Badge variant="destructive">Suspenso</Badge>
     default:
-      return <Badge variant="secondary" className="text-xs">{status}</Badge>
+      return <Badge variant="outline">{status}</Badge>
   }
 }
 
@@ -117,7 +119,7 @@ async function TenantsContent({ searchParams }: PageProps) {
 
   const [ativosRes, pendentesRes, suspensosRes] = await Promise.all([
     statusCount('active'),
-    statusCount('pending_approval'),
+    statusCount('pending'),
     statusCount('suspended'),
   ])
 
@@ -139,12 +141,7 @@ async function TenantsContent({ searchParams }: PageProps) {
             Gerencie cadastros, aprovações e status dos profissionais de saúde e farmácias parceiros
           </p>
         </div>
-        <Link href="/tenants/new">
-          <Button className="gap-2">
-            <IconPlus size={16} />
-            Novo tenant
-          </Button>
-        </Link>
+        <TenantNewButton />
       </div>
 
       {/* Cards de monitoramento */}
@@ -184,12 +181,15 @@ async function TenantsContent({ searchParams }: PageProps) {
                 <TableHead>Tipo</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Cadastro</TableHead>
-                <TableHead className="w-20" />
+                <TableHead className="w-20">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tenants.map((tenant) => (
-                <TableRow key={tenant.id}>
+                <TableRow
+                  key={tenant.id}
+                  className="[&:has([data-state=open])]:bg-muted/50"
+                >
                   <TableCell>
                     <span className="text-sm font-mono text-muted-foreground">
                       {tenant.code}
@@ -216,11 +216,7 @@ async function TenantsContent({ searchParams }: PageProps) {
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Link href={`/tenants/${tenant.id}`}>
-                      <Button variant="ghost" className="text-xs">
-                        Ver
-                      </Button>
-                    </Link>
+                    <TenantActions id={tenant.id} code={tenant.code} />
                   </TableCell>
                 </TableRow>
               ))}

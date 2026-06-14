@@ -32,7 +32,7 @@
 
 - **Framework:** Next.js 15 App Router
 - **Banco:** Supabase (Postgres 17) — project `noun-app` (`vpcjzkygiwtodokcentu`), região `us-east-2`
-- **Estilo:** Tailwind CSS v3.4, CVA, shadcn/Radix UI
+- **Estilo:** Tailwind CSS v4 (admin, web, landing) / v3.4 (mobile, `packages/config` preset), CVA, shadcn/Radix UI. Migração oklch ainda pendente.
 - **Monorepo:** pnpm workspaces + Turborepo
 - **Deploy:** Vercel (integração nativa com GitHub, branch `main`)
 - **Mobile:** Expo SDK 54, expo-router v6, NativeWind
@@ -88,7 +88,7 @@ packages/
 
 | Tabela | Descrição |
 |---|---|
-| `tenants` | Clínicas e farmácias. Campos: `id`, `name`, `legal_name`, `cnpj`, `type` (clinic/pharmacy), `status`, `plan`, `settings` (jsonb com `commission_rate`), `contract_signed_at` |
+| `tenants` | Clínicas e farmácias. Campos: `id`, `code` (legível, `NT-0001`, default via `tenant_code_seq`, migration `add_tenant_code`), `name`, `legal_name`, `cnpj`, `type` (clinic/pharmacy), `status` (active/pending_approval/suspended), `plan`, `settings` (jsonb com `commission_rate`), `contract_signed_at` |
 | `profiles` | Usuários. Campos: `id`, `full_name`, `email`, `role` (patient/doctor/nutritionist/psychologist/pharmacist/attendant/noun_admin), `is_active`, `tenant_id` |
 | `addresses` | Endereços dos usuários. Campos: `user_id` (FK manual para profiles.id), `city`, `state`, `latitude`, `longitude`, `is_active` |
 | `appointments` | Consultas. Campos: `patient_id`, `doctor_id`, `tenant_id`, `price`, `status` (completed/cancelled/scheduled), `type` |
@@ -126,13 +126,17 @@ packages/
 - Cores dos estados via `REGION_TONES` (dim/base/active por região), sem hardcode.
 
 ### Tenants (`/tenants`)
-- Listagem com busca, filtro de status, tipo (clínica/farmácia).
+- Cards de monitoramento no topo: Ativos, Pendentes, Suspensos (contagens `head: true` da base inteira).
+- Tabela em card único com a anatomia: header (título + descrição), action section (filtros) e tabela full-bleed, separados por dividers `border-b`. Sem container interno com borda.
+- Action section: button group de status (`status-filter.tsx`, segmentado, navegação instantânea via URL) à esquerda e input de busca com debounce 400ms (`search-input.tsx`) à direita.
+- Busca server-side por ID (`code`), nome, razão social e CNPJ (via `.or` + `ilike`); data `dd/mm/aaaa` filtra o dia de `created_at`.
+- Coluna ID exibe `tenants.code` (`NT-0001`) em fonte mono.
+- Não há filtro/tabs por tipo: o tipo aparece apenas como badge na tabela.
 - Detalhe do tenant: dados cadastrais, métricas financeiras (GMV, receita Noun, nº consultas, ticket médio), lista de profissionais.
 - Ações: alterar status, editar taxa de comissão.
 
-### Usuários (`/usuarios`)
-- Listagem com busca e filtros.
-- Detalhe do usuário: dados do perfil, tenant associado, últimas consultas (como paciente ou profissional).
+### Usuários (removido)
+- A página `/usuarios` foi apagada por privacidade: dados precisos de usuário são sensíveis e o admin só exibe dados macro (decisão de 11/06/2026). Comportamento individual será tratado no app mobile.
 
 ### Configurações (`/configuracoes`)
 - Seletor de cor primária (picker com tonalidades nomeadas).
@@ -142,16 +146,57 @@ packages/
 
 ### Login
 - Gradiente da coluna de capa reativo à cor primária (usa paleta do `ColorThemeProvider`).
+- Botão de mostrar/ocultar senha no campo Senha (`IconEye` / `IconEyeOff` do Tabler, dentro do input com `type` alternado).
+
+### Chamados (`/chamados`, `/chamados/[id]`)
+- Listagem por tab (source): usuário, farmácia, médico, psicólogo, nutricionista.
+- Cards de stats: Abertos, Em andamento, Resolvidos.
+- Detalhe: thread de mensagens, reply form, StatusSelect client component.
+
+### Financeiro (`/financeiro`)
+- KPIs: GMV total, receita Noun, take rate médio, nº transações.
+- Gráfico de evolução por período.
+- Breakdown por tenant com export CSV.
+- Seletor de período: mês, 3 meses, 6 meses, ano, personalizado.
 
 ---
 
 ## Padrões e Decisões Técnicas
 
+### Consumo de componentes Shadcn (regra permanente)
+
+- Componentes Shadcn são consumidos exatamente como vêm da lib. **Nunca** sobrescrever propriedades visuais base (ring, border, radius, shadow, padding, height) com classes Tailwind inline ou regras globais em `globals.css`.
+- A única customização permitida é via CSS vars semânticos no `globals.css` (`--primary`, `--ring`, `--border`, etc.), que o próprio Shadcn já consome internamente.
+- Exceção: adaptações que a Úrsula indicar explicitamente. As exceções vigentes (sancionadas) são:
+  1. **Focus ring outline sem gap** (regra global `*:focus-visible` em `globals.css`): convenção Noun deliberada, ver subseção Componentes abaixo. Substitui o ring nativo do Shadcn em todo o admin.
+  2. **Bounce tátil leve em botões** (`active:scale-[0.97]` na base do `button.tsx`): efeito de clique pedido pela Úrsula, aplicado **apenas** a botões.
+  3. **Variantes semânticas** adicionadas a `Badge` e `Alert` (`info`, `success`, `warning`, `destructive`): extensões intencionais do conjunto base.
+- Migração de espaço de cor para `oklch` (padrão do Shadcn atual) depende de migrar todo o monorepo para Tailwind v4: é esforço separado, não editar `globals.css` isolado enquanto a stack for v3.4.
+
 ### Componentes
 - Usar `'use client'` apenas quando necessário (interatividade, hooks). Preferir Server Components.
 - Tooltip nativo (`title`) proibido: usar componente Radix `<Tooltip>`.
 - Select nativo (`<select>`) proibido: usar `<Select>` do shadcn.
-- Focus ring sem gap: `box-shadow: 0 0 0 2px hsl(var(--ring))` (sem `ring-offset`).
+- Focus ring outline sem gap: `outline: 2px solid hsl(var(--ring))` + `outline-offset: 0` (anel rente à borda, segue o `border-radius`).
+- Menus Radix excluídos da regra global de focus ring via `:not([role='menu'], [role='menuitem'], ...)` em `globals.css`.
+- Não usar botões de "Voltar" em páginas de detalhe: a navegação é feita pelo breadcrumb do header.
+
+### Badge
+- Tamanho padrão: `sm` (default) = `text-xs` (12px). **Nunca** passar `className="text-xs"` explicitamente.
+- Sem hover em nenhuma variante.
+- Variantes semânticas: `success` (verde), `warning` (âmbar), `info` (azul), `destructive` (vermelho soft), `secondary` (neutro intermediário), `outline` (categórico/encerrado), `default` (primária, uso reservado).
+- Mapeamento: Ativo/Resolvido = success; Pendente/Aberto/Alta = warning; Em andamento = info; Suspenso/Inativo/Urgente = destructive; roles/Média = secondary; tipos/categorias/Fechado/Baixa = outline.
+
+### Alert
+- Componente `Alert` instalado em `apps/admin/src/components/ui/alert.tsx`.
+- Mesmas 5 variantes semânticas do badge: `default`, `info`, `success`, `warning`, `destructive`.
+- Uso: `<Alert variant="warning"><AlertTitle>...</AlertTitle><AlertDescription>...</AlertDescription></Alert>` com ícone Tabler opcional dentro.
+
+### Actions dropdown em tabelas
+- Padrão shadcn data-table: `Button variant="ghost" className="h-8 w-8 p-0 data-[state=open]:bg-muted"` + ícone `MoreHorizontal`.
+- Row com `className="[&:has([data-state=open])]:bg-muted/50"`.
+- `onCloseAutoFocus={(e) => e.preventDefault()}` no `DropdownMenuContent`.
+- `DropdownMenuItem` suporta `variant="warning"` (âmbar) e `variant="destructive"` (vermelho), separados por `DropdownMenuSeparator`.
 
 ### Queries Supabase
 - Sempre usar `createSupabaseServer()` em Server Components.

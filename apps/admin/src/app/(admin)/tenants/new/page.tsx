@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { IconArrowLeft } from '@tabler/icons-react'
 
 function validateCNPJ(cnpj: string): boolean {
   const digits = cnpj.replace(/\D/g, '')
@@ -121,13 +120,6 @@ export default function NewTenantPage() {
 
   return (
     <div className="p-6 max-w-2xl space-y-6">
-      <Link href="/tenants">
-        <Button variant="ghost" className="gap-2">
-          <IconArrowLeft size={16} />
-          Voltar para Tenants
-        </Button>
-      </Link>
-
       <Card>
         <CardHeader>
           <CardTitle>Novo Tenant</CardTitle>
@@ -211,7 +203,7 @@ export default function NewTenantPage() {
             <div className="space-y-2">
               <Label htmlFor="commissionRate">
                 Taxa de comissão (%)
-                {type === 'clinic' ? ' — entre 20% e 30%' : ' — entre 8% e 13%'}
+                {type === 'clinic' ? ': entre 20% e 30%' : ': entre 8% e 13%'}
               </Label>
               <Input
                 id="commissionRate"

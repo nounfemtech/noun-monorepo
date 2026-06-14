@@ -249,7 +249,7 @@ export function DashboardBlocks({
               <button
                 key={key}
                 data-active={activeGrowth === key}
-                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
+                className="relative flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
                 onClick={() => setActiveGrowth(key)}
               >
                 <span className="whitespace-nowrap text-xs text-muted-foreground">
@@ -315,7 +315,7 @@ export function DashboardBlocks({
               <button
                 key={key}
                 data-active={activeFunnel === key}
-                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
+                className="relative flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
                 onClick={() => setActiveFunnel(key)}
               >
                 <span className="text-xs text-muted-foreground">
@@ -361,7 +361,7 @@ export function DashboardBlocks({
       {/* ================================================================
           BLOCOS 3 e 4 — Farmácia + Saúde da plataforma (mesma linha)
       ================================================================ */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
       {/* ================================================================
           BLOCO 3 — Farmácia
           Pie Chart - Donut with Text
@@ -523,7 +523,7 @@ export function DashboardBlocks({
               <button
                 key={key}
                 data-active={activeRevenue === key}
-                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
+                className="relative flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
                 onClick={() => setActiveRevenue(key)}
               >
                 <span className="text-xs text-muted-foreground">

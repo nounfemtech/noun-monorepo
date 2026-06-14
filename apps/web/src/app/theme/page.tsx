@@ -45,7 +45,7 @@ export default function ThemePage() {
       <main className="mx-auto max-w-7xl space-y-16 px-6 py-12">
 
         {/* ── Color Picker ── */}
-        <Section title="Color Theme" description="Escolha a paleta primária — persiste no localStorage">
+        <Section title="Color Theme" description="Escolha a paleta primária, persiste no localStorage">
           <Card className="p-6">
             <ColorPicker />
           </Card>
@@ -55,12 +55,12 @@ export default function ThemePage() {
         <Section title="Tipografia" description="Reddit Sans (sans) · Reddit Mono (mono)">
           <div className="space-y-4">
             {[
-              { cls: 'text-5xl font-black',     label: 'font-black 900',    text: 'Noun — Saúde Feminina' },
-              { cls: 'text-4xl font-bold',       label: 'font-bold 700',     text: 'Noun — Saúde Feminina' },
-              { cls: 'text-3xl font-semibold',   label: 'font-semibold 600', text: 'Noun — Saúde Feminina' },
-              { cls: 'text-2xl font-medium',     label: 'font-medium 500',   text: 'Noun — Saúde Feminina' },
-              { cls: 'text-xl font-normal',      label: 'font-normal 400',   text: 'Noun — Saúde Feminina' },
-              { cls: 'text-base font-light',     label: 'font-light 300',    text: 'Noun — Saúde Feminina' },
+              { cls: 'text-5xl font-black',     label: 'font-black 900',    text: 'Noun, Saúde Feminina' },
+              { cls: 'text-4xl font-bold',       label: 'font-bold 700',     text: 'Noun, Saúde Feminina' },
+              { cls: 'text-3xl font-semibold',   label: 'font-semibold 600', text: 'Noun, Saúde Feminina' },
+              { cls: 'text-2xl font-medium',     label: 'font-medium 500',   text: 'Noun, Saúde Feminina' },
+              { cls: 'text-xl font-normal',      label: 'font-normal 400',   text: 'Noun, Saúde Feminina' },
+              { cls: 'text-base font-light',     label: 'font-light 300',    text: 'Noun, Saúde Feminina' },
               { cls: 'text-sm text-muted-foreground', label: 'muted-foreground', text: 'Texto secundário e legendas' },
               { cls: 'font-mono text-sm',        label: 'font-mono',         text: 'const supabase = createClient()' },
             ].map(({ cls, label, text }) => (
@@ -116,6 +116,9 @@ export default function ThemePage() {
             <Badge>Default</Badge>
             <Badge variant="secondary">Secondary</Badge>
             <Badge variant="outline">Outline</Badge>
+            <Badge variant="success">Success</Badge>
+            <Badge variant="warning">Warning</Badge>
+            <Badge variant="info">Info</Badge>
             <Badge variant="destructive">Destructive</Badge>
           </div>
         </Section>
@@ -321,7 +324,7 @@ export default function ThemePage() {
         </Section>
 
         {/* ── Icons ── */}
-        <Section title="Icons (@tabler/icons-react)" description="Nunca usar Lucide — apenas Tabler">
+        <Section title="Icons (@tabler/icons-react)" description="Nunca usar Lucide, apenas Tabler">
           <div className="flex flex-wrap gap-4 text-muted-foreground">
             {[IconUser, IconHeart, IconBell, IconSettings, IconSearch, IconPlus, IconTrash, IconEdit, IconCheck, IconX, IconStar, IconDownload, IconUpload, IconEye].map((Icon, i) => (
               <div key={i} className="flex flex-col items-center gap-1">

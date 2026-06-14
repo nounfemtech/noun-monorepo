@@ -1,12 +1,9 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { IconArrowLeft } from '@tabler/icons-react'
 import { TenantActions } from './tenant-actions'
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -43,10 +40,10 @@ function formatCNPJ(cnpj: string | null): string {
 
 function statusBadge(status: string) {
   switch (status) {
-    case 'active': return <Badge className="bg-green-100 text-green-700 border-green-200">Ativo</Badge>
-    case 'pending_approval': return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">Pendente aprovação</Badge>
-    case 'suspended': return <Badge className="bg-red-100 text-red-700 border-red-200">Suspenso</Badge>
-    default: return <Badge variant="secondary">{status}</Badge>
+    case 'active': return <Badge variant="success">Ativo</Badge>
+    case 'pending_approval': return <Badge variant="warning">Pendente aprovação</Badge>
+    case 'suspended': return <Badge variant="destructive">Suspenso</Badge>
+    default: return <Badge variant="outline">{status}</Badge>
   }
 }
 
@@ -111,14 +108,6 @@ export default async function TenantDetailPage({ params }: PageProps) {
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
-      {/* Voltar */}
-      <Link href="/tenants">
-        <Button variant="ghost" className="gap-2">
-          <IconArrowLeft size={16} />
-          Voltar para Tenants
-        </Button>
-      </Link>
-
       {/* Header */}
       <Card>
         <CardContent className="pt-6">
@@ -126,13 +115,7 @@ export default async function TenantDetailPage({ params }: PageProps) {
             <div>
               <div className="flex items-center gap-3 flex-wrap">
                 <h2 className="text-xl font-semibold">{tenant.name}</h2>
-                <Badge
-                  className={
-                    tenant.type === 'clinic'
-                      ? 'bg-blue-100 text-blue-700 border-blue-200'
-                      : 'bg-orange-100 text-orange-700 border-orange-200'
-                  }
-                >
+                <Badge variant="outline">
                   {tenant.type === 'clinic' ? 'Clínica' : 'Farmácia'}
                 </Badge>
                 {statusBadge(tenant.status)}
@@ -147,7 +130,7 @@ export default async function TenantDetailPage({ params }: PageProps) {
       </Card>
 
       {/* Grid de informações */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-4">
         {/* Dados cadastrais */}
         <Card>
           <CardHeader>
@@ -257,11 +240,11 @@ export default async function TenantDetailPage({ params }: PageProps) {
                     <p className="text-sm font-medium">{pro.full_name ?? '—'}</p>
                     <p className="text-xs text-muted-foreground">{pro.email ?? '—'}</p>
                   </div>
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary">
                     {roleName(pro.role)}
                   </Badge>
                   {pro.is_active === false && (
-                    <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Inativo</Badge>
+                    <Badge variant="destructive">Inativo</Badge>
                   )}
                 </div>
               ))}

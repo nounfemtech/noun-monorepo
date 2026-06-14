@@ -227,7 +227,7 @@ export default async function DashboardPage() {
   })
 
   return (
-    <div className="p-6 space-y-10">
+    <div className="p-6 space-y-4">
       {/* Header */}
       <div>
         <h1 className="text-xl font-semibold">Dashboard</h1>
@@ -251,7 +251,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ROW 3 — Gráfico + Últimas transações */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4">
         <RevenueChart data={chartData} className="lg:col-span-2" />
 
         <Card>

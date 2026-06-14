@@ -47,24 +47,26 @@ const STATUS_LABELS: Record<string, string> = {
   fechado:       'Fechado',
 }
 
+type BadgeVariant = React.ComponentProps<typeof Badge>['variant']
+
 function priorityBadge(priority: string) {
-  const map: Record<string, string> = {
-    baixa:   'bg-slate-100 text-slate-700 border-slate-200',
-    media:   'bg-blue-100 text-blue-700 border-blue-200',
-    alta:    'bg-orange-100 text-orange-700 border-orange-200',
-    urgente: 'bg-red-100 text-red-700 border-red-200',
+  const map: Record<string, BadgeVariant> = {
+    baixa:   'outline',
+    media:   'secondary',
+    alta:    'warning',
+    urgente: 'destructive',
   }
-  return <Badge className={`text-xs ${map[priority] ?? 'bg-muted'}`}>{PRIORITY_LABELS[priority] ?? priority}</Badge>
+  return <Badge variant={map[priority] ?? 'outline'}>{PRIORITY_LABELS[priority] ?? priority}</Badge>
 }
 
 function statusBadge(status: string) {
-  const map: Record<string, string> = {
-    aberto:       'bg-yellow-100 text-yellow-700 border-yellow-200',
-    em_andamento: 'bg-blue-100 text-blue-700 border-blue-200',
-    resolvido:    'bg-green-100 text-green-700 border-green-200',
-    fechado:      'bg-slate-100 text-slate-600 border-slate-200',
+  const map: Record<string, BadgeVariant> = {
+    aberto:       'warning',
+    em_andamento: 'info',
+    resolvido:    'success',
+    fechado:      'outline',
   }
-  return <Badge className={`text-xs ${map[status] ?? 'bg-muted'}`}>{STATUS_LABELS[status] ?? status}</Badge>
+  return <Badge variant={map[status] ?? 'outline'}>{STATUS_LABELS[status] ?? status}</Badge>
 }
 
 interface TicketRow {
@@ -176,7 +178,7 @@ async function ChamadosContent({ searchParams }: PageProps) {
                       {ticket.tenants?.name ?? ticket.profiles?.full_name ?? '—'}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="text-xs">{CATEGORY_LABELS[ticket.category] ?? ticket.category}</Badge>
+                      <Badge variant="outline">{CATEGORY_LABELS[ticket.category] ?? ticket.category}</Badge>
                     </TableCell>
                     <TableCell>{priorityBadge(ticket.priority)}</TableCell>
                     <TableCell>{statusBadge(ticket.status)}</TableCell>

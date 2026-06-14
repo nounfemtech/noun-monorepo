@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 const options = [
   { value: '',                 label: 'Todos'     },
   { value: 'active',           label: 'Ativos'    },
-  { value: 'pending_approval', label: 'Pendentes' },
+  { value: 'pending', label: 'Pendentes' },
   { value: 'suspended',        label: 'Suspensos' },
 ]
 
@@ -15,7 +15,7 @@ export function StatusFilter({ current, q }: { current: string; q: string }) {
   return (
     <div
       role="group"
-      className="inline-flex items-center rounded-md border border-input shadow-sm overflow-hidden divide-x divide-input"
+      className="inline-flex items-center rounded-md border border-input overflow-hidden divide-x divide-input"
     >
       {options.map((o) => {
         const params = new URLSearchParams()

@@ -447,7 +447,7 @@ function PrimaryHintPopover() {
 
         <div className="space-y-1">
           <p className="font-medium text-foreground">Black</p>
-          <p className="text-muted-foreground">Neutro absoluto, funciona em qualquer contexto. No tema escuro pode se confundir com o fundo — prefira as tonalidades Tênue ou Suave para manter a diferenciação.</p>
+          <p className="text-muted-foreground">Neutro absoluto, funciona em qualquer contexto. No tema escuro pode se confundir com o fundo, prefira as tonalidades Tênue ou Suave para manter a diferenciação.</p>
         </div>
 
         <div className="rounded-md bg-muted px-2.5 py-2 space-y-0.5">
@@ -637,7 +637,7 @@ function SettingsRow({
 function PlaceholderTab({ label }: { label: string }) {
   return (
     <div className="py-12 text-center text-sm text-muted-foreground">
-      {label} — em breve.
+      {label}: em breve.
     </div>
   )
 }
@@ -787,10 +787,10 @@ function RegiaoTab() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="dd/mm/yyyy">DD/MM/AAAA — 25/06/2025</SelectItem>
-            <SelectItem value="mm/dd/yyyy">MM/DD/AAAA — 06/25/2025</SelectItem>
-            <SelectItem value="yyyy-mm-dd">AAAA-MM-DD — 2025-06-25</SelectItem>
-            <SelectItem value="dd-mmm-yyyy">DD Mês AAAA — 25 jun 2025</SelectItem>
+            <SelectItem value="dd/mm/yyyy">DD/MM/AAAA: 25/06/2025</SelectItem>
+            <SelectItem value="mm/dd/yyyy">MM/DD/AAAA: 06/25/2025</SelectItem>
+            <SelectItem value="yyyy-mm-dd">AAAA-MM-DD: 2025-06-25</SelectItem>
+            <SelectItem value="dd-mmm-yyyy">DD Mês AAAA: 25 jun 2025</SelectItem>
           </SelectContent>
         </Select>
       </SettingsRow>
@@ -806,8 +806,8 @@ function RegiaoTab() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="24h">24 horas — 14:30</SelectItem>
-            <SelectItem value="12h">12 horas — 2:30 PM</SelectItem>
+            <SelectItem value="24h">24 horas: 14:30</SelectItem>
+            <SelectItem value="12h">12 horas: 2:30 PM</SelectItem>
           </SelectContent>
         </Select>
       </SettingsRow>
@@ -825,12 +825,12 @@ function RegiaoTab() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="BRL">BRL — Real brasileiro</SelectItem>
-            <SelectItem value="USD">USD — Dólar americano</SelectItem>
-            <SelectItem value="EUR">EUR — Euro</SelectItem>
-            <SelectItem value="GBP">GBP — Libra esterlina</SelectItem>
-            <SelectItem value="ARS">ARS — Peso argentino</SelectItem>
-            <SelectItem value="MXN">MXN — Peso mexicano</SelectItem>
+            <SelectItem value="BRL">BRL: Real brasileiro</SelectItem>
+            <SelectItem value="USD">USD: Dólar americano</SelectItem>
+            <SelectItem value="EUR">EUR: Euro</SelectItem>
+            <SelectItem value="GBP">GBP: Libra esterlina</SelectItem>
+            <SelectItem value="ARS">ARS: Peso argentino</SelectItem>
+            <SelectItem value="MXN">MXN: Peso mexicano</SelectItem>
           </SelectContent>
         </Select>
       </SettingsRow>
@@ -846,8 +846,8 @@ function RegiaoTab() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="comma">Vírgula — 1.234,56</SelectItem>
-            <SelectItem value="period">Ponto — 1,234.56</SelectItem>
+            <SelectItem value="comma">Vírgula: 1.234,56</SelectItem>
+            <SelectItem value="period">Ponto: 1,234.56</SelectItem>
           </SelectContent>
         </Select>
       </SettingsRow>
@@ -863,10 +863,10 @@ function RegiaoTab() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="period">Ponto — 1.000</SelectItem>
-            <SelectItem value="comma">Vírgula — 1,000</SelectItem>
-            <SelectItem value="space">Espaço — 1 000</SelectItem>
-            <SelectItem value="none">Nenhum — 1000</SelectItem>
+            <SelectItem value="period">Ponto: 1.000</SelectItem>
+            <SelectItem value="comma">Vírgula: 1,000</SelectItem>
+            <SelectItem value="space">Espaço: 1 000</SelectItem>
+            <SelectItem value="none">Nenhum: 1000</SelectItem>
           </SelectContent>
         </Select>
       </SettingsRow>

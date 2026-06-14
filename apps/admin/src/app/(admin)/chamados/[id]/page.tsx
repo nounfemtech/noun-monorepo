@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { IconArrowLeft, IconUser, IconRobot } from '@tabler/icons-react'
+import { IconUser, IconRobot } from '@tabler/icons-react'
 import { StatusSelect } from './status-select'
 import { ReplyForm } from './reply-form'
 
@@ -24,14 +24,16 @@ const PRIORITY_LABELS: Record<string, string> = {
   urgente: 'Urgente',
 }
 
+type BadgeVariant = React.ComponentProps<typeof Badge>['variant']
+
 function priorityBadge(priority: string) {
-  const map: Record<string, string> = {
-    baixa:   'bg-slate-100 text-slate-700 border-slate-200',
-    media:   'bg-blue-100 text-blue-700 border-blue-200',
-    alta:    'bg-orange-100 text-orange-700 border-orange-200',
-    urgente: 'bg-red-100 text-red-700 border-red-200',
+  const map: Record<string, BadgeVariant> = {
+    baixa:   'outline',
+    media:   'secondary',
+    alta:    'warning',
+    urgente: 'destructive',
   }
-  return <Badge className={`text-xs ${map[priority] ?? 'bg-muted'}`}>{PRIORITY_LABELS[priority] ?? priority}</Badge>
+  return <Badge variant={map[priority] ?? 'outline'}>{PRIORITY_LABELS[priority] ?? priority}</Badge>
 }
 
 interface TicketDetail {
@@ -84,21 +86,12 @@ async function ChamadoContent({ params }: PageProps) {
 
   return (
     <div className="p-6 space-y-6 max-w-3xl">
-      {/* Back */}
-      <Link
-        href={`/chamados?tab=${t.source}`}
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <IconArrowLeft size={14} />
-        Chamados
-      </Link>
-
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="space-y-1">
           <h1 className="text-xl font-semibold">{t.title}</h1>
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline" className="text-xs">{CATEGORY_LABELS[t.category] ?? t.category}</Badge>
+            <Badge variant="outline">{CATEGORY_LABELS[t.category] ?? t.category}</Badge>
             {priorityBadge(t.priority)}
             <span className="text-xs text-muted-foreground">
               Aberto por <span className="font-medium text-foreground">{opener}</span> em {new Date(t.created_at).toLocaleDateString('pt-BR')}
