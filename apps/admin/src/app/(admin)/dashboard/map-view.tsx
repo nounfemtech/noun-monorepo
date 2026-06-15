@@ -6,10 +6,9 @@ import 'leaflet/dist/leaflet.css'
 import { Button } from '@/components/ui/button'
 import { IconPlus, IconMinus, IconCurrentLocation, IconMaximize, IconMinimize } from '@tabler/icons-react'
 
-// ── Tile source (Esri World Street Map — English labels) ──────────────────────
-// CartoDB usa nomes locais do OSM (Africa → Afrika). Esri usa inglês.
-// Dark mode tratado via CSS filter em globals.css (.dark .leaflet-tile-pane).
-const TILES = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+// ── Tile sources ─────────────────────────────────────────────────────────────
+const LIGHT_TILES = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+const DARK_TILES  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
 
 const BRAZIL_BOUNDS: L.LatLngBoundsLiteral = [[-33.74, -73.98], [5.27, -28.86]]
 
@@ -91,13 +90,18 @@ export default function MapView({
     const el = containerRef.current
     if (!el || mapRef.current) return
 
+    const dark = document.documentElement.classList.contains('dark')
+
     const map = L.map(el, {
       zoomControl:        false,
       scrollWheelZoom:    false,
       attributionControl: false,
     })
 
-    const tile = L.tileLayer(TILES, { maxZoom: 19 })
+    const tile = L.tileLayer(dark ? DARK_TILES : LIGHT_TILES, {
+      subdomains: 'abcd',
+      maxZoom:    19,
+    })
     tile.addTo(map)
     tileLayerRef.current = tile
 
@@ -107,7 +111,14 @@ export default function MapView({
     const lg = L.layerGroup().addTo(map)
     layerGroupRef.current = lg
 
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains('dark')
+      tileLayerRef.current?.setUrl(isDark ? DARK_TILES : LIGHT_TILES)
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+
     return () => {
+      observer.disconnect()
       map.remove()
       mapRef.current        = null
       tileLayerRef.current  = null

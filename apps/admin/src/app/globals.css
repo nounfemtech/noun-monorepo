@@ -192,10 +192,6 @@
   background: hsl(var(--muted));
 }
 
-/* Dark mode: inverte os tiles Esri para visual escuro, preservando os marcadores */
-.dark .leaflet-tile-pane {
-  filter: grayscale(1) invert(0.9) brightness(0.75) contrast(1.15);
-}
 
 @keyframes map-ping {
   75%, 100% { transform: scale(2.2); opacity: 0; }
