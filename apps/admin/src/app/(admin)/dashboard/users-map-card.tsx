@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { IconChevronLeft, IconMaximize, IconMinimize } from '@tabler/icons-react'
+import { IconChevronLeft } from '@tabler/icons-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -195,22 +194,10 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
     <Card className={cn(isFullscreen && 'fixed inset-0 z-50 rounded-none bg-background flex flex-col')}>
 
       <CardHeader className="py-4 border-b shrink-0">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <CardTitle className="text-base">Usuários por região</CardTitle>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Distribuição geográfica de usuários cadastrados
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 shrink-0 -mt-0.5"
-            onClick={() => setIsFullscreen(v => !v)}
-          >
-            {isFullscreen ? <IconMinimize size={15} /> : <IconMaximize size={15} />}
-          </Button>
-        </div>
+        <CardTitle className="text-base">Usuários por região</CardTitle>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Distribuição geográfica de usuários cadastrados
+        </p>
       </CardHeader>
 
       <CardContent className={cn('px-6 pt-5 pb-6', isFullscreen && 'flex-1 flex flex-col overflow-hidden')}>
@@ -263,6 +250,7 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
               onCityClick={selectCity}
               onCityHover={setHoveredCity}
               isFullscreen={isFullscreen}
+              onToggleFullscreen={() => setIsFullscreen(v => !v)}
             />
           </div>
 

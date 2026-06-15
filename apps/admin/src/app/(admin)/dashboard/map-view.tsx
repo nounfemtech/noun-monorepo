@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { Button } from '@/components/ui/button'
-import { IconPlus, IconMinus, IconHome } from '@tabler/icons-react'
+import { IconPlus, IconMinus, IconHome, IconMaximize, IconMinimize } from '@tabler/icons-react'
 
 // ── Tile sources ────────────────────────────────────────────────────────────
 const LIGHT_TILES = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
@@ -35,9 +35,10 @@ interface MapViewProps {
   selectedStateId: string | null
   selectedCity:    CityPoint | null
   hoveredCity:     CityPoint | null
-  onCityClick:     (city: CityPoint) => void
-  onCityHover:     (city: CityPoint | null) => void
-  isFullscreen?:   boolean
+  onCityClick:          (city: CityPoint) => void
+  onCityHover:          (city: CityPoint | null) => void
+  isFullscreen?:        boolean
+  onToggleFullscreen?:  () => void
 }
 
 function createDotIcon(size: number, pulsing: boolean): L.DivIcon {
@@ -69,6 +70,7 @@ export default function MapView({
   onCityClick,
   onCityHover,
   isFullscreen,
+  onToggleFullscreen,
 }: MapViewProps) {
   const containerRef  = useRef<HTMLDivElement>(null)
   const mapRef        = useRef<L.Map | null>(null)
@@ -192,6 +194,20 @@ export default function MapView({
   return (
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full" />
+
+      {/* Fullscreen button */}
+      {onToggleFullscreen && (
+        <div className="absolute top-3 right-3 z-[1000]">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-7 w-7 bg-background/90 backdrop-blur-sm shadow-sm"
+            onClick={onToggleFullscreen}
+          >
+            {isFullscreen ? <IconMinimize size={14} /> : <IconMaximize size={14} />}
+          </Button>
+        </div>
+      )}
 
       {/* Zoom controls */}
       <div className="absolute bottom-3 left-3 z-[1000] flex flex-col gap-1">
