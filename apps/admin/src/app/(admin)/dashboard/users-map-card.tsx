@@ -228,8 +228,8 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
     if (selectedCity)     return brData.filter(c => c.city === selectedCity.city && c.state === selectedCity.state)
     if (selectedStateId)  return brData.filter(c => c.state === selectedStateId)
     if (selectedRegion)   return brData.filter(c => STATE_TO_REGION[c.state] === selectedRegion)
-    return brData
-  }, [brData, intData, selectedInternacional, selectedCountry, selectedCountryState,
+    return data
+  }, [data, brData, intData, selectedInternacional, selectedCountry, selectedCountryState,
       selectedCity, selectedRegion, selectedStateId, citiesOfCountry, citiesOfCountryState])
 
   const scopeMax = useMemo(() => Math.max(1, ...visibleDots.map(c => c.count)), [visibleDots])
@@ -313,13 +313,12 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
             >
               Todas
             </button>
-            {REGIONS.map((r, i) => (
+            {REGIONS.map((r) => (
               <button
                 key={r.id}
                 onClick={() => selectRegion(r.id)}
                 className={cn(
-                  'px-3 h-8 text-sm font-medium transition-colors inline-flex items-center gap-2 shrink-0',
-                  i < REGIONS.length - 1 && 'border-r',
+                  'px-3 h-8 text-sm font-medium transition-colors inline-flex items-center gap-2 shrink-0 border-r',
                   selectedRegion === r.id
                     ? 'bg-muted text-foreground'
                     : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
@@ -328,6 +327,17 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
                 {r.label}
               </button>
             ))}
+            <button
+              onClick={selectInternacional}
+              className={cn(
+                'px-3 h-8 text-sm font-medium transition-colors inline-flex items-center shrink-0',
+                selectedInternacional
+                  ? 'bg-muted text-foreground'
+                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
+              )}
+            >
+              Internacional
+            </button>
           </div>
         </div>
 
