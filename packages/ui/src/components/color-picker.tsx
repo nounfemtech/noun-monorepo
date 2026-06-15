@@ -61,7 +61,7 @@ function ColorItem({
       onClick={onClick}
       className={[
         'flex items-center gap-2 px-3 py-1.5 rounded-sm border text-sm transition-colors w-full',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+        'outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
         isActive
           ? 'bg-muted border-border text-foreground font-medium'
           : 'border-border text-foreground/70 hover:text-foreground hover:bg-muted/40',

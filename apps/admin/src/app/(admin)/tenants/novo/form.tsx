@@ -767,7 +767,7 @@ function ContatoTab({ form }: { form: UseFormReturn<FormData> }) {
         <Field label="CEP *" error={errors.cep} className="w-52">
           <Controller name="cep" control={control}
             render={({ field }) => (
-              <InputGroup className="overflow-hidden">
+              <InputGroup>
                 <InputGroupInput
                   {...field}
                   onChange={(e) => {
@@ -777,10 +777,10 @@ function ContatoTab({ form }: { form: UseFormReturn<FormData> }) {
                   onBlur={(e) => fetchViaCEP(e.target.value)}
                   placeholder="00000-000"
                 />
-                <InputGroupAddon align="inline-end" className="m-0 h-full p-0">
+                <InputGroupAddon align="inline-end">
                   <InputGroupButton
-                    variant="secondary"
-                    className="h-full rounded-none border-l border-input px-3"
+                    type="button"
+                    variant="ghost"
                     onClick={() => fetchViaCEP(field.value, { showError: true })}
                   >
                     Buscar

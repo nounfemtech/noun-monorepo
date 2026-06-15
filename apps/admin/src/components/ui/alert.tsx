@@ -102,7 +102,7 @@ const AlertAction = React.forwardRef<
   <button
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center gap-1 h-7 rounded-md bg-zinc-900 px-2 text-xs font-medium text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 dark:focus-visible:ring-zinc-100",
+      "inline-flex items-center justify-center gap-1 h-7 rounded-md bg-zinc-900 px-2 text-xs font-medium text-white transition-opacity hover:opacity-80 outline-none focus-visible:ring-[3px] focus-visible:ring-zinc-900/50 dark:bg-zinc-100 dark:text-zinc-900 dark:focus-visible:ring-zinc-100/50",
       className
     )}
     {...props}
@@ -119,7 +119,7 @@ const AlertClose = React.forwardRef<
     ref={ref}
     aria-label="Fechar"
     className={cn(
-      "rounded p-0.5 opacity-60 hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current",
+      "rounded p-0.5 opacity-60 hover:opacity-100 transition-opacity outline-none focus-visible:ring-[3px] focus-visible:ring-current",
       className
     )}
     {...props}

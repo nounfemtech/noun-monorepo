@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -185,24 +186,3 @@
   }
 }
 
-/* Focus ring — outline sem gap.
-   Anel desenhado pelo outline nativo, rente à borda do elemento (offset 0).
-   Menus Radix ficam de fora: indicam foco com bg-accent e o painel
-   precisa manter o próprio shadow-md sem interferência da regra global */
-*:focus-visible:not([role='menu'], [role='menuitem'], [role='menuitemcheckbox'], [role='menuitemradio'], [data-slot='input-group-control']) {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 0;
-}
-
-/* Input group: o anel fica no container, não no controle interno */
-[data-slot='input-group']:has([data-slot='input-group-control']:focus-visible) {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 0;
-}
-
-[role='menu']:focus-visible,
-[role='menuitem']:focus-visible,
-[role='menuitemcheckbox']:focus-visible,
-[role='menuitemradio']:focus-visible {
-  outline: none;
-}

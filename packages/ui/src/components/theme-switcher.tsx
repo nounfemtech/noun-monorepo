@@ -44,7 +44,7 @@ export function ThemeSwitcher({ className }: { className?: string }) {
             title={label}
             className={[
               'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
               active
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground',
