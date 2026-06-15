@@ -214,3 +214,12 @@
   border-top-color: hsl(var(--border));
 }
 
+/* Fullscreen nativo — garante layout flex quando o Card ocupa a tela inteira */
+.map-fullscreen-card:fullscreen {
+  display: flex;
+  flex-direction: column;
+  background: hsl(var(--background));
+  border-radius: 0;
+  border: none;
+}
+

@@ -4,41 +4,46 @@ import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { Button } from '@/components/ui/button'
-import { IconPlus, IconMinus, IconHome, IconMaximize, IconMinimize } from '@tabler/icons-react'
+import { IconPlus, IconMinus, IconCurrentLocation, IconMaximize, IconMinimize } from '@tabler/icons-react'
 
-// ── Tile sources ────────────────────────────────────────────────────────────
+// ── Tile sources ─────────────────────────────────────────────────────────────
 const LIGHT_TILES = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
 const DARK_TILES  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
 
 const BRAZIL_BOUNDS: L.LatLngBoundsLiteral = [[-33.74, -73.98], [5.27, -28.86]]
 
 const REGION_BOUNDS: Record<string, L.LatLngBoundsLiteral> = {
-  'Norte':         [[-10.0, -73.98], [5.27, -44.00]],
-  'Nordeste':      [[-18.35, -48.00], [2.50,  -34.88]],
-  'Centro-Oeste':  [[-24.00, -61.00], [-7.00, -45.00]],
-  'Sudeste':       [[-25.00, -52.00], [-14.00, -39.00]],
-  'Sul':           [[-33.74, -57.00], [-22.50, -48.00]],
+  'Norte':        [[-10.0, -73.98], [5.27,  -44.00]],
+  'Nordeste':     [[-18.35, -48.00], [2.50,  -34.88]],
+  'Centro-Oeste': [[-24.00, -61.00], [-7.00, -45.00]],
+  'Sudeste':      [[-25.00, -52.00], [-14.00, -39.00]],
+  'Sul':          [[-33.74, -57.00], [-22.50, -48.00]],
 }
+
+export type MapLevel =
+  | 'default' | 'region' | 'state' | 'city'
+  | 'internacional' | 'country' | 'countryState'
 
 interface CityPoint {
   city:        string
   state:       string
+  country?:    string
   count:       number
   coordinates: [number, number]
 }
 
 interface MapViewProps {
-  visibleDots:     CityPoint[]
-  scopeMax:        number
-  level:           'default' | 'region' | 'state' | 'city'
-  selectedRegion:  string | null
-  selectedStateId: string | null
-  selectedCity:    CityPoint | null
-  hoveredCity:     CityPoint | null
-  onCityClick:          (city: CityPoint) => void
-  onCityHover:          (city: CityPoint | null) => void
-  isFullscreen?:        boolean
-  onToggleFullscreen?:  () => void
+  visibleDots:         CityPoint[]
+  scopeMax:            number
+  mapLevel:            MapLevel
+  selectedRegion:      string | null
+  selectedStateId:     string | null
+  selectedCity:        CityPoint | null
+  hoveredCity:         CityPoint | null
+  onCityClick:         (city: CityPoint) => void
+  onCityHover:         (city: CityPoint | null) => void
+  isFullscreen?:       boolean
+  onToggleFullscreen?: () => void
 }
 
 function createDotIcon(size: number, pulsing: boolean): L.DivIcon {
@@ -62,7 +67,7 @@ function createDotIcon(size: number, pulsing: boolean): L.DivIcon {
 export default function MapView({
   visibleDots,
   scopeMax,
-  level,
+  mapLevel,
   selectedRegion,
   selectedStateId,
   selectedCity,
@@ -121,9 +126,16 @@ export default function MapView({
     }
   }, [])
 
-  // ── Fullscreen: recalculate container dimensions ───────────────────────────
+  // ── Fullscreen: toggle scroll-wheel zoom + recalculate size ───────────────
   useEffect(() => {
-    requestAnimationFrame(() => { mapRef.current?.invalidateSize() })
+    const map = mapRef.current
+    if (!map) return
+    if (isFullscreen) {
+      map.scrollWheelZoom.enable()
+    } else {
+      map.scrollWheelZoom.disable()
+    }
+    requestAnimationFrame(() => { map.invalidateSize() })
   }, [isFullscreen])
 
   // ── Rebuild markers ────────────────────────────────────────────────────────
@@ -133,9 +145,7 @@ export default function MapView({
 
     lg.clearLayers()
 
-    const dots = visibleDots.filter(c => c.state !== 'INT')
-
-    for (const city of dots) {
+    for (const city of visibleDots) {
       const ratio   = Math.sqrt(city.count / Math.max(1, scopeMax))
       const size    = Math.round(8 + ratio * 10)
       const r       = size / 2
@@ -148,8 +158,12 @@ export default function MapView({
         { icon: createDotIcon(size, pulsing), zIndexOffset: pulsing ? 1000 : 0 },
       )
 
+      const label = city.country
+        ? `${city.city} · ${city.country}`
+        : city.state
+
       marker.bindTooltip(
-        `<div style="line-height:1.4"><strong>${city.city}</strong><br><span style="opacity:.72">${city.count} ${city.count === 1 ? 'usuário' : 'usuários'} · ${city.state}</span></div>`,
+        `<div style="line-height:1.4"><strong>${city.city}</strong><br><span style="opacity:.72">${city.count} ${city.count === 1 ? 'usuário' : 'usuários'} · ${label}</span></div>`,
         { className: 'map-tooltip', direction: 'top', offset: [0, -r - 4] },
       )
 
@@ -168,28 +182,38 @@ export default function MapView({
 
     const fitOpts: L.FitBoundsOptions = { animate: true, duration: 0.42 }
 
-    if (level === 'default') {
-      map.fitBounds(BRAZIL_BOUNDS, fitOpts)
-    } else if (level === 'region' && selectedRegion) {
-      const pts = visibleDots.filter(c => c.state !== 'INT')
-      if (pts.length > 0) {
-        const bounds = L.latLngBounds(pts.map(c => [c.coordinates[1], c.coordinates[0]] as L.LatLngTuple))
-        map.fitBounds(bounds, { ...fitOpts, padding: [60, 60], maxZoom: 8 })
+    const fitDots = (dots: CityPoint[], maxZoom: number, pad: number) => {
+      if (dots.length === 0) return
+      if (dots.length === 1) {
+        const d = dots[0]!
+        map.setView([d.coordinates[1], d.coordinates[0]], Math.min(maxZoom, 10), { animate: true, duration: 0.42 })
       } else {
-        const fb = REGION_BOUNDS[selectedRegion]
-        if (fb) map.fitBounds(fb, fitOpts)
+        map.fitBounds(
+          L.latLngBounds(dots.map(c => [c.coordinates[1], c.coordinates[0]] as L.LatLngTuple)),
+          { ...fitOpts, padding: [pad, pad], maxZoom },
+        )
       }
-    } else if (level === 'state' && selectedStateId) {
-      const pts = visibleDots.filter(c => c.state !== 'INT')
-      if (pts.length > 0) {
-        const bounds = L.latLngBounds(pts.map(c => [c.coordinates[1], c.coordinates[0]] as L.LatLngTuple))
-        map.fitBounds(bounds, { ...fitOpts, padding: [80, 80], maxZoom: 11 })
-      }
-    } else if (level === 'city' && selectedCity && selectedCity.state !== 'INT') {
-      map.setView([selectedCity.coordinates[1], selectedCity.coordinates[0]], 13, { animate: true, duration: 0.42 })
+    }
+
+    if (mapLevel === 'default') {
+      map.fitBounds(BRAZIL_BOUNDS, fitOpts)
+    } else if (mapLevel === 'internacional') {
+      fitDots(visibleDots, 6, 60)
+    } else if (mapLevel === 'region' && selectedRegion) {
+      if (visibleDots.length > 0) fitDots(visibleDots, 8, 60)
+      else { const fb = REGION_BOUNDS[selectedRegion]; if (fb) map.fitBounds(fb, fitOpts) }
+    } else if (mapLevel === 'state') {
+      fitDots(visibleDots, 11, 80)
+    } else if (mapLevel === 'country') {
+      fitDots(visibleDots, 9, 80)
+    } else if (mapLevel === 'countryState') {
+      fitDots(visibleDots, 13, 100)
+    } else if (mapLevel === 'city' && selectedCity) {
+      const zoom = selectedCity.country ? 9 : 13
+      map.setView([selectedCity.coordinates[1], selectedCity.coordinates[0]], zoom, { animate: true, duration: 0.42 })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [level, selectedRegion, selectedStateId, selectedCity])
+  }, [mapLevel, selectedRegion, selectedStateId, selectedCity, visibleDots])
 
   return (
     <div className="relative w-full h-full">
@@ -233,7 +257,7 @@ export default function MapView({
           className="h-7 w-7 bg-background/90 backdrop-blur-sm shadow-sm"
           onClick={() => mapRef.current?.fitBounds(BRAZIL_BOUNDS, { paddingTopLeft: [20, 20], paddingBottomRight: [20, 20] })}
         >
-          <IconHome size={14} />
+          <IconCurrentLocation size={14} />
         </Button>
       </div>
     </div>
