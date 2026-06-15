@@ -12,6 +12,9 @@ const DARK_TILES  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
 
 const BRAZIL_BOUNDS: L.LatLngBoundsLiteral = [[-33.74, -73.98], [5.27, -28.86]]
 
+// Limita o pan/zoom a uma única cópia do mundo (evita duplicação no zoom out)
+const WORLD_BOUNDS: L.LatLngBoundsLiteral = [[-85, -180], [85, 180]]
+
 const REGION_BOUNDS: Record<string, L.LatLngBoundsLiteral> = {
   'Norte':        [[-10.0, -73.98], [5.27,  -44.00]],
   'Nordeste':     [[-18.35, -48.00], [2.50,  -34.88]],
@@ -96,11 +99,15 @@ export default function MapView({
       zoomControl:        false,
       scrollWheelZoom:    false,
       attributionControl: false,
+      minZoom:            2,
+      maxBounds:          WORLD_BOUNDS,
+      maxBoundsViscosity: 1,
     })
 
     const tile = L.tileLayer(dark ? DARK_TILES : LIGHT_TILES, {
       subdomains: 'abcd',
       maxZoom:    19,
+      noWrap:     true,
     })
     tile.addTo(map)
     tileLayerRef.current = tile
