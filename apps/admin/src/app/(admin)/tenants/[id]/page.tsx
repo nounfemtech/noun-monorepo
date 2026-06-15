@@ -107,7 +107,7 @@ export default async function TenantDetailPage({ params }: PageProps) {
   const commissionRate = tenant.settings?.commission_rate ?? null
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl">
+    <div className="p-6 space-y-4 max-w-4xl">
       {/* Header */}
       <Card>
         <CardContent className="pt-6">

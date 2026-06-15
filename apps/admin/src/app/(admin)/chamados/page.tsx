@@ -121,7 +121,7 @@ async function ChamadosContent({ searchParams }: PageProps) {
   const resolvidos    = tickets.filter(t => ['resolvido', 'fechado'].includes(t.status)).length
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-4">
       {/* Header */}
       <div>
         <h1 className="text-xl font-semibold">Chamados</h1>

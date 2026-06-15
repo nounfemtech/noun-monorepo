@@ -28,24 +28,37 @@ interface TenantRow {
   name: string
   legal_name: string | null
   cnpj: string | null
+  cpf: string | null
   type: string
+  tenant_type: string | null
   status: string
   created_at: string
 }
 
-function formatCNPJ(cnpj: string | null): string {
-  if (!cnpj) return '—'
-  const d = cnpj.replace(/\D/g, '')
-  if (d.length !== 14) return cnpj
-  return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12, 14)}`
+function formatDoc(cnpj: string | null, cpf: string | null): string {
+  const raw = cnpj || cpf
+  if (!raw) return '—'
+  const d = raw.replace(/\D/g, '')
+  if (d.length === 14) return `${d.slice(0,2)}.${d.slice(2,5)}.${d.slice(5,8)}/${d.slice(8,12)}-${d.slice(12,14)}`
+  if (d.length === 11) return `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9,11)}`
+  return raw
 }
 
-function typeBadge(type: string) {
-  return type === 'clinic' ? (
-    <Badge variant="outline" className="whitespace-nowrap">Profissional de saúde</Badge>
-  ) : (
-    <Badge variant="outline">Farmácia</Badge>
-  )
+const TENANT_TYPE_LABELS: Record<string, string> = {
+  farmacia:         'Farmácia',
+  clinico_geral:    'Clínico Geral',
+  endocrinologista: 'Endocrinologista',
+  ginecologista:    'Ginecologista',
+  urologista:       'Urologista',
+  psiquiatra:       'Psiquiatra',
+  nutrologo:        'Nutrólogo',
+  psicologo:        'Psicólogo',
+  nutricionista:    'Nutricionista',
+}
+
+function typeBadge(tenantType: string | null) {
+  const label = tenantType ? (TENANT_TYPE_LABELS[tenantType] ?? tenantType) : '—'
+  return <Badge variant="outline" className="whitespace-nowrap">{label}</Badge>
 }
 
 function statusBadge(status: string) {
@@ -56,6 +69,8 @@ function statusBadge(status: string) {
       return <Badge variant="warning">Pendente</Badge>
     case 'suspended':
       return <Badge variant="destructive">Suspenso</Badge>
+    case 'draft':
+      return <Badge variant="secondary">Rascunho</Badge>
     default:
       return <Badge variant="outline">{status}</Badge>
   }
@@ -77,7 +92,7 @@ async function TenantsContent({ searchParams }: PageProps) {
 
   let query = supabase
     .from('tenants')
-    .select('id, code, name, legal_name, cnpj, type, status, created_at', { count: 'exact' })
+    .select('id, code, name, legal_name, cnpj, cpf, type, tenant_type, status, created_at', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(from, to)
 
@@ -132,7 +147,7 @@ async function TenantsContent({ searchParams }: PageProps) {
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -177,7 +192,7 @@ async function TenantsContent({ searchParams }: PageProps) {
               <TableRow>
                 <TableHead>ID</TableHead>
                 <TableHead>Nome</TableHead>
-                <TableHead>CNPJ</TableHead>
+                <TableHead>CNPJ/CPF</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Cadastro</TableHead>
@@ -205,10 +220,10 @@ async function TenantsContent({ searchParams }: PageProps) {
                   </TableCell>
                   <TableCell>
                     <span className="text-sm font-mono text-muted-foreground">
-                      {formatCNPJ(tenant.cnpj)}
+                      {formatDoc(tenant.cnpj, tenant.cpf)}
                     </span>
                   </TableCell>
-                  <TableCell>{typeBadge(tenant.type)}</TableCell>
+                  <TableCell>{typeBadge(tenant.tenant_type)}</TableCell>
                   <TableCell>{statusBadge(tenant.status)}</TableCell>
                   <TableCell>
                     <span className="text-sm text-muted-foreground">

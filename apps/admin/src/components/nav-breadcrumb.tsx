@@ -18,6 +18,7 @@ const STATIC_LABELS: Record<string, string> = {
   configuracoes: 'Configurações',
   new:           'Novo',
   novo:          'Novo Tenant',
+  editar:        'Editar',
   theme:         'Tema',
 }
 

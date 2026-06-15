@@ -85,7 +85,7 @@ async function ChamadoContent({ params }: PageProps) {
   const opener = t.tenants?.name ?? t.profiles?.full_name ?? t.profiles?.email ?? 'Desconhecido'
 
   return (
-    <div className="p-6 space-y-6 max-w-3xl">
+    <div className="p-6 space-y-4 max-w-3xl">
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="space-y-1">

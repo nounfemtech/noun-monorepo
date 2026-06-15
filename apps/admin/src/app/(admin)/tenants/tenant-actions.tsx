@@ -29,7 +29,7 @@ export function TenantActions({ id, code }: { id: string; code: string }) {
         <DropdownMenuItem onClick={() => router.push(`/tenants/${id}`)}>
           Ver
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push(`/tenants/${id}`)}>
+        <DropdownMenuItem onClick={() => router.push(`/tenants/${id}/editar`)}>
           Editar
         </DropdownMenuItem>
         <DropdownMenuSeparator />

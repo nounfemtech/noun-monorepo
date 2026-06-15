@@ -8,6 +8,7 @@ const options = [
   { value: 'active',           label: 'Ativos'    },
   { value: 'pending', label: 'Pendentes' },
   { value: 'suspended',        label: 'Suspensos' },
+  { value: 'draft',            label: 'Rascunhos' },
 ]
 
 export function StatusFilter({ current, q }: { current: string; q: string }) {

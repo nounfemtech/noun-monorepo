@@ -27,8 +27,6 @@ const alertVariants = cva(
         banner: [
           "rounded-none border-x-0 border-t-0 border-b px-6 py-3",
           "[&>svg]:left-6 [&>svg]:top-3",
-          "[&>[data-alert-actions]]:top-3",
-          "[&>[data-alert-actions]]:translate-y-0",
           "[&>[data-alert-actions]]:right-6",
         ],
       },

@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Select,
@@ -27,7 +26,8 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertTitle, AlertDescription, AlertActions, AlertClose } from '@/components/ui/alert'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { createSupabaseBrowser } from '@/lib/supabase'
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
@@ -361,12 +361,7 @@ function IdentificacaoTab({ form }: { form: UseFormReturn<FormData> }) {
   const isMedico        = isEspecialista || tenantType === 'clinico_geral'
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Identificação</CardTitle>
-        <CardDescription>Tipo de tenant e dados regulatórios</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div className="space-y-6">
 
         <Field label="Tipo de tenant *" error={errors.tenantType}>
           <Controller
@@ -598,8 +593,7 @@ function IdentificacaoTab({ form }: { form: UseFormReturn<FormData> }) {
             </Field>
           </>
         )}
-      </CardContent>
-    </Card>
+      </div>
   )
 }
 
@@ -614,12 +608,7 @@ function FiscalTab({ form }: { form: UseFormReturn<FormData> }) {
   const isFarmacia = tenantType === 'farmacia'
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Fiscal</CardTitle>
-        <CardDescription>Dados de faturamento e documentação fiscal</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div className="space-y-6">
 
         {isFarmacia ? (
           <>
@@ -696,17 +685,23 @@ function FiscalTab({ form }: { form: UseFormReturn<FormData> }) {
             Selecione o tipo de tenant na aba Identificação para continuar.
           </p>
         )}
-      </CardContent>
-    </Card>
+      </div>
   )
 }
 
 // ─── Aba 3: Contato ────────────────────────────────────────────────────────────
 
-function ContatoTab({ form }: { form: UseFormReturn<FormData> }) {
+function ContatoTab({
+  form,
+  cepError,
+  setCepError,
+}: {
+  form: UseFormReturn<FormData>
+  cepError: boolean
+  setCepError: (v: boolean) => void
+}) {
   const { control, setValue, watch, formState: { errors } } = form
   const cep = watch('cep')
-  const [cepError, setCepError] = useState(false)
 
   async function fetchViaCEP(raw: string, opts?: { showError?: boolean }) {
     const digits = raw.replace(/\D/g, '')
@@ -732,12 +727,7 @@ function ContatoTab({ form }: { form: UseFormReturn<FormData> }) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Contato</CardTitle>
-        <CardDescription>E-mail, telefone e endereço completo</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div className="space-y-6">
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="E-mail *" error={errors.email}>
@@ -767,7 +757,7 @@ function ContatoTab({ form }: { form: UseFormReturn<FormData> }) {
         <Field label="CEP *" error={errors.cep} className="w-52">
           <Controller name="cep" control={control}
             render={({ field }) => (
-              <InputGroup>
+              <InputGroup className="shadow-none">
                 <InputGroupInput
                   {...field}
                   onChange={(e) => {
@@ -780,7 +770,7 @@ function ContatoTab({ form }: { form: UseFormReturn<FormData> }) {
                 <InputGroupAddon align="inline-end">
                   <InputGroupButton
                     type="button"
-                    variant="ghost"
+                    variant="secondary"
                     onClick={() => fetchViaCEP(field.value, { showError: true })}
                   >
                     Buscar
@@ -790,15 +780,6 @@ function ContatoTab({ form }: { form: UseFormReturn<FormData> }) {
             )}
           />
         </Field>
-
-        {cepError && (
-          <Alert variant="destructive">
-            <AlertTitle>CEP não encontrado</AlertTitle>
-            <AlertDescription>
-              Verifique o número digitado ou preencha o endereço manualmente.
-            </AlertDescription>
-          </Alert>
-        )}
 
         <div className="grid grid-cols-3 gap-4">
           <Field label="Logradouro *" error={errors.logradouro} className="col-span-2">
@@ -861,8 +842,7 @@ function ContatoTab({ form }: { form: UseFormReturn<FormData> }) {
             />
           </Field>
         </div>
-      </CardContent>
-    </Card>
+      </div>
   )
 }
 
@@ -873,12 +853,7 @@ function BancarioTab({ form }: { form: UseFormReturn<FormData> }) {
   const pixTipo = watch('pixTipo')
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Dados Bancários</CardTitle>
-        <CardDescription>Conta para repasse e chave PIX</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div className="space-y-6">
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Banco *" error={errors.banco}>
@@ -996,19 +971,17 @@ function BancarioTab({ form }: { form: UseFormReturn<FormData> }) {
             </Field>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
   )
 }
 
 // ─── Aba 5: Termos ─────────────────────────────────────────────────────────────
 
 function TermosTab({
-  form, adminName, loading,
+  form, adminName,
 }: {
   form: UseFormReturn<FormData>
   adminName: string
-  loading: boolean
 }) {
   const { control, formState: { errors } } = form
   const today = new Date().toLocaleString('pt-BR', {
@@ -1017,12 +990,7 @@ function TermosTab({
   })
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Termos e confirmação</CardTitle>
-        <CardDescription>Confirme o aceite dos termos para finalizar o cadastro</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div className="space-y-6">
 
         <div className="rounded-lg border p-4 space-y-2">
           <div className="flex items-start gap-3">
@@ -1094,26 +1062,111 @@ function TermosTab({
           </div>
         </div>
 
-        <Separator />
-
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? 'Cadastrando...' : 'Cadastrar Tenant'}
-        </Button>
-      </CardContent>
-    </Card>
+      </div>
   )
+}
+
+const TABS = ['identificacao', 'fiscal', 'contato', 'bancario', 'termos'] as const
+
+// ─── Tipo para edição ──────────────────────────────────────────────────────────
+
+export interface TenantEditData {
+  id: string
+  status: string
+  tenant_type: string | null
+  nome_fantasia: string | null
+  razao_social: string | null
+  cnpj: string | null
+  crf_numero: string | null
+  crf_uf: string | null
+  afe_codigo: string | null
+  possui_manipulacao: boolean | null
+  ae_numero: string | null
+  responsavel_tecnico_nome: string | null
+  responsavel_tecnico_crf: string | null
+  crm_numero: string | null
+  crm_uf: string | null
+  rqe: string | null
+  especialidade: string | null
+  crp: string | null
+  crn: string | null
+  fiscal_type: string | null
+  cpf: string | null
+  email: string | null
+  telefone: string | null
+  cep: string | null
+  logradouro: string | null
+  numero_logradouro: string | null
+  complemento: string | null
+  bairro: string | null
+  cidade: string | null
+  uf: string | null
+  banco: string | null
+  agencia: string | null
+  conta: string | null
+  tipo_conta: string | null
+  titular_nome: string | null
+  titular_documento: string | null
+  pix_tipo: string | null
+  pix_valor: string | null
+  termos_aceitos_em: string | null
 }
 
 // ─── Componente principal ──────────────────────────────────────────────────────
 
-export function NovoTenantForm({ adminName }: { adminName: string }) {
+export function NovoTenantForm({ adminName, initialData }: { adminName: string; initialData?: TenantEditData }) {
   const router = useRouter()
-  const [loading, setLoading]   = useState(false)
-  const [activeTab, setActiveTab] = useState('identificacao')
+  const isEdit = !!initialData
+
+  const [loading, setLoading]         = useState(false)
+  const [savingDraft, setSavingDraft] = useState(false)
+  const [draftId, setDraftId]         = useState<string | null>(initialData?.id ?? null)
+  const [activeTab, setActiveTab]     = useState('identificacao')
+  const [cepError, setCepError]       = useState(false)
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: initialData ? {
+      tenantType:             initialData.tenant_type || '',
+      nomeFarmacia:           initialData.tenant_type === 'farmacia' ? (initialData.nome_fantasia || '') : '',
+      nomeCompleto:           initialData.tenant_type !== 'farmacia' ? (initialData.nome_fantasia || '') : '',
+      razaoSocial:            initialData.razao_social || '',
+      cnpj:                   initialData.cnpj ? maskCNPJ(initialData.cnpj) : '',
+      crfNumero:              initialData.crf_numero || '',
+      crfUf:                  initialData.crf_uf || '',
+      afeCodigo:              initialData.afe_codigo || '',
+      possuiManipulacao:      initialData.possui_manipulacao ?? false,
+      aeNumero:               initialData.ae_numero || '',
+      responsavelTecnicoNome: initialData.responsavel_tecnico_nome || '',
+      responsavelTecnicoCrf:  initialData.responsavel_tecnico_crf || '',
+      crmNumero:              initialData.crm_numero || '',
+      crmUf:                  initialData.crm_uf || '',
+      rqe:                    initialData.rqe || '',
+      especialidade:          initialData.especialidade || '',
+      crp:                    initialData.crp || '',
+      crn:                    initialData.crn || '',
+      fiscalType:             initialData.fiscal_type || '',
+      cpf:                    initialData.cpf ? maskCPF(initialData.cpf) : '',
+      email:                  initialData.email || '',
+      telefone:               initialData.telefone ? maskPhone(initialData.telefone) : '',
+      cep:                    initialData.cep ? maskCEP(initialData.cep) : '',
+      logradouro:             initialData.logradouro || '',
+      numeroLogradouro:       initialData.numero_logradouro || '',
+      complemento:            initialData.complemento || '',
+      bairro:                 initialData.bairro || '',
+      cidade:                 initialData.cidade || '',
+      uf:                     initialData.uf || '',
+      banco:                  initialData.banco || '',
+      agencia:                initialData.agencia || '',
+      conta:                  initialData.conta || '',
+      tipoConta:              initialData.tipo_conta || '',
+      titularNome:            initialData.titular_nome || '',
+      titularDocumento:       initialData.titular_documento ? maskDoc(initialData.titular_documento) : '',
+      pixTipo:                initialData.pix_tipo || '',
+      pixValor:               initialData.pix_valor || '',
+      termosAceitos:          !!initialData.termos_aceitos_em,
+      lgpdAceita:             !!initialData.termos_aceitos_em,
+    } : {
       tenantType: '', nomeFarmacia: '', razaoSocial: '', cnpj: '',
       crfNumero: '', crfUf: '', afeCodigo: '', possuiManipulacao: false,
       aeNumero: '', responsavelTecnicoNome: '', responsavelTecnicoCrf: '',
@@ -1147,17 +1200,19 @@ export function NovoTenantForm({ adminName }: { adminName: string }) {
       const cnpjDigits  = data.cnpj.replace(/\D/g, '') || null
 
       const supabase = createSupabaseBrowser()
-      const { error } = await supabase.from('tenants').insert({
+      const targetStatus = isEdit
+        ? (initialData!.status === 'draft' ? 'pending' : initialData!.status)
+        : 'pending'
+      const insertPayload = {
         name:       displayName,
         legal_name: legalName,
         cnpj:       isFarmacia
           ? cnpjDigits
           : data.fiscalType === 'pj' ? cnpjDigits : null,
         type:     isFarmacia ? 'pharmacy' : 'clinic',
-        status:   'pending',
+        status:   targetStatus,
         settings: {},
 
-        // Novas colunas
         tenant_type:              data.tenantType,
         fiscal_type:              isFarmacia ? 'pj' : (data.fiscalType || null),
         cpf:                      data.cpf.replace(/\D/g, '') || null,
@@ -1195,16 +1250,20 @@ export function NovoTenantForm({ adminName }: { adminName: string }) {
         pix_valor:                data.pixValor || null,
         termos_aceitos_em:        new Date().toISOString(),
         termos_cadastrado_por:    adminName,
-      })
+      }
+
+      const { error } = draftId
+        ? await supabase.from('tenants').update(insertPayload).eq('id', draftId)
+        : await supabase.from('tenants').insert(insertPayload)
 
       if (error) throw error
 
-      toast.success('Tenant cadastrado com sucesso!')
+      toast.success(isEdit ? 'Tenant atualizado com sucesso!' : 'Tenant cadastrado com sucesso!')
       router.push('/tenants')
       router.refresh()
     } catch (err) {
       console.error(err)
-      toast.error('Erro ao cadastrar. Verifique os dados e tente novamente.')
+      toast.error(isEdit ? 'Erro ao atualizar. Verifique os dados e tente novamente.' : 'Erro ao cadastrar. Verifique os dados e tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -1221,16 +1280,120 @@ export function NovoTenantForm({ adminName }: { adminName: string }) {
     toast.error('Corrija os erros destacados e tente novamente')
   }
 
+  async function saveDraft() {
+    setSavingDraft(true)
+    try {
+      const data = form.getValues()
+      const isFarmacia  = data.tenantType === 'farmacia'
+      const displayName = isFarmacia
+        ? (data.nomeFarmacia || 'Rascunho')
+        : (data.nomeCompleto || 'Rascunho')
+      const legalName   = isFarmacia
+        ? data.razaoSocial
+        : data.fiscalType === 'pj'
+          ? data.razaoSocial
+          : data.nomeCompleto
+      const cnpjDigits  = data.cnpj.replace(/\D/g, '') || null
+
+      const draftPayload = {
+        name:       displayName,
+        legal_name: legalName || null,
+        cnpj:       isFarmacia
+          ? cnpjDigits
+          : data.fiscalType === 'pj' ? cnpjDigits : null,
+        type:     isFarmacia ? 'pharmacy' : 'clinic',
+        status:   'draft',
+        settings: {},
+
+        tenant_type:              data.tenantType || null,
+        fiscal_type:              isFarmacia ? 'pj' : (data.fiscalType || null),
+        cpf:                      data.cpf.replace(/\D/g, '') || null,
+        nome_fantasia:            displayName,
+        razao_social:             data.razaoSocial  || null,
+        crm_numero:               data.crmNumero    || null,
+        crm_uf:                   data.crmUf        || null,
+        rqe:                      data.rqe          || null,
+        especialidade:            data.especialidade || null,
+        crf_numero:               data.crfNumero    || null,
+        crf_uf:                   data.crfUf        || null,
+        afe_codigo:               data.afeCodigo    || null,
+        possui_manipulacao:       data.possuiManipulacao,
+        ae_numero:                data.aeNumero     || null,
+        crp:                      data.crp          || null,
+        crn:                      data.crn          || null,
+        responsavel_tecnico_nome: data.responsavelTecnicoNome || null,
+        responsavel_tecnico_crf:  data.responsavelTecnicoCrf  || null,
+        email:                    data.email || null,
+        telefone:                 data.telefone.replace(/\D/g, '') || null,
+        cep:                      data.cep.replace(/\D/g, '')      || null,
+        logradouro:               data.logradouro      || null,
+        numero_logradouro:        data.numeroLogradouro || null,
+        complemento:              data.complemento  || null,
+        bairro:                   data.bairro       || null,
+        cidade:                   data.cidade       || null,
+        uf:                       data.uf           || null,
+        banco:                    data.banco        || null,
+        agencia:                  data.agencia      || null,
+        conta:                    data.conta        || null,
+        tipo_conta:               data.tipoConta    || null,
+        titular_nome:             data.titularNome  || null,
+        titular_documento:        data.titularDocumento.replace(/\D/g, '') || null,
+        pix_tipo:                 data.pixTipo  || null,
+        pix_valor:                data.pixValor || null,
+      }
+
+      const supabase = createSupabaseBrowser()
+
+      if (draftId) {
+        const { error } = await supabase.from('tenants').update(draftPayload).eq('id', draftId)
+        if (error) throw error
+      } else {
+        const { data: inserted, error } = await supabase
+          .from('tenants')
+          .insert(draftPayload)
+          .select('id')
+          .single()
+        if (error) throw error
+        setDraftId(inserted!.id)
+      }
+
+      toast.success('Rascunho salvo')
+    } catch (err) {
+      console.error(err)
+      toast.error('Erro ao salvar rascunho')
+    } finally {
+      setSavingDraft(false)
+    }
+  }
+
+  function goToNextTab() {
+    const idx = TABS.findIndex((t) => t === activeTab)
+    if (idx !== -1 && idx < TABS.length - 1) setActiveTab(TABS[idx + 1]!)
+  }
+
   return (
-    <div className="p-6 space-y-6">
+    <>
+      {cepError && (
+        <Alert variant="destructive" shape="banner">
+          <IconAlertCircle size={16} />
+          <AlertTitle>CEP não encontrado</AlertTitle>
+          <AlertDescription>Verifique o número digitado ou preencha o endereço manualmente.</AlertDescription>
+          <AlertActions>
+            <AlertClose onClick={() => setCepError(false)} />
+          </AlertActions>
+        </Alert>
+      )}
+      <div className="p-6 space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">Novo Tenant</h1>
+        <h1 className="text-xl font-semibold">{isEdit ? 'Editar Tenant' : 'Novo Tenant'}</h1>
         <p className="text-sm text-muted-foreground">
-          Preencha os dados para cadastrar um novo parceiro na plataforma Noun
+          {isEdit
+            ? 'Edite os dados do parceiro na plataforma Noun'
+            : 'Preencha os dados para cadastrar um novo parceiro na plataforma Noun'}
         </p>
       </div>
 
-      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} noValidate>
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} noValidate className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList variant="underline">
             <TabsTrigger value="identificacao" variant="underline">Identificação</TabsTrigger>
@@ -1247,16 +1410,49 @@ export function NovoTenantForm({ adminName }: { adminName: string }) {
             <FiscalTab form={form} />
           </TabsContent>
           <TabsContent value="contato">
-            <ContatoTab form={form} />
+            <ContatoTab form={form} cepError={cepError} setCepError={setCepError} />
           </TabsContent>
           <TabsContent value="bancario">
             <BancarioTab form={form} />
           </TabsContent>
           <TabsContent value="termos">
-            <TermosTab form={form} adminName={adminName} loading={loading} />
+            <TermosTab form={form} adminName={adminName} />
           </TabsContent>
         </Tabs>
+
+        <div className="flex items-center justify-between">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => router.push('/tenants')}
+            disabled={loading || savingDraft}
+          >
+            Cancelar
+          </Button>
+          <div className="flex items-center gap-2">
+            {!isEdit && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={saveDraft}
+                disabled={loading || savingDraft}
+              >
+                {savingDraft ? 'Salvando...' : 'Salvar rascunho'}
+              </Button>
+            )}
+            {activeTab === 'termos' ? (
+              <Button type="submit" disabled={loading || savingDraft}>
+                {loading ? 'Salvando...' : isEdit ? 'Atualizar e salvar' : 'Cadastrar Tenant'}
+              </Button>
+            ) : (
+              <Button type="button" onClick={goToNextTab} disabled={loading || savingDraft}>
+                Continuar
+              </Button>
+            )}
+          </div>
+        </div>
       </form>
     </div>
+    </>
   )
 }

@@ -900,7 +900,7 @@ function RegiaoTab() {
 
 export default function ConfiguracoesPage() {
   return (
-    <div className="p-6">
+    <div className="p-6 space-y-4">
       <div>
         <h1 className="text-xl font-semibold tracking-tight">Configurações</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -908,7 +908,7 @@ export default function ConfiguracoesPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="aparencia" className="mt-6">
+      <Tabs defaultValue="aparencia">
         <TabsList variant="underline">
           <TabsTrigger value="geral"         variant="underline">Geral</TabsTrigger>
           <TabsTrigger value="time"          variant="underline">Time</TabsTrigger>
