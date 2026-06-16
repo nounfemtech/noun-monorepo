@@ -137,6 +137,14 @@
   --sidebar-accent-foreground:  240 5.9% 10%;
   --sidebar-border:             220 13% 91%;
   --sidebar-ring:               217.2 91.2% 59.8%;
+
+  /* Mapa de usuários (estilo CartoDB claro): fundo branco, terra cinza */
+  --map-bg:          0 0% 100%;
+  --map-land:        220 14% 90%;
+  --map-land-hover:  220 13% 82%;
+  --map-land-active: 220 12% 74%;
+  --map-border:      0 0% 100%;
+  --map-label:       220 9% 44%;
 }
 
 .dark {
@@ -171,6 +179,14 @@
   --sidebar-accent-foreground:  240 4.8% 95.9%;
   --sidebar-border:             240 4% 12%;
   --sidebar-ring:               217.2 91.2% 59.8%;
+
+  /* Mapa de usuários (estilo CartoDB escuro): fundo escuro, terra cinza claro */
+  --map-bg:          240 6% 11%;
+  --map-land:        240 5% 20%;
+  --map-land-hover:  240 5% 27%;
+  --map-land-active: 240 5% 33%;
+  --map-border:      240 6% 11%;
+  --map-label:       240 5% 66%;
 }
 
 /* ============================================================
@@ -193,5 +209,25 @@
   background: hsl(var(--background));
   border-radius: 0;
   border: none;
+}
+
+/* Scrollbar temático — corrige o fundo branco do scroll em modo escuro */
+.map-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+.map-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.map-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.map-scroll::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 9999px;
+}
+.map-scroll::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 

@@ -113,20 +113,20 @@ packages/
 - KPIs financeiros: GMV, receita Noun, consultas concluídas, ticket médio.
 - Gráfico de receita mensal (bar chart).
 - Card "Últimas Transações" (tabela paginada de appointments).
-- Card "Usuários por região": mapa SVG do Brasil com drill-down hierárquico.
+- Card "Usuários por região": mapa SVG do Brasil com pan/zoom livre e drill-down hierárquico.
 
 #### Mapa de Usuários por Região
-- SVG puro (sem libs externas, sem tiles, sem API): apenas dados próprios e geometria pública pré-projetada. Decisão de simplificar (15/06/2026): nada de Leaflet/zoom de rua, só representação gráfica com nomes de país, estado e cidade.
-- Dois escopos no mesmo SVG, alternados pelo button group de filtro (Todas, 5 regiões, Internacional):
-  - **Brasil:** paths dos estados em `apps/admin/src/data/brazil-states-paths.json`. Projeção manual `W=500, H=420`, limites `WEST=-73.98, EAST=-28.86, NORTH=5.27, SOUTH=-33.74`. Drill-down: Brasil → Região → Estado → Cidade.
-  - **Internacional:** paths dos países em `apps/admin/src/data/world-countries-paths.json` (gerado a partir do Natural Earth 110m, domínio público, chaveado por `NAME_PT`). Projeção equiretangular `W=1000, H=386.111`, limites `WEST=-180, EAST=180, NORTH=83, SOUTH=-56`. Drill-down: Internacional → País → Estado/Província → Cidade. Só países com usuários são clicáveis e rotulados; os demais ficam em `--muted`.
-- Pontos internacionais identificados pelo campo `country` no `CityPoint`; sem `country` = Brasil.
-- Dados reais via RPC `get_patient_city_distribution` (pacientes com endereço geolocalizado). Mock exibido quando o banco está vazio.
-- O `viewBox` anima com tween (rAF, easing cubic) a cada nível usando `getBBox` dos paths em escopo (estados ou países) e `boxFromDots` para os pontos. Na troca de escopo, salta para o full box do novo escopo antes de animar (evita interpolar entre espaços de coordenada diferentes).
-- Painel direito navega por breadcrumb entre os níveis (`BackBtn`).
-- Pontos/traços/tooltip mantêm tamanho visual constante independente do zoom (escala `s = viewBox.w / 500`, referência fixa nos dois escopos).
-- Dots: pulso animado (`animate-ping`) no hover e ao selecionar cidade, sombra suave (`drop-shadow`) na cor `--primary-foreground` para destacar em claro e escuro.
-- Cores dos estados via `REGION_TONES` (base/active por região), países com usuários em tom `--primary`, sem hardcode.
+- **Escopo Brasil apenas** (decisão de 16/06/2026). Código mundial/internacional foi removido.
+- SVG puro (sem libs externas, sem tiles, sem API): apenas dados próprios e geometria pública pré-projetada.
+- **Espaço de coordenadas:** viewBox nativo `0 0 500 420`. Paths dos estados em `apps/admin/src/data/brazil-states-paths.json` (Natural Earth, projeção equiretangular, curvas Catmull-Rom via comando `C`, `fillRule="evenodd"` para ilhas costeiras). Bounds: `WEST=-73.96, EAST=-24.65, NORTH=5.31, SOUTH=-33.70`. Projeção: `brProject(lng, lat)`.
+- **Estilo CartoDB claro:** fundo branco e terra cinza. Cores via CSS vars `--map-bg`, `--map-land`, `--map-land-hover`, `--map-land-active`, `--map-border`, `--map-label` (claras/escuras no `globals.css`). **Sem `--primary` nas terras.** Os dots permanecem em `--primary`.
+- **Dots uniformes e sutis:** todos com o mesmo raio (`DOT_R = 0.0062 * viewBox.w`), tamanho visual constante em qualquer zoom; não escala por contagem. Halo discreto (1.5x, opacidade baixa), pulso `animate-ping` so no hover/seleção, sombra `drop-shadow` em `--primary-foreground`.
+- **Pan/zoom livre:** arrastar move o mapa (pointer events + threshold de 4px, `draggedRef` impede seleção acidental), scroll do mouse da zoom no ponteiro, botões `+`/`-` dão zoom no centro e botão de foco (`IconCurrentLocation`) volta para o Brasil. O `viewBox` mantém o aspect do container (medido por `ResizeObserver` em `dims`). `clampVB` limita o zoom (`MIN_W=4`, max = Brasil inteiro) e o centro dentro do Brasil.
+- **Filtro de escopo (button group):** Todas (Brasil inteiro); 5 regiões (Norte, Nordeste, Centro Oeste, Sudeste, Sul) animam para a bbox da região via `boxFromBrIds`.
+- **Rótulos progressivos por nível de zoom (LOD):** estados (`viewBox.w < 550`, nome completo ou sigla conforme largura em pixels) e cidades (`viewBox.w < 250`). Centroides/larguras pré-medidos em `stateMeta` via `useLayoutEffect`.
+- Dados reais via RPC `get_patient_city_distribution`. Mock exibido quando o banco está vazio.
+- Drill-down pelo painel direito com breadcrumb (`BackBtn`): Brasil > Região > Estado > Cidade. Áreas de scroll usam a classe `.map-scroll` (scrollbar temático, corrige fundo branco no modo escuro).
+- Tooltip é overlay HTML posicionado por fração do `viewBox` (nítido em qualquer zoom).
 - Fullscreen nativo do card via Fullscreen API (`.map-fullscreen-card:fullscreen` em `globals.css`).
 
 ### Tenants (`/tenants`)
