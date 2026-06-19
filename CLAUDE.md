@@ -55,7 +55,7 @@ packages/
 
 - Cor primária: **amarela** (yellow). Token `--primary` injetado pelo `ColorThemeProvider` em `packages/ui/src/providers/color-theme-provider.tsx`.
 - Todas as cores usam paletas Tailwind 50-950 via CSS vars (`hsl(var(--primary))`, etc.). **Nunca** usar cores hardcoded nos componentes ou charts.
-- `--radius: 0.6rem` como base global. A escala é gerada pelo preset do Tailwind em `packages/config/tailwind/preset.ts`.
+- `--radius: 0.45rem` (preset Small do shadcn v4). Escala multiplicativa: `sm=*0.6`, `md=*0.8`, `lg=1x`, `xl=*1.4`, `2xl=*1.8`, `3xl=*2.2`, `4xl=*2.6`. Definida em `globals.css` (@theme inline) e `packages/config/tailwind/preset.ts`.
 - Fontes: `Reddit Sans` (sans) e `Reddit Mono` (mono).
 - Modo claro/escuro/system via `ColorThemeProvider`. Neutros usam Zinc.
 - Tonalidades disponíveis no picker: 300, 400, 500, 600, 700, 800 (removidas 100, 200, 900, 950).
@@ -123,10 +123,10 @@ packages/
 - **Dots uniformes e sutis:** todos com o mesmo raio (`DOT_R = 0.0062 * viewBox.w`), tamanho visual constante em qualquer zoom; não escala por contagem. Halo discreto (1.5x, opacidade baixa), pulso `animate-ping` so no hover/seleção, sombra `drop-shadow` em `--primary-foreground`.
 - **Pan/zoom livre:** arrastar move o mapa (pointer events + threshold de 4px, `draggedRef` impede seleção acidental), scroll do mouse da zoom no ponteiro, botões `+`/`-` dão zoom no centro e botão de foco (`IconCurrentLocation`) volta para o Brasil. O `viewBox` mantém o aspect do container (medido por `ResizeObserver` em `dims`). `clampVB` limita o zoom (`MIN_W=4`, max = Brasil inteiro) e o centro dentro do Brasil.
 - **Filtro de escopo (button group):** Todas (Brasil inteiro); 5 regiões (Norte, Nordeste, Centro Oeste, Sudeste, Sul) animam para a bbox da região via `boxFromBrIds`.
-- **Rótulos progressivos por nível de zoom (LOD):** estados (`viewBox.w < 550`, nome completo ou sigla conforme largura em pixels) e cidades (`viewBox.w < 250`). Centroides/larguras pré-medidos em `stateMeta` via `useLayoutEffect`.
+- **Rótulos progressivos por nível de zoom (LOD):** estados (`viewBox.w < 550`, sempre nome completo) e cidades (`viewBox.w < 250`). Centroides/larguras pré-medidos em `stateMeta` via `useLayoutEffect`.
 - Dados reais via RPC `get_patient_city_distribution`. Mock exibido quando o banco está vazio.
 - Drill-down pelo painel direito com breadcrumb (`BackBtn`): Brasil > Região > Estado > Cidade. Áreas de scroll usam a classe `.map-scroll` (scrollbar temático, corrige fundo branco no modo escuro).
-- Tooltip é overlay HTML posicionado por fração do `viewBox` (nítido em qualquer zoom).
+- Tooltip estilo `ChartTooltipContent` com line indicator em `--primary`, posicionado por fração do `viewBox` (nítido em qualquer zoom).
 - Fullscreen nativo do card via Fullscreen API (`.map-fullscreen-card:fullscreen` em `globals.css`).
 
 ### Tenants (`/tenants`)
@@ -175,7 +175,7 @@ packages/
   1. **Focus ring outline sem gap** (regra global `*:focus-visible` em `globals.css`): convenção Noun deliberada, ver subseção Componentes abaixo. Substitui o ring nativo do Shadcn em todo o admin.
   2. **Bounce tátil leve em botões** (`active:scale-[0.97]` na base do `button.tsx`): efeito de clique pedido pela Úrsula, aplicado **apenas** a botões.
   3. **Variantes semânticas** adicionadas a `Badge` e `Alert` (`info`, `success`, `warning`, `destructive`): extensões intencionais do conjunto base.
-- Migração de espaço de cor para `oklch` (padrão do Shadcn atual) depende de migrar todo o monorepo para Tailwind v4: é esforço separado, não editar `globals.css` isolado enquanto a stack for v3.4.
+- Escala de radius já migrada para padrão multiplicativo do shadcn v4 (admin, web, preset, tokens). Migração de espaço de cor para `oklch` ainda pendente: depende de migrar o mobile (Tailwind v3.4 + NativeWind) e o `ColorThemeProvider` (HSL).
 
 ### Componentes
 - Usar `'use client'` apenas quando necessário (interatividade, hooks). Preferir Server Components.

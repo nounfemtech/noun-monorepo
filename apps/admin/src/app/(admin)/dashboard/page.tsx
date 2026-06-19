@@ -246,7 +246,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard title="GMV acumulado"          value={brl.format(totalGmv)}     icon={<IconTrendingUp   size={18} className="text-primary" />} description="Volume total transacionado" highlight />
         <StatsCard title="Receita Noun acumulada" value={brl.format(nounsRevenue)} icon={<IconCurrencyReal size={18} className="text-primary" />} description="Take rate sobre GMV total" highlight />
-        <StatsCard title="GMV este mês"           value={brl.format(monthGmv)}     icon={<IconCalendar     size={18} className="text-primary" />} description="Clínico e farmácia" highlight />
+        <StatsCard title="GMV este mês"           value={brl.format(monthGmv)}     icon={<IconCalendar     size={18} className="text-primary" />} description="Especialista e farmácia" highlight />
         <StatsCard title="Receita este mês"       value={brl.format(monthRevenue)} icon={<IconCoins        size={18} className="text-primary" />} description="Receita líquida Noun" highlight />
       </div>
 

@@ -22,7 +22,7 @@ export function ExportCSVButton({ data }: ExportCSVButtonProps) {
     const header = 'Tenant,Tipo,GMV,Receita Noun,Take Rate,Transações'
     const rows = data.map((t) => {
       const takeRate = t.gmv > 0 ? ((t.nounRevenue / t.gmv) * 100).toFixed(1) + '%' : '0%'
-      const tipo = t.type === 'clinic' ? 'Clínica' : 'Farmácia'
+      const tipo = t.type === 'specialist' ? 'Especialista' : 'Farmácia'
       return [
         `"${t.name}"`,
         tipo,

@@ -251,7 +251,7 @@ async function FinanceiroContent({ searchParams }: PageProps) {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
-                        {t.type === 'clinic' ? 'Clínica' : 'Farmácia'}
+                        {t.type === 'specialist' ? 'Especialista' : 'Farmácia'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right font-medium">{brl.format(t.gmv)}</TableCell>

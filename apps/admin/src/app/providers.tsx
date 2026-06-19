@@ -2,8 +2,6 @@
 
 import { SpacemanThemeProvider, ThemeAnimationType } from '@space-man/react-theme-animation'
 import { ColorThemeProvider } from '@noun/ui'
-import { TooltipProvider } from '@/components/ui/tooltip'
-
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SpacemanThemeProvider
@@ -12,9 +10,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       duration={500}
     >
       <ColorThemeProvider defaultColorTheme="yellow">
-        <TooltipProvider>
-          {children}
-        </TooltipProvider>
+        {children}
       </ColorThemeProvider>
     </SpacemanThemeProvider>
   )

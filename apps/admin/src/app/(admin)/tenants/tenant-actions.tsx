@@ -1,42 +1,32 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { MoreHorizontal } from 'lucide-react'
+import { IconEye, IconCopy } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 export function TenantActions({ id, code }: { id: string; code: string }) {
   const router = useRouter()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0 data-[state=open]:bg-muted">
-          <span className="sr-only">Abrir menu</span>
-          <MoreHorizontal />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" onCloseAutoFocus={(e) => e.preventDefault()}>
-        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(code)}>
-          Copiar ID
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push(`/tenants/${id}`)}>
-          Ver
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push(`/tenants/${id}/editar`)}>
-          Editar
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant="warning">Suspender</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive">Deletar</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center gap-1">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigator.clipboard.writeText(code)}>
+            <IconCopy className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Copiar ID</TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.push(`/tenants/${id}`)}>
+            <IconEye className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Ver</TooltipContent>
+      </Tooltip>
+    </div>
   )
 }

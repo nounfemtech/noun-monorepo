@@ -72,8 +72,8 @@ function getCredentialType(s: Specialty): CredentialType {
   return 'crm_rqe'
 }
 
-function getTenantType(s: Specialty): 'clinic' | 'pharmacy' {
-  return s === 'farmacia' ? 'pharmacy' : 'clinic'
+function getTenantType(s: Specialty): 'specialist' | 'pharmacy' {
+  return s === 'farmacia' ? 'pharmacy' : 'specialist'
 }
 
 // ---- Masks / Validators ----

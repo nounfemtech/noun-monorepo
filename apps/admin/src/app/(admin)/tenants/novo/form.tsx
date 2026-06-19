@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -30,8 +29,7 @@ import {
 import { Alert, AlertTitle, AlertDescription, AlertActions, AlertClose } from '@/components/ui/alert'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
-import { IconAlertCircle, IconInfoCircle, IconCheck, IconSelector } from '@tabler/icons-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { IconAlertCircle, IconCheck, IconSelector } from '@tabler/icons-react'
 import { createSupabaseBrowser } from '@/lib/supabase'
 import { formatCRM, formatCRP, formatCRN, formatCRF, formatRQE } from '@/lib/formatters'
 
@@ -583,59 +581,6 @@ type FormData = z.infer<typeof formSchema>
 
 // ─── Componentes auxiliares ────────────────────────────────────────────────────
 
-function Field({
-  label, error, className, children, hint,
-}: {
-  label: string
-  error?: { message?: string }
-  className?: string
-  children: React.ReactNode
-  hint?: string
-}) {
-  return (
-    <div className={cn('space-y-1.5', className)}>
-      <div className="flex items-center gap-1">
-        <Label className="text-sm font-medium">{label}</Label>
-        {hint && (
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              <TooltipTrigger type="button" tabIndex={-1} className="text-muted-foreground hover:text-foreground transition-colors">
-                <IconInfoCircle size={14} />
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-64">
-                <p>{hint}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </div>
-      {children}
-      {error?.message && (
-        <p className="text-xs text-destructive">{error.message}</p>
-      )}
-    </div>
-  )
-}
-
-function ReadonlyField({ label, value }: { label: string; value?: string }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-sm font-medium">{label}</Label>
-      <div className="h-8 rounded-md border border-input bg-muted/50 px-3 py-1.5 text-sm text-muted-foreground">
-        {value || '—'}
-      </div>
-    </div>
-  )
-}
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide pt-1">
-      {children}
-    </p>
-  )
-}
-
 function SearchableSelect({
   value, onValueChange, options, placeholder, searchPlaceholder, error, className, listClassName, contentClassName,
 }: {
@@ -697,39 +642,47 @@ function SearchableSelect({
 
 const ESTADO_OPTIONS = ESTADOS.map((uf) => ({ value: uf, label: uf }))
 
-function UfSelect({
-  name, form, error,
-}: {
-  name: keyof FormData
-  form: UseFormReturn<FormData>
-  error?: { message?: string }
-}) {
-  return (
-    <Field label="UF *" error={error} className="w-24">
-      <Controller
-        name={name}
-        control={form.control}
-        render={({ field }) => (
-          <SearchableSelect
-            value={field.value as string}
-            onValueChange={field.onChange}
-            options={ESTADO_OPTIONS}
-            placeholder="UF"
-            searchPlaceholder="Buscar UF..."
-            error={!!error}
-            contentClassName="w-36"
-          />
-        )}
-      />
-    </Field>
-  )
-}
-
 function SectionHeader({ title, description }: { title: string; description: string }) {
   return (
     <div className="pt-1">
       <p className="text-sm font-medium text-foreground">{title}</p>
       <p className="text-sm text-muted-foreground mt-1">{description}</p>
+    </div>
+  )
+}
+
+function FormRow({
+  label, description, children, className, required,
+}: {
+  label: string
+  description?: string
+  children: React.ReactNode
+  className?: string
+  required?: boolean
+}) {
+  return (
+    <div className={cn('grid grid-cols-[200px_auto] items-center gap-8 py-4 px-4', className)}>
+      <div className="pt-0.5">
+        <p className="text-sm font-medium text-foreground">
+          {label}{required && <span className="text-destructive ml-0.5">*</span>}
+        </p>
+        {description && <p className="text-sm text-muted-foreground mt-0.5">{description}</p>}
+      </div>
+      <div className="w-[280px] justify-self-end">{children}</div>
+    </div>
+  )
+}
+
+function FieldError({ error }: { error?: { message?: string } }) {
+  if (!error?.message) return null
+  return <p className="text-xs text-destructive mt-1.5">{error.message}</p>
+}
+
+function RoValue({ label, value, mono }: { label?: string; value?: string | null; mono?: boolean }) {
+  return (
+    <div>
+      {label && <p className="text-xs text-muted-foreground mb-1">{label}</p>}
+      <p className={cn('text-sm', mono && 'font-mono')}>{value || '—'}</p>
     </div>
   )
 }
@@ -745,76 +698,70 @@ function IdentificacaoFields({ form }: { form: UseFormReturn<FormData> }) {
   const isPharmacy   = type === 'pharmacy'
   const conselho     = subtype ? getConselhoTipo(subtype) : null
   const showRQE      = subtype ? requiresRQE(subtype) : false
-
-  const subtypeOptions = isSpecialist ? SPECIALIST_SUBTYPES
-    : isPharmacy ? PHARMACY_SUBTYPES
-    : []
+  const subtypeOptions = isSpecialist ? SPECIALIST_SUBTYPES : isPharmacy ? PHARMACY_SUBTYPES : []
 
   return (
-    <div className="space-y-6">
-      <SectionLabel>Dados gerais</SectionLabel>
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Tipo *" error={errors.type}>
-          <Controller name="type" control={control}
+    <>
+      <FormRow label="Tipo" description="Especialista (médico, psicólogo, nutricionista) ou farmácia" required>
+        <Controller name="type" control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={(val) => {
+              field.onChange(val)
+              setValue('subtype', '', { shouldValidate: false })
+              if (val === 'specialist') {
+                setValue('responsavelTecnicoNome', '', { shouldValidate: false })
+                setValue('responsavelTecnicoCrf', '', { shouldValidate: false })
+                setValue('responsavelTecnicoCrfUf', '', { shouldValidate: false })
+                setValue('afeCodigo', '', { shouldValidate: false })
+                setValue('aeNumero', '', { shouldValidate: false })
+                setValue('alvaraSanitario', '', { shouldValidate: false })
+                setValue('inscricaoEstadual', '', { shouldValidate: false })
+              } else if (val === 'pharmacy') {
+                setValue('conselhoNumero', '', { shouldValidate: false })
+                setValue('conselhoUf', '', { shouldValidate: false })
+                setValue('rqe', '', { shouldValidate: false })
+                setValue('fiscalType', 'pj', { shouldValidate: false })
+              }
+            }}>
+              <SelectTrigger className={cn(errors.type && 'border-destructive')}>
+                <SelectValue placeholder="Selecione o tipo..." />
+              </SelectTrigger>
+              <SelectContent>
+                {TENANT_TYPES.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        <FieldError error={errors.type} />
+      </FormRow>
+
+      {type && (
+        <FormRow label="Subtipo" description="Especialidade ou categoria do parceiro" required>
+          <Controller name="subtype" control={control}
             render={({ field }) => (
               <Select value={field.value} onValueChange={(val) => {
                 field.onChange(val)
-                setValue('subtype', '', { shouldValidate: false })
-                if (val === 'specialist') {
-                  setValue('responsavelTecnicoNome', '', { shouldValidate: false })
-                  setValue('responsavelTecnicoCrf', '', { shouldValidate: false })
-                  setValue('responsavelTecnicoCrfUf', '', { shouldValidate: false })
-                  setValue('afeCodigo', '', { shouldValidate: false })
-                  setValue('aeNumero', '', { shouldValidate: false })
-                  setValue('alvaraSanitario', '', { shouldValidate: false })
-                  setValue('inscricaoEstadual', '', { shouldValidate: false })
-                } else if (val === 'pharmacy') {
-                  setValue('conselhoNumero', '', { shouldValidate: false })
-                  setValue('conselhoUf', '', { shouldValidate: false })
-                  setValue('rqe', '', { shouldValidate: false })
-                  setValue('fiscalType', 'pj', { shouldValidate: false })
-                }
+                if (!requiresRQE(val)) setValue('rqe', '', { shouldValidate: false })
               }}>
-                <SelectTrigger className={cn(errors.type && 'border-destructive')}>
-                  <SelectValue placeholder="Selecione o tipo..." />
+                <SelectTrigger className={cn(errors.subtype && 'border-destructive')}>
+                  <SelectValue placeholder="Selecione o subtipo..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {TENANT_TYPES.map((o) => (
+                  {subtypeOptions.map((o) => (
                     <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             )}
           />
-        </Field>
-
-        {type && (
-          <Field label="Subtipo *" error={errors.subtype}>
-            <Controller name="subtype" control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={(val) => {
-                  field.onChange(val)
-                  if (!requiresRQE(val)) {
-                    setValue('rqe', '', { shouldValidate: false })
-                  }
-                }}>
-                  <SelectTrigger className={cn(errors.subtype && 'border-destructive')}>
-                    <SelectValue placeholder="Selecione o subtipo..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {subtypeOptions.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </Field>
-        )}
-      </div>
+          <FieldError error={errors.subtype} />
+        </FormRow>
+      )}
 
       {type && (
-        <Field label="Nome de exibição *" error={errors.name}>
+        <FormRow label="Nome de exibição" description={isPharmacy ? 'Nome da farmácia na plataforma' : 'Nome do profissional como aparece para os pacientes'} required>
           <Controller name="name" control={control}
             render={({ field }) => (
               <Input {...field}
@@ -822,95 +769,123 @@ function IdentificacaoFields({ form }: { form: UseFormReturn<FormData> }) {
                 className={cn(errors.name && 'border-destructive')} />
             )}
           />
-        </Field>
+          <FieldError error={errors.name} />
+        </FormRow>
       )}
 
       {isSpecialist && conselho && (
         <>
-          <SectionLabel>Registro profissional</SectionLabel>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label={`Número do ${conselho} *`} error={errors.conselhoNumero}
-              hint={conselho === 'CRM' ? 'Conselho Regional de Medicina, número de registro emitido pelo conselho estadual.'
-                : conselho === 'CRP' ? 'Conselho Regional de Psicologia, número de registro profissional.'
-                : 'Conselho Regional de Nutricionistas, número de registro profissional.'}>
-              <Controller name="conselhoNumero" control={control}
+          <FormRow label={`Número ${conselho}`}
+            description={
+              conselho === 'CRM' ? 'Número de registro no Conselho Regional de Medicina'
+              : conselho === 'CRP' ? 'Número de registro no Conselho Regional de Psicologia'
+              : 'Número de registro no Conselho Regional de Nutricionistas'
+            } required>
+            <Controller name="conselhoNumero" control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="123456"
+                  className={cn(errors.conselhoNumero && 'border-destructive')} />
+              )}
+            />
+            <FieldError error={errors.conselhoNumero} />
+          </FormRow>
+
+          <FormRow label="UF do registro" description="Estado do conselho regional" required>
+            <Controller name="conselhoUf" control={control}
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value as string}
+                  onValueChange={field.onChange}
+                  options={ESTADO_OPTIONS}
+                  placeholder="Selecione a UF..."
+                  searchPlaceholder="Buscar UF..."
+                  error={!!errors.conselhoUf}
+                />
+              )}
+            />
+            <FieldError error={errors.conselhoUf} />
+          </FormRow>
+
+          {showRQE && (
+            <FormRow label="RQE" description="Registro de Qualificação de Especialidade" required>
+              <Controller name="rqe" control={control}
                 render={({ field }) => (
-                  <Input {...field} placeholder="123456"
-                    className={cn(errors.conselhoNumero && 'border-destructive')} />
+                  <Input {...field} placeholder="12345"
+                    className={cn(errors.rqe && 'border-destructive')} />
                 )}
               />
-            </Field>
-            <UfSelect name="conselhoUf" form={form} error={errors.conselhoUf} />
-            {showRQE && (
-              <Field label="RQE *" error={errors.rqe}
-                hint="Registro de Qualificação de Especialidade, exigido pelo CFM para médicos com título de especialista.">
-                <Controller name="rqe" control={control}
-                  render={({ field }) => (
-                    <Input {...field} placeholder="12345"
-                      className={cn(errors.rqe && 'border-destructive')} />
-                  )}
-                />
-              </Field>
-            )}
-          </div>
+              <FieldError error={errors.rqe} />
+            </FormRow>
+          )}
         </>
       )}
 
       {isPharmacy && (
         <>
-          <SectionLabel>Responsável Técnico</SectionLabel>
-          <Field label="Nome do Responsável Técnico *" error={errors.responsavelTecnicoNome}>
+          <FormRow label="Responsável Técnico" description="Nome do farmacêutico responsável técnico" required>
             <Controller name="responsavelTecnicoNome" control={control}
               render={({ field }) => (
                 <Input {...field}
                   className={cn(errors.responsavelTecnicoNome && 'border-destructive')} />
               )}
             />
-          </Field>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="CRF do RT *" error={errors.responsavelTecnicoCrf}
-              hint="Conselho Regional de Farmácia, registro do responsável técnico.">
-              <Controller name="responsavelTecnicoCrf" control={control}
-                render={({ field }) => (
-                  <Input {...field} placeholder="000000"
-                    className={cn(errors.responsavelTecnicoCrf && 'border-destructive')} />
-                )}
-              />
-            </Field>
-            <UfSelect name="responsavelTecnicoCrfUf" form={form} error={errors.responsavelTecnicoCrfUf} />
-          </div>
+            <FieldError error={errors.responsavelTecnicoNome} />
+          </FormRow>
 
-          <SectionLabel>Licenças</SectionLabel>
-          <div className="grid grid-cols-3 gap-4">
-            <Field label={subtype === 'manipulacao' ? 'AFE *' : 'AFE'} error={errors.afeCodigo}
-              hint="Autorização de Funcionamento de Empresa, emitida pela Anvisa. Obrigatória para farmácias de manipulação.">
-              <Controller name="afeCodigo" control={control}
-                render={({ field }) => (
-                  <Input {...field} placeholder="000000"
-                    className={cn(errors.afeCodigo && 'border-destructive')} />
-                )}
-              />
-            </Field>
-            <Field label="AE" error={errors.aeNumero}
-              hint="Autorização Especial para manipulação de substâncias controladas, emitida pela Anvisa.">
-              <Controller name="aeNumero" control={control}
-                render={({ field }) => (
-                  <Input {...field} placeholder="000000" />
-                )}
-              />
-            </Field>
-            <Field label="Alvará" error={errors.alvaraSanitario}
-              hint="Alvará Sanitário emitido pela Vigilância Sanitária municipal ou estadual.">
-              <Controller name="alvaraSanitario" control={control}
-                render={({ field }) => (
-                  <Input {...field} placeholder="00000/2025" />
-                )}
-              />
-            </Field>
-          </div>
+          <FormRow label="Número CRF" description="Número do Conselho Regional de Farmácia" required>
+            <Controller name="responsavelTecnicoCrf" control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="000000"
+                  className={cn(errors.responsavelTecnicoCrf && 'border-destructive')} />
+              )}
+            />
+            <FieldError error={errors.responsavelTecnicoCrf} />
+          </FormRow>
+
+          <FormRow label="UF do CRF" description="Estado do CRF do responsável técnico" required>
+            <Controller name="responsavelTecnicoCrfUf" control={control}
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value as string}
+                  onValueChange={field.onChange}
+                  options={ESTADO_OPTIONS}
+                  placeholder="Selecione a UF..."
+                  searchPlaceholder="Buscar UF..."
+                  error={!!errors.responsavelTecnicoCrfUf}
+                />
+              )}
+            />
+            <FieldError error={errors.responsavelTecnicoCrfUf} />
+          </FormRow>
+
+          <FormRow label="AFE" description={subtype === 'manipulacao' ? 'Autorização de Funcionamento (obrigatória)' : 'Autorização de Funcionamento da Empresa (Anvisa)'}>
+            <Controller name="afeCodigo" control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="000000"
+                  className={cn(errors.afeCodigo && 'border-destructive')} />
+              )}
+            />
+            <FieldError error={errors.afeCodigo} />
+          </FormRow>
+
+          <FormRow label="AE" description="Autorização Especial (Anvisa)">
+            <Controller name="aeNumero" control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="000000" />
+              )}
+            />
+          </FormRow>
+
+          <FormRow label="Alvará Sanitário" description="Número do alvará sanitário municipal">
+            <Controller name="alvaraSanitario" control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="00000/2025" />
+              )}
+            />
+          </FormRow>
         </>
       )}
-    </div>
+    </>
   )
 }
 
@@ -923,47 +898,34 @@ function IdentificacaoReadonly({ form }: { form: UseFormReturn<FormData> }) {
   const showRQE = vals.subtype ? requiresRQE(vals.subtype) : false
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <ReadonlyField label="Tipo" value={typeLabel} />
-        <ReadonlyField label="Subtipo" value={subtypeLabel} />
-      </div>
-      <ReadonlyField label="Nome de exibição" value={vals.name} />
-
+    <>
+      <FormRow label="Tipo"><RoValue value={typeLabel} /></FormRow>
+      <FormRow label="Subtipo"><RoValue value={subtypeLabel} /></FormRow>
+      <FormRow label="Nome de exibição"><RoValue value={vals.name} /></FormRow>
       {vals.type === 'specialist' && conselho && (
         <>
-          <div className="grid grid-cols-2 gap-4">
-            <ReadonlyField
-              label={conselho}
-              value={
-                conselho === 'CRM' ? formatCRM(vals.conselhoUf, vals.conselhoNumero)
-                : conselho === 'CRP' ? formatCRP(vals.conselhoUf, vals.conselhoNumero)
-                : formatCRN(vals.conselhoUf, vals.conselhoNumero)
-              }
-            />
-            {showRQE && (
-              <ReadonlyField label="RQE" value={formatRQE(vals.rqe)} />
-            )}
-          </div>
+          <FormRow label={`Número ${conselho}`}>
+            <RoValue value={
+              conselho === 'CRM' ? formatCRM(vals.conselhoUf, vals.conselhoNumero)
+              : conselho === 'CRP' ? formatCRP(vals.conselhoUf, vals.conselhoNumero)
+              : formatCRN(vals.conselhoUf, vals.conselhoNumero)
+            } mono />
+          </FormRow>
+          <FormRow label="UF do registro"><RoValue value={vals.conselhoUf} /></FormRow>
+          {showRQE && <FormRow label="RQE"><RoValue value={formatRQE(vals.rqe)} mono /></FormRow>}
         </>
       )}
-
       {vals.type === 'pharmacy' && (
         <>
-          <ReadonlyField label="Responsável Técnico" value={vals.responsavelTecnicoNome} />
-          <ReadonlyField label="CRF" value={formatCRF(vals.responsavelTecnicoCrfUf, vals.responsavelTecnicoCrf)} />
-          {(vals.afeCodigo || vals.aeNumero || vals.alvaraSanitario) && (
-            <div className="grid grid-cols-2 gap-4">
-              {vals.afeCodigo && <ReadonlyField label="AFE (Anvisa)" value={vals.afeCodigo} />}
-              {vals.aeNumero && <ReadonlyField label="Autorização Especial" value={vals.aeNumero} />}
-            </div>
-          )}
-          {vals.alvaraSanitario && (
-            <ReadonlyField label="Alvará Sanitário" value={vals.alvaraSanitario} />
-          )}
+          <FormRow label="Responsável Técnico"><RoValue value={vals.responsavelTecnicoNome} /></FormRow>
+          <FormRow label="Número CRF"><RoValue value={formatCRF(vals.responsavelTecnicoCrfUf, vals.responsavelTecnicoCrf)} mono /></FormRow>
+          <FormRow label="UF do CRF"><RoValue value={vals.responsavelTecnicoCrfUf} /></FormRow>
+          {vals.afeCodigo && <FormRow label="AFE"><RoValue value={vals.afeCodigo} /></FormRow>}
+          {vals.aeNumero && <FormRow label="AE"><RoValue value={vals.aeNumero} /></FormRow>}
+          {vals.alvaraSanitario && <FormRow label="Alvará Sanitário"><RoValue value={vals.alvaraSanitario} /></FormRow>}
         </>
       )}
-    </div>
+    </>
   )
 }
 
@@ -976,164 +938,161 @@ function FiscalFields({ form }: { form: UseFormReturn<FormData> }) {
   const isPharmacy = type === 'pharmacy'
   const showPJ     = isPharmacy || fiscalType === 'pj'
 
+  if (!type) {
+    return (
+      <div className="py-4 px-4 text-sm text-muted-foreground">
+        Selecione o tipo de parceiro na seção Identificação para continuar.
+      </div>
+    )
+  }
+
   return (
-    <div className="space-y-6">
-      {!type ? (
-        <p className="text-sm text-muted-foreground">
-          Selecione o tipo de tenant na seção Identificação para continuar.
-        </p>
-      ) : (
-        <>
-          <SectionLabel>Faturamento</SectionLabel>
-          {isPharmacy ? (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-1">
-                  <Label className="text-sm font-medium">Tipo de faturamento</Label>
-                  <TooltipProvider delayDuration={200}>
-                    <Tooltip>
-                      <TooltipTrigger type="button" tabIndex={-1} className="text-muted-foreground hover:text-foreground transition-colors">
-                        <IconInfoCircle size={14} />
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-64">
-                        <p>Definido automaticamente para farmácias.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <div className="h-8 rounded-md border border-input bg-muted/50 px-3 py-1.5 text-sm text-muted-foreground">
-                  PJ: Pessoa Jurídica
-                </div>
-              </div>
-              <Field label="CNPJ *" error={errors.cnpj}>
-                <Controller name="cnpj" control={control}
-                  render={({ field }) => (
-                    <Input {...field}
-                      onChange={(e) => field.onChange(maskCNPJ(e.target.value))}
-                      placeholder="00.000.000/0001-00"
-                      className={cn(errors.cnpj && 'border-destructive')}
-                    />
-                  )}
-                />
-              </Field>
-            </div>
-          ) : (
-            <Field label="Tipo de faturamento *" error={errors.fiscalType} className="max-w-sm">
-              <Controller name="fiscalType" control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className={cn(errors.fiscalType && 'border-destructive')}>
-                      <SelectValue placeholder="Selecione..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pf">PF: Pessoa Física</SelectItem>
-                      <SelectItem value="pj">PJ: Pessoa Jurídica</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </Field>
-          )}
-
-          {fiscalType === 'pf' && !isPharmacy && (
-            <Field label="CPF *" error={errors.cpf} className="max-w-xs">
-              <Controller name="cpf" control={control}
-                render={({ field }) => (
-                  <Input {...field}
-                    onChange={(e) => field.onChange(maskCPF(e.target.value))}
-                    placeholder="000.000.000-00"
-                    className={cn(errors.cpf && 'border-destructive')}
-                  />
-                )}
-              />
-            </Field>
-          )}
-
-          {showPJ && (
-            <div className="space-y-4">
-              <SectionLabel>Empresa</SectionLabel>
-              {!isPharmacy && (
-                <Field label="CNPJ *" error={errors.cnpj} className="max-w-xs">
-                  <Controller name="cnpj" control={control}
-                    render={({ field }) => (
-                      <Input {...field}
-                        onChange={(e) => field.onChange(maskCNPJ(e.target.value))}
-                        placeholder="00.000.000/0001-00"
-                        className={cn(errors.cnpj && 'border-destructive')}
-                      />
-                    )}
-                  />
-                </Field>
-              )}
-              <Field label="Razão Social *" error={errors.razaoSocial}>
-                <Controller name="razaoSocial" control={control}
-                  render={({ field }) => (
-                    <Input {...field} placeholder="Empresa LTDA"
-                      className={cn(errors.razaoSocial && 'border-destructive')} />
-                  )}
-                />
-              </Field>
-              <Field label="Nome Fantasia" error={errors.nomeFantasia}>
-                <Controller name="nomeFantasia" control={control}
-                  render={({ field }) => (
-                    <Input {...field} placeholder="Nome comercial (opcional)" />
-                  )}
-                />
-              </Field>
-              <Field label="Nome do Responsável *" error={errors.responsavelLegalNome}>
-                <Controller name="responsavelLegalNome" control={control}
-                  render={({ field }) => (
-                    <Input {...field}
-                      className={cn(errors.responsavelLegalNome && 'border-destructive')} />
-                  )}
-                />
-              </Field>
-            </div>
-          )}
-
-          <SectionLabel>Responsável legal</SectionLabel>
-          <div className={cn('grid gap-4', isPharmacy ? 'grid-cols-3' : 'grid-cols-2')}>
-            <Field label="CPF do Responsável *" error={errors.responsavelLegalCpf}>
-              <Controller name="responsavelLegalCpf" control={control}
-                render={({ field }) => (
-                  <Input {...field}
-                    onChange={(e) => field.onChange(maskCPF(e.target.value))}
-                    placeholder="000.000.000-00"
-                    className={cn(errors.responsavelLegalCpf && 'border-destructive')} />
-                )}
-              />
-            </Field>
-            <Field label="Regime Tributário *" error={errors.regimeTributario}>
-              <Controller name="regimeTributario" control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className={cn(errors.regimeTributario && 'border-destructive')}>
-                      <SelectValue placeholder="Selecione..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {REGIME_TRIBUTARIO.map((r) => (
-                        <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </Field>
-            {isPharmacy && (
-              <Field label="Inscrição Estadual *" error={errors.inscricaoEstadual}>
-                <Controller name="inscricaoEstadual" control={control}
-                  render={({ field }) => (
-                    <Input {...field}
-                      placeholder="000.000.000.000"
-                      className={cn(errors.inscricaoEstadual && 'border-destructive')} />
-                  )}
-                />
-              </Field>
-            )}
+    <>
+      <FormRow label="Tipo de pessoa" description="Pessoa física ou jurídica" required>
+        {isPharmacy ? (
+          <div className="h-8 rounded-md border border-input bg-muted/50 px-3 py-1.5 text-sm text-muted-foreground flex items-center">
+            PJ: Pessoa Jurídica
           </div>
+        ) : (
+          <>
+            <Controller name="fiscalType" control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className={cn(errors.fiscalType && 'border-destructive')}>
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pf">PF: Pessoa Física</SelectItem>
+                    <SelectItem value="pj">PJ: Pessoa Jurídica</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FieldError error={errors.fiscalType} />
+          </>
+        )}
+      </FormRow>
+
+      {fiscalType === 'pf' && !isPharmacy && (
+        <FormRow label="CPF" description="Cadastro de Pessoa Física" required>
+          <Controller name="cpf" control={control}
+            render={({ field }) => (
+              <Input {...field}
+                onChange={(e) => field.onChange(maskCPF(e.target.value))}
+                placeholder="000.000.000-00"
+                className={cn(errors.cpf && 'border-destructive')}
+              />
+            )}
+          />
+          <FieldError error={errors.cpf} />
+        </FormRow>
+      )}
+
+      {showPJ && !isPharmacy && (
+        <FormRow label="CNPJ" description="Cadastro Nacional de Pessoa Jurídica" required>
+          <Controller name="cnpj" control={control}
+            render={({ field }) => (
+              <Input {...field}
+                onChange={(e) => field.onChange(maskCNPJ(e.target.value))}
+                placeholder="00.000.000/0001-00"
+                className={cn(errors.cnpj && 'border-destructive')}
+              />
+            )}
+          />
+          <FieldError error={errors.cnpj} />
+        </FormRow>
+      )}
+
+      {isPharmacy && (
+        <FormRow label="CNPJ" description="Cadastro Nacional de Pessoa Jurídica" required>
+          <Controller name="cnpj" control={control}
+            render={({ field }) => (
+              <Input {...field}
+                onChange={(e) => field.onChange(maskCNPJ(e.target.value))}
+                placeholder="00.000.000/0001-00"
+                className={cn(errors.cnpj && 'border-destructive')}
+              />
+            )}
+          />
+          <FieldError error={errors.cnpj} />
+        </FormRow>
+      )}
+
+      {showPJ && (
+        <>
+          <FormRow label="Razão Social" description="Nome jurídico da empresa" required>
+            <Controller name="razaoSocial" control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="Razão Social"
+                  className={cn(errors.razaoSocial && 'border-destructive')} />
+              )}
+            />
+            <FieldError error={errors.razaoSocial} />
+          </FormRow>
+
+          <FormRow label="Nome Fantasia" description="Nome comercial (opcional)">
+            <Controller name="nomeFantasia" control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="Nome Fantasia" />
+              )}
+            />
+          </FormRow>
+
+          <FormRow label="Responsável Legal" description="Nome completo do responsável legal" required>
+            <Controller name="responsavelLegalNome" control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="Nome do Responsável Legal"
+                  className={cn(errors.responsavelLegalNome && 'border-destructive')} />
+              )}
+            />
+            <FieldError error={errors.responsavelLegalNome} />
+          </FormRow>
         </>
       )}
-    </div>
+
+      <FormRow label="CPF do responsável" description="CPF do sócio ou responsável legal" required>
+        <Controller name="responsavelLegalCpf" control={control}
+          render={({ field }) => (
+            <Input {...field}
+              onChange={(e) => field.onChange(maskCPF(e.target.value))}
+              placeholder="000.000.000-00"
+              className={cn(errors.responsavelLegalCpf && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.responsavelLegalCpf} />
+      </FormRow>
+
+      <FormRow label="Regime tributário" description="Regime de apuração de impostos" required>
+        <Controller name="regimeTributario" control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger className={cn(errors.regimeTributario && 'border-destructive')}>
+                <SelectValue placeholder="Selecione o regime..." />
+              </SelectTrigger>
+              <SelectContent>
+                {REGIME_TRIBUTARIO.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        <FieldError error={errors.regimeTributario} />
+      </FormRow>
+
+      {isPharmacy && (
+        <FormRow label="Inscrição Estadual" description="Inscrição estadual da farmácia" required>
+          <Controller name="inscricaoEstadual" control={control}
+            render={({ field }) => (
+              <Input {...field}
+                placeholder="Inscrição Estadual"
+                className={cn(errors.inscricaoEstadual && 'border-destructive')} />
+            )}
+          />
+          <FieldError error={errors.inscricaoEstadual} />
+        </FormRow>
+      )}
+    </>
   )
 }
 
@@ -1146,31 +1105,27 @@ function FiscalReadonly({ form }: { form: UseFormReturn<FormData> }) {
   const regimeLabel = REGIME_TRIBUTARIO.find(r => r.value === vals.regimeTributario)?.label || ''
 
   return (
-    <div className="space-y-6">
-      <ReadonlyField label="Tipo de faturamento" value={fiscalLabel} />
+    <>
+      <FormRow label="Tipo de pessoa"><RoValue value={fiscalLabel} /></FormRow>
       {(isPharmacy || vals.fiscalType === 'pj') && (
-        <>
-          <div className="grid grid-cols-2 gap-4">
-            <ReadonlyField label="CNPJ" value={vals.cnpj} />
-            <ReadonlyField label="Razão Social" value={vals.razaoSocial} />
-          </div>
-          {vals.nomeFantasia && (
-            <ReadonlyField label="Nome Fantasia" value={vals.nomeFantasia} />
-          )}
-          <div className="grid grid-cols-2 gap-4">
-            <ReadonlyField label="Responsável Legal" value={vals.responsavelLegalNome} />
-            <ReadonlyField label="CPF do Responsável" value={vals.responsavelLegalCpf} />
-          </div>
-        </>
+        <FormRow label="CNPJ"><RoValue value={vals.cnpj} mono /></FormRow>
       )}
       {vals.fiscalType === 'pf' && !isPharmacy && (
-        <ReadonlyField label="CPF" value={vals.cpf} />
+        <FormRow label="CPF"><RoValue value={vals.cpf} mono /></FormRow>
       )}
-      <ReadonlyField label="Regime Tributário" value={regimeLabel} />
+      {(isPharmacy || vals.fiscalType === 'pj') && (
+        <>
+          <FormRow label="Razão Social"><RoValue value={vals.razaoSocial} /></FormRow>
+          {vals.nomeFantasia && <FormRow label="Nome Fantasia"><RoValue value={vals.nomeFantasia} /></FormRow>}
+          <FormRow label="Responsável Legal"><RoValue value={vals.responsavelLegalNome} /></FormRow>
+        </>
+      )}
+      <FormRow label="CPF do responsável"><RoValue value={vals.responsavelLegalCpf} mono /></FormRow>
+      <FormRow label="Regime tributário"><RoValue value={regimeLabel} /></FormRow>
       {isPharmacy && vals.inscricaoEstadual && (
-        <ReadonlyField label="Inscrição Estadual" value={vals.inscricaoEstadual} />
+        <FormRow label="Inscrição Estadual"><RoValue value={vals.inscricaoEstadual} /></FormRow>
       )}
-    </div>
+    </>
   )
 }
 
@@ -1227,157 +1182,151 @@ function ContatoFields({
   }
 
   return (
-    <div className="space-y-6">
-      <SectionLabel>Dados de contato</SectionLabel>
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="E-mail *" error={errors.email}>
-          <Controller name="email" control={control}
-            render={({ field }) => (
-              <Input {...field} type="email" placeholder="contato@clinica.com.br"
-                className={cn(errors.email && 'border-destructive')} />
-            )}
-          />
-        </Field>
-        <Field label="Telefone *" error={errors.telefone}>
-          <Controller name="telefone" control={control}
-            render={({ field }) => (
-              <Input {...field}
-                onChange={(e) => field.onChange(maskPhone(e.target.value))}
-                placeholder="(11) 99999-9999"
-                className={cn(errors.telefone && 'border-destructive')}
+    <>
+      <FormRow label="E-mail" description="E-mail de contato do parceiro" required>
+        <Controller name="email" control={control}
+          render={({ field }) => (
+            <Input {...field} type="email" placeholder="contato@clinica.com.br"
+              className={cn(errors.email && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.email} />
+      </FormRow>
+
+      <FormRow label="Telefone" description="Telefone de contato" required>
+        <Controller name="telefone" control={control}
+          render={({ field }) => (
+            <Input {...field}
+              onChange={(e) => field.onChange(maskPhone(e.target.value))}
+              placeholder="(11) 99999-9999"
+              className={cn(errors.telefone && 'border-destructive')}
+            />
+          )}
+        />
+        <FieldError error={errors.telefone} />
+      </FormRow>
+
+      <FormRow label="CEP" description="Preenchimento automático do endereço" required>
+        <Controller name="cep" control={control}
+          render={({ field }) => (
+            <InputGroup className="shadow-none">
+              <InputGroupInput
+                {...field}
+                onChange={(e) => {
+                  field.onChange(maskCEP(e.target.value))
+                  if (cepError) setCepError(false)
+                }}
+                onBlur={(e) => fetchViaCEP(e.target.value)}
+                placeholder="00000-000"
               />
-            )}
-          />
-        </Field>
-      </div>
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => fetchViaCEP(field.value, { showError: true })}
+                >
+                  Buscar
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+          )}
+        />
+        <FieldError error={errors.cep} />
+      </FormRow>
 
-      <SectionLabel>Endereço</SectionLabel>
+      <FormRow label="UF" description="Estado" required>
+        <Controller name="uf" control={control}
+          render={({ field }) => (
+            <SearchableSelect
+              value={field.value}
+              onValueChange={(val) => {
+                field.onChange(val)
+                setValue('cidade', '', { shouldValidate: false })
+                fetchCidades(val)
+              }}
+              options={ESTADO_OPTIONS}
+              placeholder="Selecione a UF..."
+              searchPlaceholder="Buscar UF..."
+              error={!!errors.uf}
+            />
+          )}
+        />
+        <FieldError error={errors.uf} />
+      </FormRow>
 
-      <div className="flex gap-4">
-        <Field label="CEP *" error={errors.cep} className="w-40 shrink-0">
-          <Controller name="cep" control={control}
-            render={({ field }) => (
-              <InputGroup className="shadow-none">
-                <InputGroupInput
-                  {...field}
-                  onChange={(e) => {
-                    field.onChange(maskCEP(e.target.value))
-                    if (cepError) setCepError(false)
-                  }}
-                  onBlur={(e) => fetchViaCEP(e.target.value)}
-                  placeholder="00000-000"
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    type="button"
-                    variant="secondary"
-                    onClick={() => fetchViaCEP(field.value, { showError: true })}
-                  >
-                    Buscar
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
-            )}
-          />
-        </Field>
-        <Field label="UF *" error={errors.uf} className="w-24 shrink-0">
-          <Controller name="uf" control={control}
-            render={({ field }) => (
+      <FormRow label="Cidade" description="Município" required>
+        <Controller name="cidade" control={control}
+          render={({ field }) => (
+            cidades.length > 0 ? (
               <SearchableSelect
                 value={field.value}
-                onValueChange={(val) => {
-                  field.onChange(val)
-                  setValue('cidade', '', { shouldValidate: false })
-                  fetchCidades(val)
-                }}
-                options={ESTADO_OPTIONS}
-                placeholder="UF"
-                searchPlaceholder="Buscar UF..."
-                error={!!errors.uf}
-                contentClassName="w-36"
+                onValueChange={field.onChange}
+                options={cidades.map((c) => ({ value: c, label: c }))}
+                placeholder="Selecione a cidade..."
+                searchPlaceholder="Buscar cidade..."
+                error={!!errors.cidade}
               />
-            )}
-          />
-        </Field>
-        <Field label="Cidade *" error={errors.cidade} className="flex-1">
-          <Controller name="cidade" control={control}
-            render={({ field }) => (
-              cidades.length > 0 ? (
-                <SearchableSelect
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  options={cidades.map((c) => ({ value: c, label: c }))}
-                  placeholder="Selecione a cidade..."
-                  searchPlaceholder="Buscar cidade..."
-                  error={!!errors.cidade}
-                />
-              ) : (
-                <Input {...field} className={cn(errors.cidade && 'border-destructive')} />
-              )
-            )}
-          />
-        </Field>
-      </div>
+            ) : (
+              <Input {...field} placeholder="Cidade" className={cn(errors.cidade && 'border-destructive')} />
+            )
+          )}
+        />
+        <FieldError error={errors.cidade} />
+      </FormRow>
 
-      <div className="grid grid-cols-3 gap-4">
-        <Field label="Logradouro *" error={errors.logradouro} className="col-span-2">
-          <Controller name="logradouro" control={control}
-            render={({ field }) => (
-              <Input {...field} placeholder="Rua, Avenida..."
-                className={cn(errors.logradouro && 'border-destructive')} />
-            )}
-          />
-        </Field>
-        <Field label="Número *" error={errors.numeroLogradouro}>
-          <Controller name="numeroLogradouro" control={control}
-            render={({ field }) => (
-              <Input {...field} placeholder="123"
-                className={cn(errors.numeroLogradouro && 'border-destructive')} />
-            )}
-          />
-        </Field>
-      </div>
+      <FormRow label="Logradouro" description="Rua, avenida, alameda..." required>
+        <Controller name="logradouro" control={control}
+          render={({ field }) => (
+            <Input {...field} placeholder="Logradouro"
+              className={cn(errors.logradouro && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.logradouro} />
+      </FormRow>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Complemento" error={undefined}>
-          <Controller name="complemento" control={control}
-            render={({ field }) => <Input {...field} placeholder="Sala 201, Apto..." />}
-          />
-        </Field>
-        <Field label="Bairro *" error={errors.bairro}>
-          <Controller name="bairro" control={control}
-            render={({ field }) => (
-              <Input {...field}
-                className={cn(errors.bairro && 'border-destructive')} />
-            )}
-          />
-        </Field>
-      </div>
-    </div>
+      <FormRow label="Número" description="Número do imóvel" required>
+        <Controller name="numeroLogradouro" control={control}
+          render={({ field }) => (
+            <Input {...field} placeholder="Número"
+              className={cn(errors.numeroLogradouro && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.numeroLogradouro} />
+      </FormRow>
+
+      <FormRow label="Complemento" description="Sala, andar, bloco (opcional)">
+        <Controller name="complemento" control={control}
+          render={({ field }) => <Input {...field} placeholder="Complemento" />}
+        />
+      </FormRow>
+
+      <FormRow label="Bairro" description="Bairro do endereço" required>
+        <Controller name="bairro" control={control}
+          render={({ field }) => (
+            <Input {...field} placeholder="Bairro"
+              className={cn(errors.bairro && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.bairro} />
+      </FormRow>
+    </>
   )
 }
 
 function ContatoReadonly({ form }: { form: UseFormReturn<FormData> }) {
   const vals = form.getValues()
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <ReadonlyField label="E-mail" value={vals.email} />
-        <ReadonlyField label="Telefone" value={vals.telefone} />
-      </div>
-      <SectionLabel>Endereço</SectionLabel>
-      <ReadonlyField label="CEP" value={vals.cep} />
-      <div className="grid grid-cols-3 gap-4">
-        <ReadonlyField label="Logradouro" value={vals.logradouro} />
-        <ReadonlyField label="Número" value={vals.numeroLogradouro} />
-        <ReadonlyField label="Complemento" value={vals.complemento} />
-      </div>
-      <div className="grid grid-cols-3 gap-4">
-        <ReadonlyField label="Bairro" value={vals.bairro} />
-        <ReadonlyField label="Cidade" value={vals.cidade} />
-        <ReadonlyField label="UF" value={vals.uf} />
-      </div>
-    </div>
+    <>
+      <FormRow label="E-mail"><RoValue value={vals.email} /></FormRow>
+      <FormRow label="Telefone"><RoValue value={vals.telefone} /></FormRow>
+      <FormRow label="CEP"><RoValue value={vals.cep} mono /></FormRow>
+      <FormRow label="UF"><RoValue value={vals.uf} /></FormRow>
+      <FormRow label="Cidade"><RoValue value={vals.cidade} /></FormRow>
+      <FormRow label="Logradouro"><RoValue value={vals.logradouro} /></FormRow>
+      <FormRow label="Número"><RoValue value={vals.numeroLogradouro} /></FormRow>
+      {vals.complemento && <FormRow label="Complemento"><RoValue value={vals.complemento} /></FormRow>}
+      <FormRow label="Bairro"><RoValue value={vals.bairro} /></FormRow>
+    </>
   )
 }
 
@@ -1388,121 +1337,119 @@ function BancarioFields({ form }: { form: UseFormReturn<FormData> }) {
   const pixTipo = watch('pixTipo')
 
   return (
-    <div className="space-y-6">
-      <SectionLabel>Conta bancária</SectionLabel>
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Banco *" error={errors.banco}>
-          <Controller name="banco" control={control}
-            render={({ field }) => (
-              <SearchableSelect
-                value={field.value}
-                onValueChange={field.onChange}
-                options={BANCOS}
-                placeholder="Selecione o banco..."
-                searchPlaceholder="Buscar banco..."
-                error={!!errors.banco}
-              />
-            )}
-          />
-        </Field>
-        <Field label="Tipo de conta *" error={errors.tipoConta}>
-          <Controller name="tipoConta" control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className={cn(errors.tipoConta && 'border-destructive')}>
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="corrente">Conta Corrente</SelectItem>
-                  <SelectItem value="poupanca">Conta Poupança</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </Field>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Agência *" error={errors.agencia}>
-          <Controller name="agencia" control={control}
-            render={({ field }) => (
-              <Input {...field} placeholder="0000"
-                className={cn(errors.agencia && 'border-destructive')} />
-            )}
-          />
-        </Field>
-        <Field label="Conta *" error={errors.conta}>
-          <Controller name="conta" control={control}
-            render={({ field }) => (
-              <Input {...field} placeholder="00000-0"
-                className={cn(errors.conta && 'border-destructive')} />
-            )}
-          />
-        </Field>
-      </div>
-
-      <SectionLabel>Titular da conta</SectionLabel>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Nome do titular *" error={errors.titularNome}>
-          <Controller name="titularNome" control={control}
-            render={({ field }) => (
-              <Input {...field}
-                className={cn(errors.titularNome && 'border-destructive')} />
-            )}
-          />
-        </Field>
-        <Field label="CPF / CNPJ do titular *" error={errors.titularDocumento}>
-          <Controller name="titularDocumento" control={control}
-            render={({ field }) => (
-              <Input {...field}
-                onChange={(e) => field.onChange(maskDoc(e.target.value))}
-                placeholder="000.000.000-00"
-                className={cn(errors.titularDocumento && 'border-destructive')}
-              />
-            )}
-          />
-        </Field>
-      </div>
-
-      <SectionLabel>PIX (opcional)</SectionLabel>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Tipo de chave" error={undefined}>
-          <Controller name="pixTipo" control={control}
-            render={({ field }) => (
-              <Select value={field.value || ''} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Nenhuma" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PIX_TIPOS.map((p) => (
-                    <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </Field>
-        {pixTipo && (
-          <Field label="Chave PIX" error={errors.pixValor}>
-            <Controller name="pixValor" control={control}
-              render={({ field }) => (
-                <Input {...field}
-                  placeholder={
-                    pixTipo === 'cpf'      ? '000.000.000-00'     :
-                    pixTipo === 'cnpj'     ? '00.000.000/0001-00' :
-                    pixTipo === 'email'    ? 'email@dominio.com'  :
-                    pixTipo === 'telefone' ? '(11) 99999-9999'    :
-                    'Chave aleatória (UUID)'
-                  }
-                />
-              )}
+    <>
+      <FormRow label="Banco" description="Instituição bancária" required>
+        <Controller name="banco" control={control}
+          render={({ field }) => (
+            <SearchableSelect
+              value={field.value}
+              onValueChange={field.onChange}
+              options={BANCOS}
+              placeholder="Banco..."
+              searchPlaceholder="Buscar banco..."
+              error={!!errors.banco}
             />
-          </Field>
-        )}
-      </div>
-    </div>
+          )}
+        />
+        <FieldError error={errors.banco} />
+      </FormRow>
+
+      <FormRow label="Tipo de conta" description="Corrente ou poupança" required>
+        <Controller name="tipoConta" control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger className={cn(errors.tipoConta && 'border-destructive')}>
+                <SelectValue placeholder="Tipo de conta..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="corrente">Conta Corrente</SelectItem>
+                <SelectItem value="poupanca">Conta Poupança</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
+        <FieldError error={errors.tipoConta} />
+      </FormRow>
+
+      <FormRow label="Agência" description="Número da agência" required>
+        <Controller name="agencia" control={control}
+          render={({ field }) => (
+            <Input {...field} placeholder="Agência"
+              className={cn(errors.agencia && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.agencia} />
+      </FormRow>
+
+      <FormRow label="Conta" description="Número da conta com dígito" required>
+        <Controller name="conta" control={control}
+          render={({ field }) => (
+            <Input {...field} placeholder="Conta"
+              className={cn(errors.conta && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.conta} />
+      </FormRow>
+
+      <FormRow label="Nome do titular" description="Titular da conta bancária" required>
+        <Controller name="titularNome" control={control}
+          render={({ field }) => (
+            <Input {...field} placeholder="Nome do titular"
+              className={cn(errors.titularNome && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.titularNome} />
+      </FormRow>
+
+      <FormRow label="CPF / CNPJ do titular" description="Documento do titular" required>
+        <Controller name="titularDocumento" control={control}
+          render={({ field }) => (
+            <Input {...field}
+              onChange={(e) => field.onChange(maskDoc(e.target.value))}
+              placeholder="CPF / CNPJ"
+              className={cn(errors.titularDocumento && 'border-destructive')}
+            />
+          )}
+        />
+        <FieldError error={errors.titularDocumento} />
+      </FormRow>
+
+      <FormRow label="Tipo de chave PIX" description="Tipo da chave PIX (opcional)">
+        <Controller name="pixTipo" control={control}
+          render={({ field }) => (
+            <Select value={field.value || ''} onValueChange={field.onChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Tipo de chave..." />
+              </SelectTrigger>
+              <SelectContent>
+                {PIX_TIPOS.map((p) => (
+                  <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+      </FormRow>
+
+      {pixTipo && (
+        <FormRow label="Chave PIX" description="Valor da chave PIX">
+          <Controller name="pixValor" control={control}
+            render={({ field }) => (
+              <Input {...field}
+                placeholder={
+                  pixTipo === 'cpf'      ? '000.000.000-00'     :
+                  pixTipo === 'cnpj'     ? '00.000.000/0001-00' :
+                  pixTipo === 'email'    ? 'email@dominio.com'  :
+                  pixTipo === 'telefone' ? '(11) 99999-9999'    :
+                  'Chave aleatória (UUID)'
+                }
+              />
+            )}
+          />
+          <FieldError error={errors.pixValor} />
+        </FormRow>
+      )}
+    </>
   )
 }
 
@@ -1513,30 +1460,20 @@ function BancarioReadonly({ form }: { form: UseFormReturn<FormData> }) {
   const pixTipoLabel = PIX_TIPOS.find(p => p.value === vals.pixTipo)?.label || ''
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <ReadonlyField label="Banco" value={bancoLabel} />
-        <ReadonlyField label="Tipo de conta" value={tipoContaLabel} />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <ReadonlyField label="Agência" value={vals.agencia} />
-        <ReadonlyField label="Conta" value={vals.conta} />
-      </div>
-      <SectionLabel>Titular da conta</SectionLabel>
-      <div className="grid grid-cols-2 gap-4">
-        <ReadonlyField label="Nome do titular" value={vals.titularNome} />
-        <ReadonlyField label="CPF / CNPJ do titular" value={vals.titularDocumento} />
-      </div>
+    <>
+      <FormRow label="Banco"><RoValue value={bancoLabel} /></FormRow>
+      <FormRow label="Tipo de conta"><RoValue value={tipoContaLabel} /></FormRow>
+      <FormRow label="Agência"><RoValue value={vals.agencia} mono /></FormRow>
+      <FormRow label="Conta"><RoValue value={vals.conta} mono /></FormRow>
+      <FormRow label="Nome do titular"><RoValue value={vals.titularNome} /></FormRow>
+      <FormRow label="CPF / CNPJ do titular"><RoValue value={vals.titularDocumento} mono /></FormRow>
       {vals.pixTipo && (
         <>
-          <SectionLabel>PIX</SectionLabel>
-          <div className="grid grid-cols-2 gap-4">
-            <ReadonlyField label="Tipo de chave" value={pixTipoLabel} />
-            <ReadonlyField label="Chave PIX" value={vals.pixValor} />
-          </div>
+          <FormRow label="Tipo de chave PIX"><RoValue value={pixTipoLabel} /></FormRow>
+          <FormRow label="Chave PIX"><RoValue value={vals.pixValor} mono /></FormRow>
         </>
       )}
-    </div>
+    </>
   )
 }
 
@@ -1546,50 +1483,57 @@ function ComercialFields({ form }: { form: UseFormReturn<FormData> }) {
   const { control, formState: { errors } } = form
 
   return (
-    <div className="space-y-6">
-      <SectionLabel>Condições comerciais</SectionLabel>
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Taxa de comissão (%)" error={errors.commissionRate}>
-          <Controller name="commissionRate" control={control}
-            render={({ field }) => (
-              <Input {...field} type="number" step="0.01" min="0" max="100"
-                placeholder="25.00" />
-            )}
-          />
-        </Field>
-        <Field label="Prazo de repasse (dias)" error={errors.payoutDelayDays}>
-          <Controller name="payoutDelayDays" control={control}
-            render={({ field }) => (
-              <Input {...field} type="number" min="0"
-                placeholder="30" />
-            )}
-          />
-        </Field>
-      </div>
-      <Field label="Observações comerciais" error={errors.commercialNotes}>
+    <>
+      <FormRow label="Taxa de comissão" description="Percentual retido pela Noun por consulta">
+        <Controller name="commissionRate" control={control}
+          render={({ field }) => (
+            <Input {...field} type="number" step="0.01" min="0" max="100"
+              placeholder="Taxa (%)"
+              className={cn(errors.commissionRate && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.commissionRate} />
+      </FormRow>
+
+      <FormRow label="Prazo de repasse" description="Dias corridos após a consulta para o repasse">
+        <Controller name="payoutDelayDays" control={control}
+          render={({ field }) => (
+            <Input {...field} type="number" min="0"
+              placeholder="Prazo (dias)"
+              className={cn(errors.payoutDelayDays && 'border-destructive')} />
+          )}
+        />
+        <FieldError error={errors.payoutDelayDays} />
+      </FormRow>
+      <FormRow label="Observações" description="Condições especiais ou termos negociados">
         <Controller name="commercialNotes" control={control}
           render={({ field }) => (
             <Textarea {...field} placeholder="Condições especiais, termos negociados..."
               rows={3} />
           )}
         />
-      </Field>
-    </div>
+        <FieldError error={errors.commercialNotes} />
+      </FormRow>
+    </>
   )
 }
 
 function ComercialReadonly({ form }: { form: UseFormReturn<FormData> }) {
   const vals = form.getValues()
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <ReadonlyField label="Taxa de comissão (%)" value={vals.commissionRate || undefined} />
-        <ReadonlyField label="Prazo de repasse (dias)" value={vals.payoutDelayDays || undefined} />
-      </div>
+    <>
+      <FormRow label="Taxa de comissão">
+        <RoValue value={vals.commissionRate ? `${vals.commissionRate}%` : undefined} />
+      </FormRow>
+      <FormRow label="Prazo de repasse">
+        <RoValue value={vals.payoutDelayDays ? `${vals.payoutDelayDays} dias` : undefined} />
+      </FormRow>
       {vals.commercialNotes && (
-        <ReadonlyField label="Observações comerciais" value={vals.commercialNotes} />
+        <FormRow label="Observações">
+          <p className="text-sm">{vals.commercialNotes}</p>
+        </FormRow>
       )}
-    </div>
+    </>
   )
 }
 
@@ -1609,7 +1553,7 @@ function TermosFields({
   })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <div className="rounded-lg border p-4 space-y-2">
         <div className="flex items-start gap-3">
           <Controller name="termosAceitos" control={control}
@@ -1664,23 +1608,12 @@ function TermosFields({
         )}
       </div>
 
-      {!disabled && (
-        <div className="rounded-lg bg-muted/40 border border-dashed p-4 space-y-3">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Registro de aceite
-          </p>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Data e hora</p>
-              <p className="text-sm font-mono">{today}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Cadastrado por</p>
-              <p className="text-sm">{adminName}</p>
-            </div>
-          </div>
+      <div className="rounded-lg border border-dashed p-4 bg-muted pointer-events-none">
+        <div className="grid grid-cols-2 gap-4">
+          <RoValue label="Data e hora" value={today} mono />
+          <RoValue label="Cadastrado por" value={adminName} />
         </div>
-      )}
+      </div>
     </div>
   )
 }
@@ -1688,9 +1621,9 @@ function TermosFields({
 function TermosReadonly({ form }: { form: UseFormReturn<FormData> }) {
   const vals = form.getValues()
   return (
-    <div className="space-y-6">
-      <ReadonlyField label="Termos de Parceria Noun" value={vals.termosAceitos ? 'Sim' : 'Não'} />
-      <ReadonlyField label="Política de Privacidade e LGPD" value={vals.lgpdAceita ? 'Sim' : 'Não'} />
+    <div className="space-y-1">
+      <RoValue label="Termos de Parceria Noun" value={vals.termosAceitos ? 'Sim' : 'Não'} />
+      <RoValue label="Política de Privacidade e LGPD" value={vals.lgpdAceita ? 'Sim' : 'Não'} />
     </div>
   )
 }
@@ -1778,7 +1711,7 @@ const SECTION_FIELD_KEYS: Record<SectionKey, (keyof FormData)[]> = {
 
 // ─── Componente principal ──────────────────────────────────────────────────────
 
-export function NovoTenantForm({ adminName, initialData }: { adminName: string; initialData?: TenantEditData }) {
+export function NovoTenantForm({ adminName, initialData, noPadding = false }: { adminName: string; initialData?: TenantEditData; noPadding?: boolean }) {
   const router = useRouter()
   const isEdit = !!initialData
 
@@ -2127,62 +2060,90 @@ export function NovoTenantForm({ adminName, initialData }: { adminName: string; 
           </AlertActions>
         </Alert>
       )}
-      <div className="p-6 space-y-4">
-        <div>
-          <h1 className="text-xl font-semibold">{isEdit ? 'Editar Tenant' : 'Novo Tenant'}</h1>
-          <p className="text-sm text-muted-foreground">
-            {isEdit
-              ? 'Edite os dados do parceiro na plataforma Noun'
-              : 'Preencha os dados para cadastrar um novo parceiro na plataforma Noun'}
-          </p>
+      <div className={cn(noPadding ? 'space-y-4' : 'p-6 space-y-4')}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold">{isEdit ? 'Editar Tenant' : 'Novo Tenant'}</h1>
+            <p className="text-sm text-muted-foreground">
+              {isEdit
+                ? 'Edite os dados do parceiro na plataforma Noun'
+                : 'Preencha os dados para cadastrar um novo parceiro na plataforma Noun'}
+            </p>
+          </div>
+          {isEdit && (
+            <div className="flex items-center gap-2 shrink-0">
+              <Button type="button" variant="secondary" size="sm" onClick={() => router.push('/tenants')} disabled={loading}>
+                Cancelar
+              </Button>
+              <Button type="submit" size="sm" disabled={loading}>
+                {loading ? 'Salvando...' : 'Salvar'}
+              </Button>
+            </div>
+          )}
         </div>
 
         <Separator />
 
-        <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} noValidate className="space-y-0 pt-4">
+        <form id="tenant-edit-form" onSubmit={form.handleSubmit(onSubmit, onInvalid)} noValidate className="space-y-0 pt-4">
           {SECTIONS.map((section, idx) => {
             const editing = editingState[section.key]
+            const isTermos = section.key === 'termos'
             return (
               <React.Fragment key={section.key}>
                 {idx > 0 && <Separator className="my-8" />}
-                <div ref={sectionRefs[section.key]} className="flex gap-8 scroll-mt-6">
-                  <div className="w-64 shrink-0">
-                    <SectionHeader title={section.title} description={section.description} />
-                  </div>
-                  <div className="flex-1 max-w-xl">
-                  <Card>
-                    <CardContent className="p-4">
+                <div ref={sectionRefs[section.key]} className="scroll-mt-6 grid grid-cols-[220px_580px] gap-8 mx-auto">
+                  {isTermos ? <div /> : <SectionHeader title={section.title} description={section.description} />}
+                  {isTermos ? (
+                    <div>
                       {editing ? renderEditFields(section.key) : renderReadonlyFields(section.key)}
-                    </CardContent>
-                    {isEdit && (
-                      <CardFooter className="flex justify-end gap-2 border-t pt-4">
-                        {editing ? (
-                          <>
+                      {isEdit && (
+                        <div className="flex items-center justify-end gap-2 pt-3">
+                          {editing ? (
+                            <>
+                              <Button type="button" variant="ghost" size="sm"
+                                onClick={() => resetSection(section.key)}>
+                                Cancelar
+                              </Button>
+                              <Button type="button" size="sm"
+                                onClick={() => editingSetters[section.key](false)}>
+                                Salvar alterações
+                              </Button>
+                            </>
+                          ) : (
                             <Button type="button" variant="ghost" size="sm"
-                              onClick={() => resetSection(section.key)}>
-                              Cancelar
-                            </Button>
-                            <Button type="button" variant="default" size="sm"
-                              onClick={() => editingSetters[section.key](false)}>
-                              Salvar alterações
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Button type="button" variant="ghost" size="sm"
-                              onClick={() => resetSection(section.key)}>
-                              Cancelar
-                            </Button>
-                            <Button type="button" variant="outline" size="sm"
                               onClick={() => editingSetters[section.key](true)}>
                               Editar
                             </Button>
-                          </>
-                        )}
-                      </CardFooter>
-                    )}
-                  </Card>
-                  </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border divide-y [&>*:last-child]:border-t-0">
+                      {editing ? renderEditFields(section.key) : renderReadonlyFields(section.key)}
+                      {isEdit && (
+                        <div className="flex items-center justify-end gap-2 px-4 py-3">
+                          {editing ? (
+                            <>
+                              <Button type="button" variant="ghost" size="sm"
+                                onClick={() => resetSection(section.key)}>
+                                Cancelar
+                              </Button>
+                              <Button type="button" size="sm"
+                                onClick={() => editingSetters[section.key](false)}>
+                                Salvar alterações
+                              </Button>
+                            </>
+                          ) : (
+                            <Button type="button" variant="ghost" size="sm"
+                              onClick={() => editingSetters[section.key](true)}>
+                              Editar
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </React.Fragment>
             )
@@ -2215,7 +2176,7 @@ export function NovoTenantForm({ adminName, initialData }: { adminName: string; 
               {isEdit && (
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="secondary"
                   onClick={() => router.push('/tenants')}
                   disabled={loading}
                 >
@@ -2223,7 +2184,7 @@ export function NovoTenantForm({ adminName, initialData }: { adminName: string; 
                 </Button>
               )}
               <Button type="submit" disabled={loading || savingDraft}>
-                {loading ? 'Salvando...' : isEdit ? 'Atualizar e salvar' : 'Cadastrar Tenant'}
+                {loading ? 'Salvando...' : isEdit ? 'Salvar' : 'Cadastrar Tenant'}
               </Button>
             </div>
           </div>

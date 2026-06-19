@@ -46,16 +46,16 @@ export default function NewTenantPage() {
   const [name, setName] = useState('')
   const [legalName, setLegalName] = useState('')
   const [cnpj, setCnpj] = useState('')
-  const [type, setType] = useState<'clinic' | 'pharmacy'>('clinic')
+  const [type, setType] = useState<'specialist' | 'pharmacy'>('specialist')
   const [crmNumber, setCrmNumber] = useState('')
   const [crfNumber, setCrfNumber] = useState('')
   const [commissionRate, setCommissionRate] = useState('25')
   const [plan, setPlan] = useState('')
   const [contractSignedAt, setContractSignedAt] = useState('')
 
-  function handleTypeChange(newType: 'clinic' | 'pharmacy') {
+  function handleTypeChange(newType: 'specialist' | 'pharmacy') {
     setType(newType)
-    setCommissionRate(newType === 'clinic' ? '25' : '10.5')
+    setCommissionRate(newType === 'specialist' ? '25' : '10.5')
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -76,8 +76,8 @@ export default function NewTenantPage() {
     }
 
     const rate = parseFloat(commissionRate)
-    if (type === 'clinic' && (rate < 20 || rate > 30)) {
-      setError('Taxa de comissão para clínica deve estar entre 20% e 30%.')
+    if (type === 'specialist' && (rate < 20 || rate > 30)) {
+      setError('Taxa de comissão para especialista deve estar entre 20% e 30%.')
       return
     }
     if (type === 'pharmacy' && (rate < 8 || rate > 13)) {
@@ -98,7 +98,7 @@ export default function NewTenantPage() {
       settings: { commission_rate: rate },
     }
 
-    if (type === 'clinic' && crmNumber.trim()) payload.crm_number = crmNumber.trim()
+    if (type === 'specialist' && crmNumber.trim()) payload.crm_number = crmNumber.trim()
     if (type === 'pharmacy' && crfNumber.trim()) payload.crf_number = crfNumber.trim()
     if (plan.trim()) payload.plan = plan.trim()
     if (contractSignedAt) payload.contract_signed_at = contractSignedAt
@@ -165,19 +165,19 @@ export default function NewTenantPage() {
             {/* Tipo */}
             <div className="space-y-2">
               <Label htmlFor="type">Tipo *</Label>
-              <Select value={type} onValueChange={(v) => handleTypeChange(v as 'clinic' | 'pharmacy')}>
+              <Select value={type} onValueChange={(v) => handleTypeChange(v as 'specialist' | 'pharmacy')}>
                 <SelectTrigger id="type" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="clinic">Clínica</SelectItem>
+                  <SelectItem value="specialist">Especialista</SelectItem>
                   <SelectItem value="pharmacy">Farmácia</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* CRM ou CRF */}
-            {type === 'clinic' ? (
+            {type === 'specialist' ? (
               <div className="space-y-2">
                 <Label htmlFor="crmNumber">Número do CRM</Label>
                 <Input
@@ -203,14 +203,14 @@ export default function NewTenantPage() {
             <div className="space-y-2">
               <Label htmlFor="commissionRate">
                 Taxa de comissão (%)
-                {type === 'clinic' ? ': entre 20% e 30%' : ': entre 8% e 13%'}
+                {type === 'specialist' ? ': entre 20% e 30%' : ': entre 8% e 13%'}
               </Label>
               <Input
                 id="commissionRate"
                 type="number"
                 step="0.5"
-                min={type === 'clinic' ? 20 : 8}
-                max={type === 'clinic' ? 30 : 13}
+                min={type === 'specialist' ? 20 : 8}
+                max={type === 'specialist' ? 30 : 13}
                 value={commissionRate}
                 onChange={(e) => setCommissionRate(e.target.value)}
               />

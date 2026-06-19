@@ -120,27 +120,27 @@ const FUNNEL_DATA: Record<PeriodKey, { t: string; realizadas: number; canceladas
   ],
 }
 
-const REVENUE_TREND: Record<PeriodKey, { t: string; clinico: number; farmacia: number }[]> = {
+const REVENUE_TREND: Record<PeriodKey, { t: string; especialista: number; farmacia: number }[]> = {
   mes: [
-    { t: 'S1', clinico: 2100, farmacia: 750 }, { t: 'S2', clinico: 2250, farmacia: 820 },
-    { t: 'S3', clinico: 2180, farmacia: 780 }, { t: 'S4', clinico: 2220, farmacia: 850 },
+    { t: 'S1', especialista: 2100, farmacia: 750 }, { t: 'S2', especialista: 2250, farmacia: 820 },
+    { t: 'S3', especialista: 2180, farmacia: 780 }, { t: 'S4', especialista: 2220, farmacia: 850 },
   ],
   '3meses': [
-    { t: 'Jan', clinico: 7900, farmacia: 2800 }, { t: 'Fev', clinico: 8200, farmacia: 3000 },
-    { t: 'Mar', clinico: 8650, farmacia: 3200 },
+    { t: 'Jan', especialista: 7900, farmacia: 2800 }, { t: 'Fev', especialista: 8200, farmacia: 3000 },
+    { t: 'Mar', especialista: 8650, farmacia: 3200 },
   ],
   '6meses': [
-    { t: 'Out', clinico: 6400, farmacia: 2100 }, { t: 'Nov', clinico: 7100, farmacia: 2400 },
-    { t: 'Dez', clinico: 7600, farmacia: 2600 }, { t: 'Jan', clinico: 7900, farmacia: 2800 },
-    { t: 'Fev', clinico: 8200, farmacia: 3000 }, { t: 'Mar', clinico: 8650, farmacia: 3200 },
+    { t: 'Out', especialista: 6400, farmacia: 2100 }, { t: 'Nov', especialista: 7100, farmacia: 2400 },
+    { t: 'Dez', especialista: 7600, farmacia: 2600 }, { t: 'Jan', especialista: 7900, farmacia: 2800 },
+    { t: 'Fev', especialista: 8200, farmacia: 3000 }, { t: 'Mar', especialista: 8650, farmacia: 3200 },
   ],
   ano: [
-    { t: 'Abr', clinico: 4800, farmacia: 1200 }, { t: 'Mai', clinico: 5200, farmacia: 1400 },
-    { t: 'Jun', clinico: 5800, farmacia: 1700 }, { t: 'Jul', clinico: 6000, farmacia: 1800 },
-    { t: 'Ago', clinico: 6200, farmacia: 1900 }, { t: 'Set', clinico: 6400, farmacia: 2100 },
-    { t: 'Out', clinico: 6200, farmacia: 2000 }, { t: 'Nov', clinico: 7100, farmacia: 2400 },
-    { t: 'Dez', clinico: 7600, farmacia: 2600 }, { t: 'Jan', clinico: 7900, farmacia: 2800 },
-    { t: 'Fev', clinico: 8200, farmacia: 3000 }, { t: 'Mar', clinico: 8650, farmacia: 3200 },
+    { t: 'Abr', especialista: 4800, farmacia: 1200 }, { t: 'Mai', especialista: 5200, farmacia: 1400 },
+    { t: 'Jun', especialista: 5800, farmacia: 1700 }, { t: 'Jul', especialista: 6000, farmacia: 1800 },
+    { t: 'Ago', especialista: 6200, farmacia: 1900 }, { t: 'Set', especialista: 6400, farmacia: 2100 },
+    { t: 'Out', especialista: 6200, farmacia: 2000 }, { t: 'Nov', especialista: 7100, farmacia: 2400 },
+    { t: 'Dez', especialista: 7600, farmacia: 2600 }, { t: 'Jan', especialista: 7900, farmacia: 2800 },
+    { t: 'Fev', especialista: 8200, farmacia: 3000 }, { t: 'Mar', especialista: 8650, farmacia: 3200 },
   ],
 }
 
@@ -176,7 +176,7 @@ const TENANT_TYPES: Record<PeriodKey, { medicos: number; saude: number; farmacia
 }
 
 const chartConfigRevenue = {
-  clinico:  { label: 'Canal clínico',  color: 'var(--chart-1)' },
+  especialista:  { label: 'Canal especialista', color: 'var(--chart-1)' },
   farmacia: { label: 'Canal farmácia', color: 'var(--chart-2)' },
 } satisfies ChartConfig
 
@@ -201,7 +201,7 @@ export function DashboardBlocks({
 
   const [activeGrowth,  setActiveGrowth]  = useState<'novos' | 'ativos'>('novos')
   const [activeFunnel,  setActiveFunnel]  = useState<'realizadas' | 'canceladas'>('realizadas')
-  const [activeRevenue, setActiveRevenue] = useState<'clinico' | 'farmacia'>('clinico')
+  const [activeRevenue, setActiveRevenue] = useState<'especialista' | 'farmacia'>('especialista')
 
   const b1 = data[p1]
   const b2 = data[p2]
@@ -215,7 +215,7 @@ export function DashboardBlocks({
 
   const growthTotals  = { novos: b1.new_patients,  ativos: b1.active_patients }
   const funnelTotals  = { realizadas: b2.completed, canceladas: b2.cancelled }
-  const revenueTotals = { clinico: b5.earn_fee,    farmacia: farmaciaRevenue }
+  const revenueTotals = { especialista: b5.earn_fee,    farmacia: farmaciaRevenue }
 
   const ordersData = [
     { name: 'entregues', value: b3.orders_delivered, fill: 'var(--color-entregues)' },
@@ -299,13 +299,13 @@ export function DashboardBlocks({
       </Card>
 
       {/* ================================================================
-          BLOCO 2 — Funil clínico
+          BLOCO 2 — Funil de consultas
           Bar Chart - Interactive (tabs realizadas / canceladas)
       ================================================================ */}
       <Card className="!py-0">
         <CardHeader className="flex flex-col items-stretch space-y-0 border-b !p-0 sm:flex-row">
           <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
-            <CardTitle className="text-base">Funil clínico</CardTitle>
+            <CardTitle className="text-base">Funil de consultas</CardTitle>
             <CardDescription>
               Conversão de agendamentos em consultas realizadas
             </CardDescription>
@@ -508,7 +508,7 @@ export function DashboardBlocks({
 
       {/* ================================================================
           BLOCO 5 — Financeiro avançado
-          Line Chart - Interactive (canal clínico vs farmácia)
+          Line Chart - Interactive (canal especialista vs farmácia)
       ================================================================ */}
       <Card className="!py-0">
         <CardHeader className="flex flex-col items-stretch space-y-0 border-b !p-0 sm:flex-row">
@@ -519,7 +519,7 @@ export function DashboardBlocks({
             </CardDescription>
           </div>
           <div className="flex">
-            {(['clinico', 'farmacia'] as const).map((key) => (
+            {(['especialista', 'farmacia'] as const).map((key) => (
               <button
                 key={key}
                 data-active={activeRevenue === key}

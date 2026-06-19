@@ -594,7 +594,7 @@ export function UsersMapCard({ cities }: { cities: CityPoint[] }) {
                 if (!m) return null
                 const screenW = m.w * pxPerUnit
                 if (screenW < 24 || !inView(m.cx, m.cy)) return null
-                const text = screenW > 58 ? (STATE_NAMES[st.id] ?? st.id) : st.id
+                const text = STATE_NAMES[st.id] ?? st.id
                 return (
                   <text key={`sl-${st.id}`} x={m.cx} y={m.cy} textAnchor="middle"
                     fontSize={fontWorld(11)} fontWeight={600} fontFamily="inherit" pointerEvents="none"

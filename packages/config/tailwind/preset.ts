@@ -66,13 +66,13 @@ const preset: Omit<Config, 'content'> = {
       // Border Radius — baseado em --radius CSS variable
       // ------------------------------------------------------------------
       borderRadius: {
+        sm:   'calc(var(--radius) * 0.6)',
+        md:   'calc(var(--radius) * 0.8)',
         lg:   'var(--radius)',
-        md:   'calc(var(--radius) - 2px)',
-        sm:   'calc(var(--radius) - 4px)',
-        xl:   'calc(var(--radius) + 4px)',
-        '2xl':'calc(var(--radius) + 8px)',
-        '3xl':'calc(var(--radius) + 16px)',
-        '4xl':'calc(var(--radius) + 24px)',
+        xl:   'calc(var(--radius) * 1.4)',
+        '2xl':'calc(var(--radius) * 1.8)',
+        '3xl':'calc(var(--radius) * 2.2)',
+        '4xl':'calc(var(--radius) * 2.6)',
         // Numérico (0 a 1rem em 0.125rem)
         'r-0': '0',
         'r-1': '0.125rem',

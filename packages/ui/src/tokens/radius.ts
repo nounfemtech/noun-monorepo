@@ -1,18 +1,18 @@
 // ============================================================
-// Noun Design System — Border Radius Tokens
+// Noun Design System — Border Radius Tokens (shadcn v4 scale)
 // ============================================================
 
-/** Escala named baseada em --radius (CSS variable, default 0.375rem) */
+/** Escala multiplicativa baseada em --radius (CSS variable, default 0.5rem) */
 export const radius = {
   none: '0',
-  sm:   'calc(var(--radius) - 4px)',   // ~0.25rem
-  md:   'var(--radius)',                // 0.375rem  ← padrão
+  sm:   'calc(var(--radius) * 0.6)',
+  md:   'calc(var(--radius) * 0.8)',
   DEFAULT: 'var(--radius)',
-  lg:   'calc(var(--radius) + 2px)',   // ~0.5rem
-  xl:   'calc(var(--radius) + 4px)',   // ~0.625rem
-  '2xl':'calc(var(--radius) + 8px)',   // ~0.75rem
-  '3xl':'calc(var(--radius) + 16px)',  // ~1rem
-  '4xl':'calc(var(--radius) + 24px)',  // ~1.25rem
+  lg:   'var(--radius)',
+  xl:   'calc(var(--radius) * 1.4)',
+  '2xl':'calc(var(--radius) * 1.8)',
+  '3xl':'calc(var(--radius) * 2.2)',
+  '4xl':'calc(var(--radius) * 2.6)',
   full: '9999px',
 } as const
 

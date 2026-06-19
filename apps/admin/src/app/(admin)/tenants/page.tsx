@@ -26,11 +26,11 @@ interface TenantRow {
   id: string
   code: string
   name: string
-  legal_name: string | null
+  razao_social: string | null
   cnpj: string | null
   cpf: string | null
   type: string
-  tenant_type: string | null
+  subtype: string | null
   status: string
   created_at: string
 }
@@ -92,7 +92,7 @@ async function TenantsContent({ searchParams }: PageProps) {
 
   let query = supabase
     .from('tenants')
-    .select('id, code, name, legal_name, cnpj, cpf, type, tenant_type, status, created_at', { count: 'exact' })
+    .select('id, code, name, razao_social, cnpj, cpf, type, subtype, status, created_at', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(from, to)
 
@@ -114,7 +114,7 @@ async function TenantsContent({ searchParams }: PageProps) {
       const conditions = [
         `code.ilike.%${term}%`,
         `name.ilike.%${term}%`,
-        `legal_name.ilike.%${term}%`,
+        `razao_social.ilike.%${term}%`,
         `cnpj.ilike.%${term}%`,
       ]
       const digits = term.replace(/\D/g, '')
@@ -213,8 +213,8 @@ async function TenantsContent({ searchParams }: PageProps) {
                   <TableCell>
                     <div>
                       <p className="text-sm font-medium">{tenant.name}</p>
-                      {tenant.legal_name && (
-                        <p className="text-xs text-muted-foreground">{tenant.legal_name}</p>
+                      {tenant.razao_social && (
+                        <p className="text-xs text-muted-foreground">{tenant.razao_social}</p>
                       )}
                     </div>
                   </TableCell>
@@ -223,7 +223,7 @@ async function TenantsContent({ searchParams }: PageProps) {
                       {formatDoc(tenant.cnpj, tenant.cpf)}
                     </span>
                   </TableCell>
-                  <TableCell>{typeBadge(tenant.tenant_type)}</TableCell>
+                  <TableCell>{typeBadge(tenant.subtype)}</TableCell>
                   <TableCell>{statusBadge(tenant.status)}</TableCell>
                   <TableCell>
                     <span className="text-sm text-muted-foreground">
