@@ -271,7 +271,7 @@ export function TenantNewModal({
       cnpj: cnpj.replace(/\D/g, ''),
       type: tenantType,
       specialty: tenantType === 'pharmacy' ? null : specialty,
-      status: 'pending',
+      status: 'active',
       settings: { commission_rate: rate },
     }
 

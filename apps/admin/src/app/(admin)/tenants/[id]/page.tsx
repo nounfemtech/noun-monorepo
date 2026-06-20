@@ -48,7 +48,6 @@ const SUBTYPE_LABELS: Record<string, string> = {
 function statusBadge(status: string) {
   switch (status) {
     case 'active':    return <Badge variant="success">Ativo</Badge>
-    case 'pending':   return <Badge variant="warning">Pendente</Badge>
     case 'suspended': return <Badge variant="destructive">Suspenso</Badge>
     case 'draft':     return <Badge variant="secondary">Rascunho</Badge>
     default:          return <Badge variant="outline">{status}</Badge>

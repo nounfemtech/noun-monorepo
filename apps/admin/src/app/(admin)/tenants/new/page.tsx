@@ -94,7 +94,7 @@ export default function NewTenantPage() {
       legal_name: legalName.trim(),
       cnpj: cnpj.replace(/\D/g, ''),
       type,
-      status: 'pending_approval',
+      status: 'active',
       settings: { commission_rate: rate },
     }
 

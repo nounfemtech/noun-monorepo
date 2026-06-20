@@ -22,6 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Separator } from '@/components/ui/separator'
 import { IconClockPause, IconDotsVertical, IconLockOpen, IconPencil, IconTrash } from '@tabler/icons-react'
 
 interface TenantActionsProps {
@@ -58,13 +59,17 @@ export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProp
   const isSuspended = currentStatus === 'suspended'
 
   return (
-    <div className="space-y-4 py-6">
+    <div className="py-6 space-y-8">
+
       {/* Zona de atenção */}
-      <div className="rounded-lg border border-amber-200 dark:border-amber-900 p-6">
-        <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">
-          Zona de atenção
-        </p>
-        <div className="mt-4 border-t pt-4 space-y-4">
+      <div className="grid grid-cols-[220px_580px] gap-8 mx-auto">
+        <div className="pt-1">
+          <p className="text-sm font-medium text-amber-600 dark:text-amber-400">Zona de atenção</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Ações que afetam temporariamente o acesso do tenant à plataforma.
+          </p>
+        </div>
+        <div className="rounded-lg border border-amber-200 dark:border-amber-900 p-4 flex items-center justify-between gap-8">
           <div>
             <p className="text-sm font-medium">{isSuspended ? 'Reativar tenant' : 'Suspender tenant'}</p>
             <p className="text-sm text-muted-foreground mt-1">
@@ -76,7 +81,7 @@ export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProp
           <Button
             size="sm"
             variant="outline"
-            className={isSuspended ? '' : 'border-amber-400 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:hover:bg-amber-950'}
+            className={isSuspended ? 'shrink-0' : 'shrink-0 border-amber-400 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:hover:bg-amber-950'}
             onClick={() => setSuspendOpen(true)}
             disabled={loading}
           >
@@ -87,12 +92,17 @@ export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProp
         </div>
       </div>
 
+      <Separator />
+
       {/* Zona de perigo */}
-      <div className="rounded-lg border border-destructive/30 p-6">
-        <p className="text-xs font-semibold uppercase tracking-wide text-destructive">
-          Zona de perigo
-        </p>
-        <div className="mt-4 border-t pt-4 space-y-4">
+      <div className="grid grid-cols-[220px_580px] gap-8 mx-auto">
+        <div className="pt-1">
+          <p className="text-sm font-medium text-destructive">Zona de perigo</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Ações irreversíveis que afetam permanentemente os dados do tenant.
+          </p>
+        </div>
+        <div className="rounded-lg border border-destructive/30 p-4 flex items-center justify-between gap-8">
           <div>
             <p className="text-sm font-medium">Excluir tenant</p>
             <p className="text-sm text-muted-foreground mt-1">
@@ -101,7 +111,8 @@ export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProp
           </div>
           <Button
             size="sm"
-            variant="destructive"
+            variant="outline"
+            className="shrink-0 border-red-400 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950"
             onClick={() => setDeleteOpen(true)}
             disabled={loading}
           >
@@ -199,7 +210,7 @@ export function TenantHeaderActions({ tenantId, currentStatus }: TenantHeaderAct
     router.push('/tenants')
   }
 
-  const canSuspend    = currentStatus === 'active' || currentStatus === 'pending'
+  const canSuspend    = currentStatus === 'active'
   const canReactivate = currentStatus === 'suspended'
 
   return (

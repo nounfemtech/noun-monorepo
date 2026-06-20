@@ -5,9 +5,8 @@ import { cn } from '@/lib/utils'
 
 const options = [
   { value: '',                 label: 'Todos'     },
-  { value: 'active',           label: 'Ativos'    },
-  { value: 'pending', label: 'Pendentes' },
-  { value: 'suspended',        label: 'Suspensos' },
+  { value: 'active',    label: 'Ativos'    },
+  { value: 'suspended', label: 'Suspensos' },
   { value: 'draft',            label: 'Rascunhos' },
 ]
 

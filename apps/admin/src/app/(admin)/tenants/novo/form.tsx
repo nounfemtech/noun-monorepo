@@ -1844,8 +1844,8 @@ export function NovoTenantForm({ adminName, initialData, noPadding = false }: { 
 
       const supabase = createSupabaseBrowser()
       const targetStatus = isEdit
-        ? (initialData!.status === 'draft' ? 'pending' : initialData!.status)
-        : 'pending'
+        ? (initialData!.status === 'draft' ? 'active' : initialData!.status)
+        : 'active'
 
       const payload = {
         name:     data.name,

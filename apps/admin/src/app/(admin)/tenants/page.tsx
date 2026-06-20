@@ -65,8 +65,6 @@ function statusBadge(status: string) {
   switch (status) {
     case 'active':
       return <Badge variant="success">Ativo</Badge>
-    case 'pending':
-      return <Badge variant="warning">Pendente</Badge>
     case 'suspended':
       return <Badge variant="destructive">Suspenso</Badge>
     case 'draft':
@@ -132,14 +130,12 @@ async function TenantsContent({ searchParams }: PageProps) {
       .select('id', { count: 'exact', head: true })
       .eq('status', st)
 
-  const [ativosRes, pendentesRes, suspensosRes] = await Promise.all([
+  const [ativosRes, suspensosRes] = await Promise.all([
     statusCount('active'),
-    statusCount('pending'),
     statusCount('suspended'),
   ])
 
   const ativos = ativosRes.count ?? 0
-  const pendentes = pendentesRes.count ?? 0
   const suspensos = suspensosRes.count ?? 0
 
   const tenants = (data ?? []) as TenantRow[]
@@ -160,9 +156,8 @@ async function TenantsContent({ searchParams }: PageProps) {
       </div>
 
       {/* Cards de monitoramento */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <StatsCard title="Ativos" value={ativos} description="Operando normalmente" />
-        <StatsCard title="Pendentes" value={pendentes} description="Aguardando aprovação" />
         <StatsCard title="Suspensos" value={suspensos} description="Acesso bloqueado" />
       </div>
 
