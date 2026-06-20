@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin-auth'
 import { createSupabaseServer } from '@/lib/supabase-server'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { StatsCard } from '@/components/stats-card'
 import { TenantGestaoZones } from './tenant-actions'
@@ -45,12 +44,12 @@ const SUBTYPE_LABELS: Record<string, string> = {
   farmacia:         'Farmácia',
 }
 
-function statusBadge(status: string) {
+function statusLabel(status: string) {
   switch (status) {
-    case 'active':    return <Badge variant="success">Ativo</Badge>
-    case 'suspended': return <Badge variant="destructive">Suspenso</Badge>
-    case 'draft':     return <Badge variant="secondary">Rascunho</Badge>
-    default:          return <Badge variant="outline">{status}</Badge>
+    case 'active':    return 'Ativo'
+    case 'suspended': return 'Suspenso'
+    case 'draft':     return 'Rascunho'
+    default:          return status
   }
 }
 
@@ -311,24 +310,24 @@ export default async function TenantDetailPage({ params, searchParams }: PagePro
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <h1 className="text-xl font-semibold">{tenant.name}</h1>
-          {statusBadge(tenant.status)}
-          {tenant.subtype && (
-            <Badge variant="outline">
-              {SUBTYPE_LABELS[tenant.subtype] ?? tenant.subtype}
-            </Badge>
-          )}
-        </div>
-        <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 mb-1 text-sm text-muted-foreground">
+          <span>{tenant.code}</span>
           {tenant.razao_social && (
             <>
-              <span>{tenant.razao_social}</span>
               <span>·</span>
+              <span>{tenant.razao_social}</span>
             </>
           )}
-          <span className="font-mono text-xs">{tenant.code}</span>
+          <span>·</span>
+          <span>{statusLabel(tenant.status)}</span>
+          {tenant.subtype && (
+            <>
+              <span>·</span>
+              <span>{SUBTYPE_LABELS[tenant.subtype] ?? tenant.subtype}</span>
+            </>
+          )}
         </div>
+        <h1 className="text-xl font-semibold">{tenant.name}</h1>
       </div>
 
       {/* Tab line */}
