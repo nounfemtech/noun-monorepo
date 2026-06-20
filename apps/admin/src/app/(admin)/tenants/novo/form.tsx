@@ -2070,7 +2070,7 @@ export function NovoTenantForm({ adminName, initialData, noPadding = false }: { 
                 : 'Preencha os dados para cadastrar um novo parceiro na plataforma Noun'}
             </p>
           </div>
-          {isEdit && (
+          {isEdit && !noPadding && (
             <div className="flex items-center gap-2 shrink-0">
               <Button type="button" variant="secondary" size="sm" onClick={() => router.push('/tenants')} disabled={loading}>
                 Cancelar
@@ -2149,45 +2149,49 @@ export function NovoTenantForm({ adminName, initialData, noPadding = false }: { 
             )
           })}
 
-          <Separator className="my-8" />
+          {(!isEdit || !noPadding) && (
+            <>
+              <Separator className="my-8" />
 
-          <div className="flex items-center justify-between">
-            {!isEdit && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => router.push('/tenants')}
-                disabled={loading || savingDraft}
-              >
-                Cancelar
-              </Button>
-            )}
-            <div className={isEdit ? 'flex items-center gap-2 ml-auto' : 'flex items-center gap-2'}>
-              {!isEdit && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={saveDraft}
-                  disabled={loading || savingDraft}
-                >
-                  {savingDraft ? 'Salvando...' : 'Salvar rascunho'}
-                </Button>
-              )}
-              {isEdit && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => router.push('/tenants')}
-                  disabled={loading}
-                >
-                  Cancelar
-                </Button>
-              )}
-              <Button type="submit" disabled={loading || savingDraft}>
-                {loading ? 'Salvando...' : isEdit ? 'Salvar' : 'Cadastrar Tenant'}
-              </Button>
-            </div>
-          </div>
+              <div className="flex items-center justify-between">
+                {!isEdit && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => router.push('/tenants')}
+                    disabled={loading || savingDraft}
+                  >
+                    Cancelar
+                  </Button>
+                )}
+                <div className={isEdit ? 'flex items-center gap-2 ml-auto' : 'flex items-center gap-2'}>
+                  {!isEdit && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={saveDraft}
+                      disabled={loading || savingDraft}
+                    >
+                      {savingDraft ? 'Salvando...' : 'Salvar rascunho'}
+                    </Button>
+                  )}
+                  {isEdit && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => router.push('/tenants')}
+                      disabled={loading}
+                    >
+                      Cancelar
+                    </Button>
+                  )}
+                  <Button type="submit" disabled={loading || savingDraft}>
+                    {loading ? 'Salvando...' : isEdit ? 'Salvar' : 'Cadastrar Tenant'}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </form>
       </div>
     </>

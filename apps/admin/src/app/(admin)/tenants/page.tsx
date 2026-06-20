@@ -45,15 +45,8 @@ function formatDoc(cnpj: string | null, cpf: string | null): string {
 }
 
 const TENANT_TYPE_LABELS: Record<string, string> = {
-  farmacia:         'Farmácia',
-  clinico_geral:    'Clínico Geral',
-  endocrinologista: 'Endocrinologista',
-  ginecologista:    'Ginecologista',
-  urologista:       'Urologista',
-  psiquiatra:       'Psiquiatra',
-  nutrologo:        'Nutrólogo',
-  psicologo:        'Psicólogo',
-  nutricionista:    'Nutricionista',
+  specialist: 'Especialista',
+  pharmacy:   'Farmácia',
 }
 
 function typeBadge(tenantType: string | null) {
@@ -218,7 +211,7 @@ async function TenantsContent({ searchParams }: PageProps) {
                       {formatDoc(tenant.cnpj, tenant.cpf)}
                     </span>
                   </TableCell>
-                  <TableCell>{typeBadge(tenant.subtype)}</TableCell>
+                  <TableCell>{typeBadge(tenant.type)}</TableCell>
                   <TableCell>{statusBadge(tenant.status)}</TableCell>
                   <TableCell>
                     <span className="text-sm text-muted-foreground">
