@@ -130,14 +130,15 @@ packages/
 - Fullscreen nativo do card via Fullscreen API (`.map-fullscreen-card:fullscreen` em `globals.css`).
 
 ### Tenants (`/tenants`)
-- Cards de monitoramento no topo: Ativos, Pendentes, Suspensos (contagens `head: true` da base inteira).
+- Cards de monitoramento no topo: Ativos, Suspensos (contagens `head: true` da base inteira). Status `pending` removido — tenants nascem como `active`.
 - Tabela em card único com a anatomia: header (título + descrição), action section (filtros) e tabela full-bleed, separados por dividers `border-b`. Sem container interno com borda.
 - Action section: button group de status (`status-filter.tsx`, segmentado, navegação instantânea via URL) à esquerda e input de busca com debounce 400ms (`search-input.tsx`) à direita.
 - Busca server-side por ID (`code`), nome, razão social e CNPJ (via `.or` + `ilike`); data `dd/mm/aaaa` filtra o dia de `created_at`.
-- Coluna ID exibe `tenants.code` (`NT-0001`) em fonte mono.
+- Coluna ID exibe `tenants.code` (`NT-0001`) em fonte mono. Coluna Tipo exibe `tenant.type` (não `subtype`).
 - Não há filtro/tabs por tipo: o tipo aparece apenas como badge na tabela.
 - Detalhe do tenant: dados cadastrais, métricas financeiras (GMV, receita Noun, nº consultas, ticket médio), lista de profissionais.
 - Ações: alterar status, editar taxa de comissão.
+- **Ícones de pagamento** (card "Últimas transações" na aba Métricas): SVGs oficiais inline para Visa, Mastercard, Elo, Google Pay, PayPal e Pix. Tamanho: `width="51" height="36"` com `viewBox="0 0 34 24"` (escala 1.5×). IDs do Pix: `pix-pattern` e `pix-image` para evitar conflito com outros SVGs na página. Fallback para método desconhecido: `IconCreditCard` em container `w-[51px] h-9 rounded border border-border bg-muted`.
 
 ### Usuários (removido)
 - A página `/usuarios` foi apagada por privacidade: dados precisos de usuário são sensíveis e o admin só exibe dados macro (decisão de 11/06/2026). Comportamento individual será tratado no app mobile.

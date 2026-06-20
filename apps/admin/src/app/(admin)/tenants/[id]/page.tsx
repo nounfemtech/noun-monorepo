@@ -55,14 +55,14 @@ function statusLabel(status: string) {
 
 function PaymentIcon({ method, brand }: { method: string | null; brand: string | null }) {
   if (brand === 'visa') return (
-    <svg width="34" height="24" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+    <svg width="51" height="36" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" fill="white"/>
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" stroke="#F5F5F5"/>
       <path fillRule="evenodd" clipRule="evenodd" d="M10.7501 15.8582H8.69031L7.14576 9.79235C7.07245 9.51332 6.91679 9.26664 6.68782 9.15038C6.11639 8.85821 5.48672 8.62568 4.7998 8.50841V8.27487H8.11789C8.57583 8.27487 8.91929 8.62568 8.97653 9.0331L9.77793 13.4086L11.8367 8.27487H13.8392L10.7501 15.8582ZM14.984 15.8582H13.0388L14.6406 8.27487H16.5858L14.984 15.8582ZM19.1025 10.3757C19.1597 9.96725 19.5032 9.73372 19.9039 9.73372C20.5336 9.67508 21.2195 9.79235 21.7919 10.0835L22.1354 8.45079C21.5629 8.21725 20.9333 8.09998 20.3619 8.09998C18.4738 8.09998 17.1 9.15038 17.1 10.6082C17.1 11.7173 18.0731 12.2996 18.7601 12.6504C19.5032 13.0002 19.7894 13.2337 19.7322 13.5835C19.7322 14.1082 19.1597 14.3418 18.5883 14.3418C17.9014 14.3418 17.2145 14.1669 16.5858 13.8747L16.2424 15.5084C16.9293 15.7996 17.6724 15.9169 18.3594 15.9169C20.4763 15.9745 21.7919 14.9251 21.7919 13.35C21.7919 11.3664 19.1025 11.2502 19.1025 10.3757V10.3757ZM28.5998 15.8582L27.0553 8.27487H25.3962C25.0528 8.27487 24.7093 8.50841 24.5948 8.85821L21.7347 15.8582H23.7372L24.1369 14.7502H26.5973L26.8263 15.8582H28.5998ZM25.6824 10.3171L26.2539 13.1751H24.6521L25.6824 10.3171Z" fill="#172B85"/>
     </svg>
   )
   if (brand === 'mastercard') return (
-    <svg width="34" height="24" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+    <svg width="51" height="36" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" fill="white"/>
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" stroke="#F5F5F5"/>
       <path d="M21.5771 5.02997C25.322 5.02997 28.3584 8.02986 28.3584 11.7302C28.3583 15.4304 25.322 18.4304 21.5771 18.4304C19.8982 18.4303 18.3629 17.8256 17.1787 16.8268C15.9945 17.8254 14.4591 18.4304 12.7803 18.4304C9.03566 18.4301 6.00011 15.4302 6 11.7302C6 8.02999 9.03559 5.03019 12.7803 5.02997C14.459 5.02997 15.9945 5.63405 17.1787 6.63251C18.3629 5.63391 19.8983 5.03 21.5771 5.02997Z" fill="#ED0006"/>
@@ -71,7 +71,7 @@ function PaymentIcon({ method, brand }: { method: string | null; brand: string |
     </svg>
   )
   if (brand === 'elo') return (
-    <svg width="34" height="24" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+    <svg width="51" height="36" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" fill="white"/>
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" stroke="#F5F5F5"/>
       <path d="M7.82406 9.49573C8.11175 9.40141 8.41952 9.35019 8.73975 9.35019C10.1373 9.35019 11.3031 10.3241 11.5705 11.6178L13.5509 11.2216C13.0965 9.0229 11.1154 7.3678 8.73975 7.3678C8.19585 7.3678 7.67231 7.45472 7.18359 7.61484L7.82406 9.49573Z" fill="#FECA2F"/>
@@ -81,7 +81,7 @@ function PaymentIcon({ method, brand }: { method: string | null; brand: string |
     </svg>
   )
   if (brand === 'google_pay' || method === 'google_pay') return (
-    <svg width="34" height="24" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+    <svg width="51" height="36" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" fill="white"/>
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" stroke="#F5F5F5"/>
       <path d="M26.7119 14.1301H26.7295L28.1465 10.5715H29.1436L26.0801 17.7062H25.1348L26.2734 15.2101L24.2637 10.5715H25.2598L26.7119 14.1301ZM21.918 10.4094C22.5953 10.4094 23.1306 10.5944 23.5234 10.9582C23.9163 11.3221 24.1093 11.8307 24.1094 12.4719V15.5275H23.2334V14.841H23.1934C22.8119 15.4069 22.3106 15.6895 21.6787 15.6896C21.1435 15.6896 20.6878 15.5278 20.3291 15.2043C19.9761 14.9039 19.7767 14.4593 19.7881 13.9914C19.7881 13.4772 19.9818 13.0729 20.3633 12.7668C20.7447 12.4607 21.2569 12.3108 21.8945 12.3107C22.441 12.3107 22.8853 12.4142 23.2383 12.6105V12.3967C23.2382 12.0791 23.1023 11.7784 22.8633 11.5705C22.6185 11.351 22.3049 11.2297 21.9805 11.2297C21.468 11.2297 21.0637 11.4498 20.7676 11.8888L19.959 11.3742C20.3917 10.7331 21.0469 10.4094 21.918 10.4094ZM17.5732 8.28338C18.1596 8.2719 18.7289 8.49746 19.1445 8.91326C19.9759 9.69891 20.0272 11.0221 19.2471 11.8713L19.1445 11.9748C18.7175 12.3849 18.1938 12.5929 17.5732 12.5929H16.0586V15.5275H15.1416V8.28338H17.5732ZM22.0371 13.0617C21.6671 13.0618 21.354 13.1542 21.1035 13.3332C20.8587 13.5122 20.7334 13.7375 20.7334 14.009C20.7335 14.2515 20.8473 14.4768 21.0352 14.6154C21.2402 14.7771 21.4908 14.8634 21.7471 14.8576C22.1341 14.8576 22.504 14.702 22.7773 14.425C23.0791 14.1362 23.2333 13.7952 23.2334 13.4025C22.9486 13.1714 22.5497 13.0559 22.0371 13.0617ZM16.0586 11.7033H17.5957C17.9374 11.7149 18.2685 11.5767 18.502 11.3283C18.9802 10.8257 18.9681 10.0166 18.4727 9.53142C18.2392 9.30054 17.9259 9.17302 17.5957 9.17302H16.0586V11.7033Z" fill="#3C4043"/>
@@ -92,7 +92,7 @@ function PaymentIcon({ method, brand }: { method: string | null; brand: string |
     </svg>
   )
   if (brand === 'paypal' || method === 'paypal') return (
-    <svg width="34" height="24" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+    <svg width="51" height="36" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" fill="white"/>
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" stroke="#F5F5F5"/>
       <path fillRule="evenodd" clipRule="evenodd" d="M14.614 18.4482L14.8347 16.9991L14.3431 16.9873H11.9951L13.6268 6.29364C13.6319 6.26126 13.6484 6.2312 13.6724 6.20981C13.6965 6.18843 13.7272 6.1767 13.7594 6.1767H17.7184C19.0328 6.1767 19.9398 6.45933 20.4133 7.01727C20.6353 7.27902 20.7767 7.55261 20.8452 7.85357C20.9169 8.16945 20.9181 8.54679 20.8481 9.00709L20.843 9.04057V9.33555L21.0651 9.46557C21.252 9.56809 21.4006 9.6854 21.5145 9.81969C21.7044 10.0435 21.8272 10.328 21.8791 10.6652C21.9328 11.0119 21.9151 11.4247 21.8272 11.892C21.7259 12.4294 21.5622 12.8975 21.341 13.2805C21.1376 13.6334 20.8785 13.9262 20.5708 14.153C20.277 14.3685 19.928 14.5321 19.5333 14.6368C19.1509 14.7397 18.7149 14.7917 18.2367 14.7917H17.9286C17.7083 14.7917 17.4943 14.8737 17.3263 15.0207C17.1579 15.1707 17.0465 15.3758 17.0123 15.6L16.989 15.7305L16.599 18.2847L16.5814 18.3784C16.5767 18.4081 16.5686 18.4229 16.5568 18.4329C16.5463 18.4421 16.5311 18.4482 16.5164 18.4482H14.614" fill="#28356A"/>
@@ -102,7 +102,7 @@ function PaymentIcon({ method, brand }: { method: string | null; brand: string |
     </svg>
   )
   if (method === 'pix') return (
-    <svg width="34" height="24" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+    <svg width="51" height="36" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" fill="white"/>
       <rect x="0.5" y="0.5" width="33" height="23" rx="3.5" stroke="#F5F5F5"/>
       <rect x="4" y="7" width="27" height="10" fill="url(#pix-pattern)"/>
@@ -110,12 +110,12 @@ function PaymentIcon({ method, brand }: { method: string | null; brand: string |
         <pattern id="pix-pattern" patternContentUnits="objectBoundingBox" width="1" height="1">
           <use href="#pix-image" transform="matrix(0.00335648 0 0 0.00916666 -0.037037 -1)"/>
         </pattern>
-        <image id="pix-image" width="320" height="320" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4AeydC3wU1dn/z5ndXCAJSr1XW1vftur7KqCtbT/1b4sJeHm1lgQjKoqEhIBQrNZqa7WieClapdpqxZAglKqNEES8QgC19bXVIgH9+La1vlprra0XREDIZeb8f88kGzYhCXuZ3czM/pJ59sycmTnneb7nzG/PzOzOWop/JEACJJCjBCiAOdrwDJsESEApCiB7AQmQQM4SyGkBzNlWZ+AkQAIuAQqgi4EvJEACuUiAApiLrc6YSYAEXAIUQBdDDr4wZBIgAd4EYR8gARLIXQIcAeZu2zNyEsh5AhTAnO8CuQiAMZNAJwEKYCcHvpIACeQgAQpgDjY6QyYBEugkQAHs5MBXEsgVAowzjgAFMA4GZ0mABHKLAAUwt9qb0ZIACfQmQAHsTYTLJEACOUMgpwQwZ1qVgZIACSREgAKYECZuRAIkEEYCFMAwtipjIgESSIgABTAhTCHYiCGQAAnsRoACuBsSZpAACeQKAQpgrrQ04yQBEtiNAAVwNyTMCB8BRkQCfROgAPbNhbkkQAI5QIACmAONzBBJgAT6JkAB7JsLc0kgLAQYxwAEKIADwOEqEiCBcBOgAIa7fRkdCZDAAAQogAPA4SoSIIFgE9iT9xTAPRHiehIggdASoACGtmkZGAmQwJ4IUAD3RIjrSYAEQksg1AIY2lZjYCRAAp4QoAB6gpGFkAAJBJEABTCIrUafSYAEPCFAAfQEow8LoUskQAJ7JEAB3CMibkACJBBWAhTAsLYs4yIBEtgjAQrgHhFxg+ARoMckkBgBCmBinLgVCZBACAlQAEPYqAyJBEggMQIUwMQ4cSsSCAoB+pkEAQpgErC4KQmQQLgIUADD1Z6MhgRIIAkCFMAkYHFTEiABfxNI1jsKYLLEuD0JkEBgCVAAQ9OUDIQESCBZAhTAZIlxexIggdAQCJUAhqZVGAgJkEBWCFAAs4KZlZAACfiRAAXQj61Cn0iABLJCgAKYFcxZqIRVkAAJJE2AApiUrh3YgARIIAsEKIBZgMwqSIAEgkiAAhhEq9FnEiABTwhQAD3B6INC6BIJkMAeCVAA94iIG5AACYSVAAUwrC3LuEiABPZIgAK4R0TcIHgE6DEJJEaAApgYJ25FAiQQQgIUwBA2KkMiARJIjAAFMDFO3IoEgkKAfSYBCmASsLgpCZBAuAhQAMPVnoyGBEggCQIUwCRgcVMSIAF/E0jWOwpgssS4PQmQQGAJUABD05QMhARIIFkCFMBkiXF7EiCB0BColAKYGDVuRAIk4AsCFEBfNAOdIAEQwJEe+QABYuBfzFzfKgAAAABJRU5ErkJggg=="/>
+        <image id="pix-image" width="320" height="320" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4AeydC3wU1dn/z5ndXCAJSr3XW1vftur7KqCtbT/1b4sJeHm1lgQjKoqEhIBQrNZqa7WieClapdpqxZAglKqNEES8QgC19bXVIgH9+La1vlprra0XREDIZeb8f88kGzYhCXuZ3czM/pJ59sycmTnneb7nzG/PzOzOWop/JEACJJCjBCiAOdrwDJsESEApCiB7AQmQQM4SyGkBzNlWZ+AkQAIuAQqgi4EvJEACuUiAApiLrc6YSYAEXAIUQBdDDr4wZBIgAd4EYR8gARLIXQIcAeZu2zNyEsh5AhTAnO8CuQiAMZNAJwEKYCcHvpIACeQgAQpgDjY6QyYBEugkQAHs5MBXEsgVAowzjgAFMA4GZ0mABHKLAAUwt9qb0ZIACfQmQAHsTYTLJEACOUMgpwQwZ1qVgZIACSREgAKYECZuRAIkEEYCFMAwtipjIgESSIgABTAhTCHYiCGQAAnsRoACuBsSZpAACeQKAQpgrrQ04yQBEtiNAAVwNyTMCB8BRkQCfROgAPbNhbkkQAI5QIACmAONzBBJgAT6JkAB7JsLc0kgLAQYxwAEKIADwOEqEiCBcBOgAIa7fRkdCZDAAAQogAPA4SoSIIFgE9iT9xTAPRHiehIggdASoACGtmkZGAmQwJ4IUAD3RIjrSYAEQksg1AIY2lZjYCRAAp4QoAB6gpGFkAAJBJEABTCIrUafSYAEPCFAAfQEow8LoUskQAJ7JEAB3CMibkACJBBWAhTAsLYs4yIBEtgjAQrgHhFxg+ARoMckkBgBCmBinLgVCZBACAlQAEPYqAyJBEggMQIUwMQ4cSsSCAoB+pkEAQpgErC4KQmQQLgIUADD1Z6MhgRIIAkCFMAkYHFTEiABfxNI1jsKYLLEuD0JkEBgCVAAQ9OUDIQESCBZAhTAZIlxexIggdAQCJUAhqZVGAgJkEBWCFAAs4KZlZAACfiRAAXQj61Cn0iABLJCgAKYFcxZqIRVkAAJJE2AApiUrh3YgARIIAsEKIBZgMwqSIAEgkiAAhhEq9FnEiABTwhQAD3B6INC6BIJkMAeCVAA94iIG5AACYSVAAUwrC3LuEiABPZIgAK4R0TcIHgE6DEJJEaAApgYJ25FAiQQQgIUwBA2KkMiARJIjAAFMDFO3IoEgkKAfSYBCmASsLgpCZBAuAhQAMPVnoyGBEggCQIUwCRgcVMSIAF/E0jWOwpgssS4PQmQQGAJUABD05QMhARIIFkCFMBkiXF7EiCB0BColAKYGDVuRAIk4AsCFEBfNAOdIAEQwJEe+QABYuBfzFzfKgAAAABJRU5ErkJggg=="/>
       </defs>
     </svg>
   )
   return (
-    <div className="w-[34px] h-6 rounded border border-border bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+    <div className="w-[51px] h-9 rounded border border-border bg-muted flex items-center justify-center shrink-0 overflow-hidden">
       <IconCreditCard className="size-3.5 text-muted-foreground" />
     </div>
   )
