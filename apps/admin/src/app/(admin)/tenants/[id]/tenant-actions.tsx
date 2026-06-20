@@ -13,13 +13,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from '@/components/ui/dialog'
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { IconClockPause, IconDotsVertical, IconLockOpen, IconPencil, IconTrash } from '@tabler/icons-react'
 
 interface TenantActionsProps {
@@ -32,6 +34,7 @@ interface TenantActionsProps {
 export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [suspendOpen, setSuspendOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   async function updateStatus(status: string) {
@@ -39,6 +42,7 @@ export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProp
     const supabase = createSupabaseBrowser()
     await supabase.from('tenants').update({ status }).eq('id', tenantId)
     setLoading(false)
+    setSuspendOpen(false)
     router.refresh()
   }
 
@@ -60,8 +64,8 @@ export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProp
         <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">
           Zona de atenção
         </p>
-        <div className="mt-4 flex items-start justify-between gap-8 border-t pt-4">
-          <div className="min-w-0">
+        <div className="mt-4 border-t pt-4 space-y-4">
+          <div>
             <p className="text-sm font-medium">{isSuspended ? 'Reativar tenant' : 'Suspender tenant'}</p>
             <p className="text-sm text-muted-foreground mt-1">
               {isSuspended
@@ -73,7 +77,7 @@ export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProp
             size="sm"
             variant="outline"
             className={isSuspended ? '' : 'border-amber-400 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:hover:bg-amber-950'}
-            onClick={() => updateStatus(isSuspended ? 'active' : 'suspended')}
+            onClick={() => setSuspendOpen(true)}
             disabled={loading}
           >
             {isSuspended
@@ -88,8 +92,8 @@ export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProp
         <p className="text-xs font-semibold uppercase tracking-wide text-destructive">
           Zona de perigo
         </p>
-        <div className="mt-4 flex items-start justify-between gap-8 border-t pt-4">
-          <div className="min-w-0">
+        <div className="mt-4 border-t pt-4 space-y-4">
+          <div>
             <p className="text-sm font-medium">Excluir tenant</p>
             <p className="text-sm text-muted-foreground mt-1">
               Exclui permanentemente o tenant e todos os dados associados, incluindo profissionais, pacientes e consultas. Esta ação não pode ser desfeita.
@@ -107,22 +111,57 @@ export function TenantGestaoZones({ tenantId, currentStatus }: TenantActionsProp
         </div>
       </div>
 
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Excluir tenant</DialogTitle>
-            <DialogDescription>
-              Esta ação é irreversível e removerá todos os dados associados.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={deleteTenant} disabled={loading}>
+      {/* AlertDialog: Suspender / Reativar */}
+      <AlertDialog open={suspendOpen} onOpenChange={setSuspendOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isSuspended ? 'Reativar tenant' : 'Suspender tenant'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {isSuspended
+                ? 'O tenant voltará a ter acesso à plataforma. Profissionais e pacientes poderão utilizar os serviços normalmente.'
+                : 'O tenant será suspenso e perderá o acesso à plataforma temporariamente. Profissionais e pacientes não conseguirão acessar os serviços.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel size="sm">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              size="sm"
+              variant={isSuspended ? 'default' : 'destructive'}
+              onClick={() => updateStatus(isSuspended ? 'active' : 'suspended')}
+              disabled={loading}
+            >
+              {loading
+                ? (isSuspended ? 'Reativando...' : 'Suspendendo...')
+                : (isSuspended ? 'Reativar' : 'Suspender')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* AlertDialog: Excluir */}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir tenant</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível e removerá todos os dados associados, incluindo profissionais, pacientes e consultas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel size="sm">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              size="sm"
+              variant="destructive"
+              onClick={deleteTenant}
+              disabled={loading}
+            >
               {loading ? 'Excluindo...' : 'Excluir'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
@@ -137,13 +176,17 @@ interface TenantHeaderActionsProps {
 export function TenantHeaderActions({ tenantId, currentStatus }: TenantHeaderActionsProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [suspendOpen, setSuspendOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+
+  const isSuspended = currentStatus === 'suspended'
 
   async function updateStatus(status: string) {
     setLoading(true)
     const supabase = createSupabaseBrowser()
     await supabase.from('tenants').update({ status }).eq('id', tenantId)
     setLoading(false)
+    setSuspendOpen(false)
     router.refresh()
   }
 
@@ -178,7 +221,7 @@ export function TenantHeaderActions({ tenantId, currentStatus }: TenantHeaderAct
           {canSuspend && (
             <DropdownMenuItem
               className="flex items-center gap-2"
-              onClick={() => updateStatus('suspended')}
+              onClick={() => setSuspendOpen(true)}
               disabled={loading}
             >
               <IconClockPause className="h-4 w-4" />
@@ -189,7 +232,7 @@ export function TenantHeaderActions({ tenantId, currentStatus }: TenantHeaderAct
           {canReactivate && (
             <DropdownMenuItem
               className="flex items-center gap-2"
-              onClick={() => updateStatus('active')}
+              onClick={() => setSuspendOpen(true)}
               disabled={loading}
             >
               <IconLockOpen className="h-4 w-4" />
@@ -210,24 +253,57 @@ export function TenantHeaderActions({ tenantId, currentStatus }: TenantHeaderAct
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Excluir tenant</DialogTitle>
-            <DialogDescription>
-              Esta ação é irreversível e removerá todos os dados associados.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={deleteTenant} disabled={loading}>
+      {/* AlertDialog: Suspender / Reativar */}
+      <AlertDialog open={suspendOpen} onOpenChange={setSuspendOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isSuspended ? 'Reativar tenant' : 'Suspender tenant'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {isSuspended
+                ? 'O tenant voltará a ter acesso à plataforma. Profissionais e pacientes poderão utilizar os serviços normalmente.'
+                : 'O tenant será suspenso e perderá o acesso à plataforma temporariamente. Profissionais e pacientes não conseguirão acessar os serviços.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel size="sm">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              size="sm"
+              variant={isSuspended ? 'default' : 'destructive'}
+              onClick={() => updateStatus(isSuspended ? 'active' : 'suspended')}
+              disabled={loading}
+            >
+              {loading
+                ? (isSuspended ? 'Reativando...' : 'Suspendendo...')
+                : (isSuspended ? 'Reativar' : 'Suspender')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* AlertDialog: Excluir */}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir tenant</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível e removerá todos os dados associados, incluindo profissionais, pacientes e consultas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel size="sm">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              size="sm"
+              variant="destructive"
+              onClick={deleteTenant}
+              disabled={loading}
+            >
               {loading ? 'Excluindo...' : 'Excluir'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

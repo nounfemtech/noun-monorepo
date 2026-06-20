@@ -74,30 +74,6 @@ const FUNNEL_DATA: Record<PeriodKey, { t: string; realizadas: number; canceladas
   ],
 }
 
-const REVENUE_TREND: Record<PeriodKey, { t: string; gmv: number; receita: number }[]> = {
-  mes: [
-    { t: 'S1', gmv: 3200, receita: 320 }, { t: 'S2', gmv: 3600, receita: 360 },
-    { t: 'S3', gmv: 3400, receita: 340 }, { t: 'S4', gmv: 3800, receita: 380 },
-  ],
-  '3meses': [
-    { t: 'Jan', gmv: 11200, receita: 1120 }, { t: 'Fev', gmv: 12400, receita: 1240 },
-    { t: 'Mar', gmv: 13600, receita: 1360 },
-  ],
-  '6meses': [
-    { t: 'Out', gmv: 8800, receita: 880 }, { t: 'Nov', gmv: 9600, receita: 960 },
-    { t: 'Dez', gmv: 10800, receita: 1080 }, { t: 'Jan', gmv: 11200, receita: 1120 },
-    { t: 'Fev', gmv: 12400, receita: 1240 }, { t: 'Mar', gmv: 13600, receita: 1360 },
-  ],
-  ano: [
-    { t: 'Abr', gmv: 5600, receita: 560 }, { t: 'Mai', gmv: 6400, receita: 640 },
-    { t: 'Jun', gmv: 7200, receita: 720 }, { t: 'Jul', gmv: 7800, receita: 780 },
-    { t: 'Ago', gmv: 8400, receita: 840 }, { t: 'Set', gmv: 8800, receita: 880 },
-    { t: 'Out', gmv: 8400, receita: 840 }, { t: 'Nov', gmv: 9600, receita: 960 },
-    { t: 'Dez', gmv: 10800, receita: 1080 }, { t: 'Jan', gmv: 11200, receita: 1120 },
-    { t: 'Fev', gmv: 12400, receita: 1240 }, { t: 'Mar', gmv: 13600, receita: 1360 },
-  ],
-}
-
 const chartConfigGrowth = {
   novos:  { label: 'Novos pacientes',  color: 'var(--chart-1)' },
   ativos: { label: 'Pacientes ativos', color: 'var(--chart-2)' },
@@ -113,11 +89,6 @@ const chartConfigOrders = {
   pendentes: { label: 'Pendentes', color: 'var(--chart-2)' },
 } satisfies ChartConfig
 
-const chartConfigRevenue = {
-  gmv:     { label: 'GMV',          color: 'var(--chart-1)' },
-  receita: { label: 'Receita Noun', color: 'var(--chart-5)' },
-} satisfies ChartConfig
-
 export function TenantMetricasBlocks({
   data,
   tenantType,
@@ -128,24 +99,19 @@ export function TenantMetricasBlocks({
   const [p1, setP1] = useState<PeriodKey>('mes')
   const [p2, setP2] = useState<PeriodKey>('mes')
   const [p3, setP3] = useState<PeriodKey>('mes')
-  const [p5, setP5] = useState<PeriodKey>('mes')
 
   const [activeGrowth,  setActiveGrowth]  = useState<'novos' | 'ativos'>('novos')
   const [activeFunnel,  setActiveFunnel]  = useState<'realizadas' | 'canceladas'>('realizadas')
-  const [activeRevenue, setActiveRevenue] = useState<'gmv' | 'receita'>('gmv')
 
   const b1 = data[p1]
   const b2 = data[p2]
   const b3 = data[p3]
-  const b5 = data[p5]
 
   const conversionRate = b2.scheduled > 0 ? Math.round((b2.completed / b2.scheduled) * 1000) / 10 : 0
-  const takeRate       = b5.earn_gmv  > 0 ? Math.round((b5.earn_fee  / b5.earn_gmv)  * 1000) / 10 : 0
   const pending        = Math.max(0, b3.orders_total - b3.orders_delivered)
 
   const growthTotals  = { novos: b1.new_patients,  ativos: b1.active_patients }
   const funnelTotals  = { realizadas: b2.completed, canceladas: b2.cancelled }
-  const revenueTotals = { gmv: b5.earn_gmv, receita: b5.earn_fee }
 
   const ordersData = [
     { name: 'entregues', value: b3.orders_delivered, fill: 'var(--color-entregues)' },
@@ -315,66 +281,6 @@ export function TenantMetricasBlocks({
         </Card>
       )}
 
-      {/* ── Financeiro avançado ─────────────────────────────────────────────────── */}
-      <Card className="!py-0">
-        <CardHeader className="flex flex-col items-stretch space-y-0 border-b !p-0 sm:flex-row">
-          <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
-            <CardTitle className="text-base">Financeiro avançado</CardTitle>
-            <CardDescription>Take rate e receita Noun ao longo do período selecionado</CardDescription>
-          </div>
-          <div className="flex">
-            {(['gmv', 'receita'] as const).map((key) => (
-              <button
-                key={key}
-                data-active={activeRevenue === key}
-                className="relative flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-4"
-                onClick={() => setActiveRevenue(key)}
-              >
-                <span className="text-xs text-muted-foreground">
-                  {chartConfigRevenue[key].label}
-                </span>
-                <span className="text-lg leading-none font-bold sm:text-3xl">
-                  {brl.format(revenueTotals[key])}
-                </span>
-              </button>
-            ))}
-          </div>
-        </CardHeader>
-        <CardContent className="px-2 sm:p-6">
-          <div className="flex justify-end mb-4">
-            <PeriodoFilter value={p5} onChange={(v) => setP5(v as PeriodKey)} />
-          </div>
-          <ChartContainer config={chartConfigRevenue} className="aspect-auto h-[250px] w-full [&_.recharts-surface]:overflow-visible">
-            <AreaChart data={REVENUE_TREND[p5]} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="fillTenantRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor={`var(--color-${activeRevenue})`} stopOpacity={0.4} />
-                  <stop offset="95%" stopColor={`var(--color-${activeRevenue})`} stopOpacity={0.05} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid vertical={false} />
-              <XAxis dataKey="t" tickLine={false} axisLine={false} tickMargin={8} interval="preserveStartEnd" />
-              <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
-              <Area
-                type="monotone"
-                dataKey={activeRevenue}
-                stroke={`var(--color-${activeRevenue})`}
-                fill="url(#fillTenantRevenue)"
-                strokeWidth={2}
-                dot={false}
-              />
-            </AreaChart>
-          </ChartContainer>
-        </CardContent>
-        <CardFooter className="flex-col gap-2 text-sm">
-          <div className="flex items-center gap-2 leading-none font-medium">
-            Take rate: {takeRate}% <IconTrendingUp size={16} />
-          </div>
-          <div className="leading-none text-muted-foreground">
-            GMV no período: {brl.format(b5.earn_gmv)}
-          </div>
-        </CardFooter>
-      </Card>
     </>
   )
 }

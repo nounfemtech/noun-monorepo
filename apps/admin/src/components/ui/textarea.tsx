@@ -22,17 +22,14 @@ export interface TextareaProps
   extends React.ComponentProps<"textarea">,
     VariantProps<typeof textareaVariants> {}
 
-const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, size, ...props }, ref) => {
-    return (
-      <textarea
-        className={cn(textareaVariants({ size }), className)}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
-)
-Textarea.displayName = "Textarea"
+function Textarea({ className, size, ...props }: TextareaProps) {
+  return (
+    <textarea
+      data-slot="textarea"
+      className={cn(textareaVariants({ size }), className)}
+      {...props}
+    />
+  )
+}
 
 export { Textarea, textareaVariants }

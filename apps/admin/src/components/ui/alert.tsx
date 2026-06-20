@@ -38,93 +38,89 @@ const alertVariants = cva(
   }
 )
 
-const Alert = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, shape, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="alert"
-    className={cn(alertVariants({ variant, shape }), className)}
-    {...props}
-  />
-))
-Alert.displayName = "Alert"
+function Alert({
+  className,
+  variant,
+  shape,
+  ...props
+}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
+  return (
+    <div
+      data-slot="alert"
+      role="alert"
+      className={cn(alertVariants({ variant, shape }), className)}
+      {...props}
+    />
+  )
+}
 
-const AlertTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <h5
-    ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-    {...props}
-  />
-))
-AlertTitle.displayName = "AlertTitle"
+function AlertTitle({ className, ...props }: React.ComponentProps<"h5">) {
+  return (
+    <h5
+      data-slot="alert-title"
+      className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+      {...props}
+    />
+  )
+}
 
-const AlertDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
-    {...props}
-  />
-))
-AlertDescription.displayName = "AlertDescription"
+function AlertDescription({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="alert-description"
+      className={cn("text-sm [&_p]:leading-relaxed", className)}
+      {...props}
+    />
+  )
+}
 
-/** Flex row absoluto à direita — agrupa AlertAction e AlertClose */
-const AlertActions = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    data-alert-actions=""
-    className={cn(
-      "absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5",
-      className
-    )}
-    {...props}
-  />
-))
-AlertActions.displayName = "AlertActions"
+function AlertActions({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="alert-actions"
+      data-alert-actions=""
+      className={cn(
+        "absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-/** Botão de ação xs com fundo preto */
-const AlertAction = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, ...props }, ref) => (
-  <button
-    ref={ref}
-    className={cn(
-      "inline-flex items-center justify-center gap-1 h-7 rounded-md bg-zinc-900 px-2 text-xs font-medium text-white transition-opacity hover:opacity-80 outline-none focus-visible:ring-[3px] focus-visible:ring-zinc-900/50 dark:bg-zinc-100 dark:text-zinc-900 dark:focus-visible:ring-zinc-100/50",
-      className
-    )}
-    {...props}
-  />
-))
-AlertAction.displayName = "AlertAction"
+function AlertAction({
+  className,
+  ...props
+}: React.ComponentProps<"button">) {
+  return (
+    <button
+      data-slot="alert-action"
+      className={cn(
+        "inline-flex items-center justify-center gap-1 h-7 rounded-md bg-zinc-900 px-2 text-xs font-medium text-white transition-opacity hover:opacity-80 outline-none focus-visible:ring-[3px] focus-visible:ring-zinc-900/50 dark:bg-zinc-100 dark:text-zinc-900 dark:focus-visible:ring-zinc-100/50",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-/** Botão X de fechar */
-const AlertClose = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, ...props }, ref) => (
-  <button
-    ref={ref}
-    aria-label="Fechar"
-    className={cn(
-      "rounded p-0.5 opacity-60 hover:opacity-100 transition-opacity outline-none focus-visible:ring-[3px] focus-visible:ring-current",
-      className
-    )}
-    {...props}
-  >
-    <IconX size={14} />
-  </button>
-))
-AlertClose.displayName = "AlertClose"
+function AlertClose({ className, ...props }: React.ComponentProps<"button">) {
+  return (
+    <button
+      data-slot="alert-close"
+      aria-label="Fechar"
+      className={cn(
+        "rounded p-0.5 opacity-60 hover:opacity-100 transition-opacity outline-none focus-visible:ring-[3px] focus-visible:ring-current",
+        className
+      )}
+      {...props}
+    >
+      <IconX size={14} />
+    </button>
+  )
+}
 
 export { Alert, AlertTitle, AlertDescription, AlertActions, AlertAction, AlertClose }
