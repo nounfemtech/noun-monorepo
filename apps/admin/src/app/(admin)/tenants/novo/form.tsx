@@ -32,6 +32,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { IconAlertCircle, IconCheck, IconSelector } from '@tabler/icons-react'
 import { createSupabaseBrowser } from '@/lib/supabase'
 import { formatCRM, formatCRP, formatCRN, formatCRF, formatRQE } from '@/lib/formatters'
+import { atualizarTenant } from '../[id]/actions'
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
 
@@ -1709,6 +1710,15 @@ const SECTION_FIELD_KEYS: Record<SectionKey, (keyof FormData)[]> = {
   termos: TERMOS_FIELDS,
 }
 
+const SECTION_DB_KEYS: Record<SectionKey, string[]> = {
+  identificacao: ['name', 'type', 'subtype', 'conselho_numero', 'conselho_uf', 'rqe', 'responsavel_tecnico_nome', 'responsavel_tecnico_crf', 'responsavel_tecnico_crf_uf', 'afe_codigo', 'ae_numero', 'alvara_sanitario'],
+  fiscal: ['fiscal_type', 'cpf', 'cnpj', 'razao_social', 'nome_fantasia', 'regime_tributario', 'responsavel_legal_nome', 'responsavel_legal_cpf', 'inscricao_estadual'],
+  contato: ['email', 'telefone', 'cep', 'logradouro', 'numero_logradouro', 'complemento', 'bairro', 'cidade', 'uf'],
+  bancario: ['banco', 'agencia', 'conta', 'tipo_conta', 'titular_nome', 'titular_documento', 'pix_tipo', 'pix_valor'],
+  comercial: ['commission_rate', 'payout_delay_days', 'commercial_notes'],
+  termos: [],
+}
+
 // ─── Componente principal ──────────────────────────────────────────────────────
 
 export function NovoTenantForm({ adminName, initialData, noPadding = false }: { adminName: string; initialData?: TenantEditData; noPadding?: boolean }) {
@@ -1836,82 +1846,125 @@ export function NovoTenantForm({ adminName, initialData, noPadding = false }: { 
     editingSetters[section](false)
   }
 
+  async function saveSectionToDb(section: SectionKey) {
+    if (!draftId) return
+    const dbKeys = SECTION_DB_KEYS[section]
+    if (!dbKeys.length) {
+      editingSetters[section](false)
+      return
+    }
+
+    setLoading(true)
+    try {
+      const data = form.getValues()
+      const fullPayload = buildPayload(data) as Record<string, unknown>
+      const partial: Record<string, unknown> = {}
+      for (const key of dbKeys) {
+        if (key in fullPayload) partial[key] = fullPayload[key]
+      }
+
+      const result = await atualizarTenant(draftId, partial)
+      if (result.error) throw new Error(result.error)
+
+      toast.success('Alterações salvas')
+      editingSetters[section](false)
+    } catch (err) {
+      console.error(err)
+      toast.error('Erro ao salvar alterações')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function buildPayload(data: FormData) {
+    const isPharmacy = data.type === 'pharmacy'
+    const cnpjDigits = data.cnpj.replace(/\D/g, '') || null
+
+    return {
+      name:     data.name,
+      type:     isPharmacy ? 'pharmacy' as const : 'specialist' as const,
+      subtype:  data.subtype || null,
+
+      cnpj: (isPharmacy || data.fiscalType === 'pj') ? cnpjDigits : null,
+      razao_social:  data.razaoSocial || null,
+      nome_fantasia: data.nomeFantasia || null,
+
+      conselho_numero: !isPharmacy ? (data.conselhoNumero || null) : null,
+      conselho_uf:     !isPharmacy ? (data.conselhoUf || null) : null,
+      rqe:             !isPharmacy ? (data.rqe || null) : null,
+
+      responsavel_tecnico_nome:   isPharmacy ? (data.responsavelTecnicoNome || null) : null,
+      responsavel_tecnico_crf:    isPharmacy ? (data.responsavelTecnicoCrf || null) : null,
+      responsavel_tecnico_crf_uf: isPharmacy ? (data.responsavelTecnicoCrfUf || null) : null,
+      afe_codigo:       isPharmacy ? (data.afeCodigo || null) : null,
+      ae_numero:        isPharmacy ? (data.aeNumero || null) : null,
+      alvara_sanitario: isPharmacy ? (data.alvaraSanitario || null) : null,
+
+      fiscal_type:           isPharmacy ? 'pj' : (data.fiscalType || null),
+      cpf:                   data.cpf.replace(/\D/g, '') || null,
+      regime_tributario:     data.regimeTributario || null,
+      responsavel_legal_nome: data.responsavelLegalNome || null,
+      responsavel_legal_cpf:  data.responsavelLegalCpf.replace(/\D/g, '') || null,
+      inscricao_estadual:    isPharmacy ? (data.inscricaoEstadual || null) : null,
+
+      email:             data.email,
+      telefone:          data.telefone.replace(/\D/g, '') || null,
+      cep:               data.cep.replace(/\D/g, '') || null,
+      logradouro:        data.logradouro,
+      numero_logradouro: data.numeroLogradouro,
+      complemento:       data.complemento || null,
+      bairro:            data.bairro,
+      cidade:            data.cidade,
+      uf:                data.uf,
+
+      banco:             data.banco,
+      agencia:           data.agencia,
+      conta:             data.conta,
+      tipo_conta:        data.tipoConta,
+      titular_nome:      data.titularNome,
+      titular_documento: data.titularDocumento.replace(/\D/g, '') || null,
+      pix_tipo:          data.pixTipo || null,
+      pix_valor:         data.pixValor || null,
+
+      commission_rate:    data.commissionRate ? parseFloat(data.commissionRate) : null,
+      payout_delay_days:  data.payoutDelayDays ? parseInt(data.payoutDelayDays, 10) : null,
+      commercial_notes:   data.commercialNotes || null,
+    }
+  }
+
   async function onSubmit(data: FormData) {
     setLoading(true)
     try {
-      const isPharmacy = data.type === 'pharmacy'
-      const cnpjDigits = data.cnpj.replace(/\D/g, '') || null
+      const payload = buildPayload(data)
 
-      const supabase = createSupabaseBrowser()
-      const targetStatus = isEdit
-        ? (initialData!.status === 'draft' ? 'active' : initialData!.status)
-        : 'active'
+      if (isEdit && draftId) {
+        const result = await atualizarTenant(draftId, payload)
+        if (result.error) throw new Error(result.error)
 
-      const payload = {
-        name:     data.name,
-        type:     isPharmacy ? 'pharmacy' as const : 'specialist' as const,
-        subtype:  data.subtype || null,
-        status:   targetStatus,
-        settings: {},
+        toast.success('Tenant atualizado com sucesso!')
 
-        cnpj: (isPharmacy || data.fiscalType === 'pj') ? cnpjDigits : null,
-        razao_social:  data.razaoSocial || null,
-        nome_fantasia: data.nomeFantasia || null,
+        if (!noPadding) {
+          router.push('/tenants')
+          router.refresh()
+        }
+      } else {
+        const supabase = createSupabaseBrowser()
+        const { error } = await supabase
+          .from('tenants')
+          .insert({
+            ...payload,
+            status: 'active',
+            settings: {},
+            termos_aceitos_em: new Date().toISOString(),
+            termos_cadastrado_por: adminName,
+          })
 
-        conselho_numero: !isPharmacy ? (data.conselhoNumero || null) : null,
-        conselho_uf:     !isPharmacy ? (data.conselhoUf || null) : null,
-        rqe:             !isPharmacy ? (data.rqe || null) : null,
+        if (error) throw error
 
-        responsavel_tecnico_nome:   isPharmacy ? (data.responsavelTecnicoNome || null) : null,
-        responsavel_tecnico_crf:    isPharmacy ? (data.responsavelTecnicoCrf || null) : null,
-        responsavel_tecnico_crf_uf: isPharmacy ? (data.responsavelTecnicoCrfUf || null) : null,
-        afe_codigo:       isPharmacy ? (data.afeCodigo || null) : null,
-        ae_numero:        isPharmacy ? (data.aeNumero || null) : null,
-        alvara_sanitario: isPharmacy ? (data.alvaraSanitario || null) : null,
-
-        fiscal_type:           isPharmacy ? 'pj' : (data.fiscalType || null),
-        cpf:                   data.cpf.replace(/\D/g, '') || null,
-        regime_tributario:     data.regimeTributario || null,
-        responsavel_legal_nome: data.responsavelLegalNome || null,
-        responsavel_legal_cpf:  data.responsavelLegalCpf.replace(/\D/g, '') || null,
-        inscricao_estadual:    isPharmacy ? (data.inscricaoEstadual || null) : null,
-
-        email:             data.email,
-        telefone:          data.telefone.replace(/\D/g, '') || null,
-        cep:               data.cep.replace(/\D/g, '') || null,
-        logradouro:        data.logradouro,
-        numero_logradouro: data.numeroLogradouro,
-        complemento:       data.complemento || null,
-        bairro:            data.bairro,
-        cidade:            data.cidade,
-        uf:                data.uf,
-
-        banco:             data.banco,
-        agencia:           data.agencia,
-        conta:             data.conta,
-        tipo_conta:        data.tipoConta,
-        titular_nome:      data.titularNome,
-        titular_documento: data.titularDocumento.replace(/\D/g, '') || null,
-        pix_tipo:          data.pixTipo || null,
-        pix_valor:         data.pixValor || null,
-
-        commission_rate:    data.commissionRate ? parseFloat(data.commissionRate) : null,
-        payout_delay_days:  data.payoutDelayDays ? parseInt(data.payoutDelayDays, 10) : null,
-        commercial_notes:   data.commercialNotes || null,
-
-        termos_aceitos_em:     new Date().toISOString(),
-        termos_cadastrado_por: adminName,
+        toast.success('Tenant cadastrado com sucesso!')
+        router.push('/tenants')
+        router.refresh()
       }
-
-      const { error } = draftId
-        ? await supabase.from('tenants').update(payload).eq('id', draftId)
-        : await supabase.from('tenants').insert(payload)
-
-      if (error) throw error
-
-      toast.success(isEdit ? 'Tenant atualizado com sucesso!' : 'Tenant cadastrado com sucesso!')
-      router.push('/tenants')
-      router.refresh()
     } catch (err) {
       console.error(err)
       toast.error(isEdit ? 'Erro ao atualizar. Verifique os dados e tente novamente.' : 'Erro ao cadastrar. Verifique os dados e tente novamente.')
@@ -2075,7 +2128,7 @@ export function NovoTenantForm({ adminName, initialData, noPadding = false }: { 
               <Button type="button" variant="secondary" size="sm" onClick={() => router.push('/tenants')} disabled={loading}>
                 Cancelar
               </Button>
-              <Button type="submit" size="sm" disabled={loading}>
+              <Button type="submit" form="tenant-edit-form" size="sm" disabled={loading}>
                 {loading ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>
@@ -2104,9 +2157,9 @@ export function NovoTenantForm({ adminName, initialData, noPadding = false }: { 
                                 onClick={() => resetSection(section.key)}>
                                 Cancelar
                               </Button>
-                              <Button type="button" size="sm"
-                                onClick={() => editingSetters[section.key](false)}>
-                                Salvar alterações
+                              <Button type="button" size="sm" disabled={loading}
+                                onClick={() => saveSectionToDb(section.key)}>
+                                {loading ? 'Salvando...' : 'Salvar alterações'}
                               </Button>
                             </>
                           ) : (
@@ -2129,9 +2182,9 @@ export function NovoTenantForm({ adminName, initialData, noPadding = false }: { 
                                 onClick={() => resetSection(section.key)}>
                                 Cancelar
                               </Button>
-                              <Button type="button" size="sm"
-                                onClick={() => editingSetters[section.key](false)}>
-                                Salvar alterações
+                              <Button type="button" size="sm" disabled={loading}
+                                onClick={() => saveSectionToDb(section.key)}>
+                                {loading ? 'Salvando...' : 'Salvar alterações'}
                               </Button>
                             </>
                           ) : (
@@ -2149,7 +2202,7 @@ export function NovoTenantForm({ adminName, initialData, noPadding = false }: { 
             )
           })}
 
-          {(!isEdit || !noPadding) && (
+          {!(isEdit && noPadding) && (
             <>
               <Separator className="my-8" />
 

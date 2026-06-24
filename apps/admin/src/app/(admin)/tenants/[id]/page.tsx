@@ -15,6 +15,7 @@ import {
 import { Fragment } from 'react'
 import { TransactionsEmpty } from '@/app/(admin)/dashboard/transactions-empty'
 import { IconCreditCard } from '@tabler/icons-react'
+import { AcessoConnect } from './acesso-connect'
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -357,6 +358,13 @@ export default async function TenantDetailPage({ params, searchParams }: PagePro
         </div>
         <h1 className="text-xl font-semibold">{tenant.name}</h1>
       </div>
+
+      {/* Acesso ao Noun Connect */}
+      <AcessoConnect
+        tenantId={id}
+        tenantEmail={tenant.email ?? null}
+        hasAccess={!!tenant.user_id}
+      />
 
       {/* Tab line */}
       <div className="flex gap-6 border-b">
