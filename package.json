@@ -15,7 +15,8 @@
     "dev:web": "turbo dev --filter=web",
     "dev:mobile": "turbo dev --filter=mobile",
     "dev:landing": "turbo dev --filter=landing",
-    "dev:admin": "turbo dev --filter=admin"
+    "dev:admin": "turbo dev --filter=admin",
+    "dev:connect": "turbo dev --filter=connect"
   },
   "devDependencies": {
     "prettier": "^3.4.2",
