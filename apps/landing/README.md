@@ -1,13 +1,5 @@
 # apps/landing
 
-Landing page da Noun. **Será migrada do repositório `noun-web`.**
+Landing page pública da Noun. Deploy em produção via projeto Vercel `noun-monorepo-web` (Root Directory apontado para esta pasta).
 
-## Status
-
-Placeholder — aguardando migração.
-
-## Para migrar
-
-1. Copiar o conteúdo de `noun-web` para esta pasta
-2. Atualizar imports para usar `@noun/ui` e `@noun/types`
-3. Remover dependências duplicadas já cobertas pelos pacotes compartilhados
+Ver [CLAUDE.md](./CLAUDE.md) para produto, marca, design system e copy.
