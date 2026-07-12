@@ -19,7 +19,7 @@
 ## Localhost
 
 - Admin: `http://localhost:3002` — iniciar com `cd apps/admin && pnpm dev`
-- Web: `http://localhost:3000` — iniciar com `cd apps/web && pnpm dev`
+- Landing: `http://localhost:3001` — iniciar com `cd apps/landing && pnpm dev`
 
 ## Preview MCP
 
@@ -32,7 +32,7 @@
 
 - **Framework:** Next.js 15 App Router
 - **Banco:** Supabase (Postgres 17) — project `noun-app` (`vpcjzkygiwtodokcentu`), região `us-east-2`
-- **Estilo:** Tailwind CSS v4 (admin, web, landing) / v3.4 (mobile, `packages/config` preset), CVA, shadcn/Radix UI. Migração oklch ainda pendente.
+- **Estilo:** Tailwind CSS v4 (admin, landing) / v3.4 (mobile, `packages/config` preset), CVA, shadcn/Radix UI. Migração oklch ainda pendente.
 - **Monorepo:** pnpm workspaces + Turborepo
 - **Deploy:** Vercel (integração nativa com GitHub, branch `main`)
 - **Mobile:** Expo SDK 54, expo-router v6, NativeWind
@@ -42,7 +42,8 @@
 ```
 apps/
   admin/    Next.js 15 — painel administrativo (porta 3002)
-  web/      Next.js 15 — app público (porta 3000)
+  landing/  Next.js 15 — landing page pública (deploy: projeto Vercel noun-monorepo-web)
+  connect/  Next.js 15 — convite e primeiro acesso de profissionais/tenants
   mobile/   Expo — app mobile (iOS/Android)
 packages/
   ui/       Componentes compartilhados (shadcn/Radix + NativeWind)
@@ -176,7 +177,7 @@ packages/
   1. **Focus ring outline sem gap** (regra global `*:focus-visible` em `globals.css`): convenção Noun deliberada, ver subseção Componentes abaixo. Substitui o ring nativo do Shadcn em todo o admin.
   2. **Bounce tátil leve em botões** (`active:scale-[0.97]` na base do `button.tsx`): efeito de clique pedido pela Úrsula, aplicado **apenas** a botões.
   3. **Variantes semânticas** adicionadas a `Badge` e `Alert` (`info`, `success`, `warning`, `destructive`): extensões intencionais do conjunto base.
-- Escala de radius já migrada para padrão multiplicativo do shadcn v4 (admin, web, preset, tokens). Migração de espaço de cor para `oklch` ainda pendente: depende de migrar o mobile (Tailwind v3.4 + NativeWind) e o `ColorThemeProvider` (HSL).
+- Escala de radius já migrada para padrão multiplicativo do shadcn v4 (admin, landing, preset, tokens). Migração de espaço de cor para `oklch` ainda pendente: depende de migrar o mobile (Tailwind v3.4 + NativeWind) e o `ColorThemeProvider` (HSL).
 
 ### Componentes
 - Usar `'use client'` apenas quando necessário (interatividade, hooks). Preferir Server Components.

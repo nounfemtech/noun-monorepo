@@ -29,7 +29,7 @@ Status atual do produto (jul/2026): pré-lançamento, app mobile ainda em constr
 - Shadcn/UI — sem design system proprietário, componentes consumidos sem alterar propriedades visuais base (só via CSS vars em `globals.css`, mesma regra do resto do monorepo)
 - Ícones: Tabler Icons
 - Tipografia: Reddit Sans (100–900) + Reddit Mono (uso pontual, dado/código)
-- Deploy: Vercel, projeto `noun-monorepo-web` com Root Directory reapontado para `apps/landing` (jul/2026: `apps/web`, o app público separado, ainda é só scaffold sem páginas reais, então o domínio existente foi reaproveitado em vez de criar um projeto novo). URL: `noun-monorepo-web.vercel.app`.
+- Deploy: Vercel, projeto `noun-monorepo-web` com Root Directory apontado para `apps/landing` (jul/2026: o antigo `apps/web`, scaffold sem páginas reais, foi removido do monorepo; a landing é o app público real). URL: `noun-monorepo-web.vercel.app`.
 - Backend do formulário de waitlist: Supabase (mesmo projeto do ecossistema)
 
 ## 4. Sistema de design
