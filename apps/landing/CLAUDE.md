@@ -29,7 +29,7 @@ Status atual do produto (jul/2026): pré-lançamento, app mobile ainda em constr
 - Shadcn/UI — sem design system proprietário, componentes consumidos sem alterar propriedades visuais base (só via CSS vars em `globals.css`, mesma regra do resto do monorepo)
 - Ícones: Tabler Icons
 - Tipografia: Reddit Sans (100–900) + Reddit Mono (uso pontual, dado/código)
-- Deploy: Vercel, novo projeto apontando para `apps/landing` (mesmo padrão de `noun-monorepo-admin` e `noun-monorepo-connect`)
+- Deploy: Vercel, projeto `noun-monorepo-web` com Root Directory reapontado para `apps/landing` (jul/2026: `apps/web`, o app público separado, ainda é só scaffold sem páginas reais, então o domínio existente foi reaproveitado em vez de criar um projeto novo). URL: `noun-monorepo-web.vercel.app`.
 - Backend do formulário de waitlist: Supabase (mesmo projeto do ecossistema)
 
 ## 4. Sistema de design
@@ -47,11 +47,13 @@ Paleta primária: 4 cores, direto da paleta padrão do Tailwind, sem redefiniç�
 
 Os demais tons de cada uma dessas quatro paletas (50–950) ficam disponíveis como apoio (hover, backgrounds sutis, texto sobre fundo colorido, etc.), nunca como cor principal de uma seção.
 
-**Alocação sugerida por contexto** (ajustável, é só uma proposta de ponto de partida):
-- **Yellow 400**: cor de ação. Botões primários e CTAs em toda a página. Já é a cor primária usada no Vaughan (admin), então mantém consistência de marca entre produto interno e página pública.
-- **Rose 300**: seções voltadas à paciente (Hero, Jornada Hormonal, Problema & Solução). Tom acolhedor.
-- **Blue 300**: seção "Para médicos e médicas parceiras". Tom de confiança/profissional.
-- **Violet 300**: seção "Para farmácias parceiras" e blocos relacionados a dados/acompanhamento (linha do tempo, gráficos).
+**Alocação implementada por seção** (`bg-*-50/40` para fundo de seção, `bg-*-100`/`text-*-700` para badge de ícone):
+- **Yellow 400**: cor de ação. Botões primários e CTAs em toda a página.
+- **Rose**: Hero (eyebrow badge) e seção 2 "O que você pode fazer no app" (`app-features.tsx`, `bg-rose-50/40`).
+- **Violet**: seção 3 "Especialidades disponíveis" (`especialidades.tsx`, `bg-violet-50/40`, ícones `bg-violet-100`/`text-violet-700`).
+- **Blue**: badge de ícone da seção "Segurança e privacidade" (`seguranca-privacidade.tsx`).
+- Seção 4 "Para quem é o Noun" (`para-quem.tsx`) usa `bg-background` (branco/neutro), sem cor de marca dominante.
+- "Para médicos" e "Para farmácias" ainda não migradas para esse padrão sem-card; alocação de cor (blue/violet, respectivamente) segue como proposta original até serem revisadas.
 
 ### 4.2 Neutro
 
@@ -96,24 +98,30 @@ Light mode como padrão de lançamento (marketing converte melhor em fundo claro
 
 ### 4.7 Direção visual (guia para quem for construir)
 
-Elemento de assinatura sugerido: um fio/linha contínua que atravessa a página representando a "jornada hormonal" (a mesma metáfora que já existe dentro do produto, na timeline pessoal da paciente). Usar esse fio para conectar Hero → Como Funciona → O que você pode fazer no app, em vez de recorrer a numeração genérica (01/02/03) ou gradiente decorativo sem relação com o conteúdo. Evitar os clichês visuais mais comuns de página gerada por IA: fundo bege com serifada de alto contraste e terracota; fundo quase preto com um único acento neon; layout jornal com hairlines e radius zero. Nenhum dos três combina com um produto de saúde inclusivo e acolhedor.
+Elemento de assinatura implementado no Hero: grade de linhas de fundo (`linear-gradient` 48px x 48px, cor `var(--border)`) com fade curvo de opacidade via `radial-gradient` em `maskImage`/`WebkitMaskImage`, e alguns quadrados de 48px pintados nas 4 cores de marca (`rose/blue/yellow/violet-200` a 30% de opacidade), alinhados aos vértices da grade. Ver `hero.tsx`.
+
+Seções sem cards: a partir da revisão de jul/2026, ícone + título + texto ficam direto no fundo colorido da seção (sem wrapper de card, sem borda, sem sombra). Ícone em badge quadrado com cantos arredondados (`rounded-lg`), nunca círculo.
+
+Evitar os clichês visuais mais comuns de página gerada por IA: fundo bege com serifada de alto contraste e terracota; fundo quase preto com um único acento neon; layout jornal com hairlines e radius zero. Nenhum dos três combina com um produto de saúde inclusivo e acolhedor.
 
 ## 5. Arquitetura de informação
 
-| # | Seção | Objetivo |
-|---|---|---|
-| 1 | Hero | Comunicar em 3 segundos o que é o Noun e para quem é |
-| 2 | Problema & Solução | Empatia com a dor de saúde hormonal fragmentada, sem diagnóstico ou promessa clínica |
-| 3 | Como Funciona | Jornada em passos, por perfil (paciente / médico / farmácia) |
-| 4 | O que você pode fazer no app | Detalhar os módulos do app mobile em benefícios, não em features técnicas |
-| 5 | Especialidades disponíveis | Gineco, Endócrino, Nutri, Psico, Uro |
-| 6 | Para quem é o Noun | Reforço de identidade e inclusão, nomeando os públicos |
-| 7 | Segurança e privacidade | Confiança em dado de saúde sensível, LGPD, controle da paciente |
-| 8 | Para médicos e médicas parceiras | Aquisição de médicos |
-| 9 | Para farmácias parceiras | Aquisição de farmácias |
-| 10 | Credibilidade | Prova de seriedade sem depoimento inventado (pré-lançamento) |
-| 11 | FAQ | Reduzir objeção antes da conversão |
-| 12 | CTA final + Rodapé | Última chance de conversão + navegação institucional |
+Ordem real implementada em `page.tsx` (a seção "Problema & Solução / Como Funciona" da v1 do PRD foi removida da página; "O que você pode fazer no app" passou a ser a seção 2 visível):
+
+| # | Seção | Componente | Objetivo |
+|---|---|---|---|
+| 1 | Hero | `hero.tsx` | Comunicar em 3 segundos o que é o Noun e para quem é |
+| 2 | O que você pode fazer no app | `app-features.tsx` | Detalhar os módulos do app mobile em benefícios, não em features técnicas |
+| — | CTA de download do app | `app-download-cta.tsx` | Badges de loja (App Store / Google Play), não conta como seção numerada |
+| 3 | Especialidades disponíveis | `especialidades.tsx` | Gineco, Endócrino, Nutri, Psico, Uro |
+| 4 | Para quem é o Noun | `para-quem.tsx` | Reforço de identidade e inclusão, nomeando os públicos, com CTA de waitlist |
+| 5 | Segurança e privacidade | `seguranca-privacidade.tsx` | Confiança em dado de saúde sensível, LGPD, controle da paciente |
+| — | Para médicos e médicas parceiras | `medicos.tsx` | Aquisição de médicos |
+| — | Para farmácias parceiras | `farmacias.tsx` | Aquisição de farmácias |
+| — | Credibilidade | `credibilidade.tsx` | Prova de seriedade sem depoimento inventado (pré-lançamento) |
+| — | Estamos começando | `estamos-comecando.tsx` | Reforço de estágio pré-lançamento |
+| — | FAQ | `faq.tsx` | Reduzir objeção antes da conversão |
+| — | CTA final + Rodapé | `cta-final-rodape.tsx` | Última chance de conversão + navegação institucional |
 
 ## 6. Copy de referência (PT-BR)
 
