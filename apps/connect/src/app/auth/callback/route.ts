@@ -4,22 +4,20 @@ import { createSupabaseServer } from '@/lib/supabase-server'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const isInvite = searchParams.get('type') === 'invite'
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login`)
   }
 
   const supabase = await createSupabaseServer()
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+  const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-  if (error || !data.session) {
+  if (error) {
     return NextResponse.redirect(`${origin}/login`)
   }
 
-  const isFirstAccess = !data.user.last_sign_in_at ||
-    data.user.last_sign_in_at === data.user.created_at
-
-  if (isFirstAccess) {
+  if (isInvite) {
     return NextResponse.redirect(`${origin}/auth/set-password`)
   }
 

@@ -20,7 +20,7 @@ export async function gerarAcesso(tenantId: string) {
   if (!tenant.email) return { error: 'Tenant sem e-mail cadastrado' }
 
   const admin = createSupabaseAdmin()
-  const redirectTo = `${process.env.NEXT_PUBLIC_CONNECT_URL}/auth/callback`
+  const redirectTo = `${process.env.NEXT_PUBLIC_CONNECT_URL}/auth/callback?type=invite`
 
   const { data, error } = await admin.auth.admin.inviteUserByEmail(tenant.email, {
     redirectTo,
@@ -72,7 +72,7 @@ export async function reenviarConvite(tenantId: string) {
   if (!tenant.email) return { error: 'Tenant sem e-mail cadastrado' }
 
   const admin = createSupabaseAdmin()
-  const redirectTo = `${process.env.NEXT_PUBLIC_CONNECT_URL}/auth/callback`
+  const redirectTo = `${process.env.NEXT_PUBLIC_CONNECT_URL}/auth/callback?type=invite`
 
   const { error } = await admin.auth.admin.inviteUserByEmail(tenant.email, {
     redirectTo,
