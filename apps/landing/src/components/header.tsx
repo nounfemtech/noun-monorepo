@@ -32,35 +32,35 @@ type DropdownItem = {
   icon: Icon
 }
 
-const inicioItem = { label: 'Início', href: '#' }
+const inicioItem = { label: 'Início', href: '/' }
 
 const trailingItems = [
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Blog', href: '#blog' },
+  { label: 'FAQ', href: '/faq' },
+  { label: 'Blog', href: '/blog' },
 ]
 
 const sobreItems: DropdownItem[] = [
   {
     label: 'Quem Somos',
-    href: '#quem-somos',
+    href: '/sobre/quem-somos',
     description: 'A equipe e a história por trás do Noun.',
     icon: IconUsers,
   },
   {
     label: 'Nossa missão',
-    href: '#missao',
+    href: '/sobre/missao',
     description: 'Por que existimos e para quem trabalhamos.',
     icon: IconTarget,
   },
   {
     label: 'Visão do Noun',
-    href: '#visao',
+    href: '/sobre/visao',
     description: 'Onde queremos chegar com a saúde hormonal.',
     icon: IconEye,
   },
   {
     label: 'Princípios e valores',
-    href: '#valores',
+    href: '/sobre/valores',
     description: 'O que guia cada decisão que tomamos.',
     icon: IconHeartHandshake,
   },
@@ -69,49 +69,49 @@ const sobreItems: DropdownItem[] = [
 const servicosItems: DropdownItem[] = [
   {
     label: 'Ginecologia',
-    href: '#ginecologia',
+    href: '/servicos/ginecologia',
     description: 'Cuidado ginecológico para todas as identidades.',
     icon: IconGenderFemale,
   },
   {
     label: 'Endocrinologia',
-    href: '#endocrinologia',
+    href: '/servicos/endocrinologia',
     description: 'Acompanhamento hormonal especializado.',
     icon: IconDroplet,
   },
   {
     label: 'Nutrição',
-    href: '#nutricao',
+    href: '/servicos/nutricao',
     description: 'Orientação nutricional para sua jornada hormonal.',
     icon: IconApple,
   },
   {
     label: 'Psicologia',
-    href: '#psicologia',
+    href: '/servicos/psicologia',
     description: 'Suporte emocional em cada etapa do cuidado.',
     icon: IconBrain,
   },
   {
     label: 'Urologia',
-    href: '#urologia',
+    href: '/servicos/urologia',
     description: 'Cuidado urológico especializado.',
     icon: IconStethoscope,
   },
   {
     label: 'Farmácia e medicamento',
-    href: '#farmacia',
+    href: '/servicos/farmacia',
     description: 'Farmácias parceiras e acompanhamento de pedidos.',
     icon: IconPill,
   },
   {
     label: 'Receitas e documentos',
-    href: '#receitas',
+    href: '/servicos/receitas',
     description: 'Receita digital e documentos direto no app.',
     icon: IconFileText,
   },
   {
     label: 'Status de saúde',
-    href: '#status-saude',
+    href: '/servicos/status-saude',
     description: 'Linha do tempo da sua saúde hormonal.',
     icon: IconActivity,
   },
@@ -182,7 +182,7 @@ export function Header() {
 
         <div className="justify-self-end">
           <Button asChild size="sm">
-            <a href="#waitlist">Entrar na lista de espera</a>
+            <a href="/lista-de-espera?tipo=paciente">Entrar na lista de espera</a>
           </Button>
         </div>
       </div>

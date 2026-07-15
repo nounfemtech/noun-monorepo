@@ -53,7 +53,9 @@ export function Medicos() {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <Button size="lg">Quero ser parceiro(a)</Button>
+          <Button asChild size="lg">
+            <a href="/lista-de-espera?tipo=medico">Quero ser parceiro(a)</a>
+          </Button>
         </div>
       </div>
     </section>

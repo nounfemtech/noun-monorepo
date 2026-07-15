@@ -1,46 +1,19 @@
-import { WaitlistForm } from '@/components/waitlist-form'
+import { Button } from '@/components/ui/button'
+import { IconArrowRight } from '@tabler/icons-react'
 
 export function Hero() {
   return (
-    <section id="waitlist" className="relative overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            'linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-          maskImage:
-            'radial-gradient(ellipse 90% 55% at 50% 0%, black 35%, transparent 85%)',
-          WebkitMaskImage:
-            'radial-gradient(ellipse 90% 55% at 50% 0%, black 35%, transparent 85%)',
-        }}
-      >
-        <div className="absolute size-12 bg-rose-200/30" style={{ left: 96, top: 0 }} />
-        <div className="absolute size-12 bg-yellow-200/30" style={{ left: 336, top: 96 }} />
-        <div className="absolute size-12 bg-blue-200/30" style={{ left: 624, top: 48 }} />
-        <div className="absolute size-12 bg-violet-200/30" style={{ left: 864, top: 0 }} />
-        <div className="absolute size-12 bg-rose-200/30" style={{ left: 1104, top: 144 }} />
-        <div className="absolute size-12 bg-blue-200/30" style={{ left: 192, top: 240 }} />
-        <div className="absolute size-12 bg-violet-200/30" style={{ left: 480, top: 192 }} />
-        <div className="absolute size-12 bg-yellow-200/30" style={{ left: 768, top: 288 }} />
-        <div className="absolute size-12 bg-rose-200/30" style={{ left: 960, top: 336 }} />
-        <div className="absolute size-12 bg-blue-200/30" style={{ left: 48, top: 96 }} />
-        <div className="absolute size-12 bg-yellow-200/30" style={{ left: 240, top: 0 }} />
-        <div className="absolute size-12 bg-rose-200/30" style={{ left: 576, top: 144 }} />
-        <div className="absolute size-12 bg-blue-200/30" style={{ left: 912, top: 96 }} />
-        <div className="absolute size-12 bg-violet-200/30" style={{ left: 144, top: 192 }} />
-        <div className="absolute size-12 bg-blue-200/30" style={{ left: 432, top: 288 }} />
-        <div className="absolute size-12 bg-rose-200/30" style={{ left: 720, top: 0 }} />
-        <div className="absolute size-12 bg-yellow-200/30" style={{ left: 1008, top: 192 }} />
-        <div className="absolute size-12 bg-violet-200/30" style={{ left: 288, top: 336 }} />
-        <div className="absolute size-12 bg-rose-200/30" style={{ left: 672, top: 240 }} />
-        <div className="absolute size-12 bg-blue-200/30" style={{ left: 1056, top: 48 }} />
+    <section className="relative overflow-hidden">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="absolute size-[34rem] translate-x-20 -translate-y-20 rounded-full bg-rose-100/60" />
+        <div className="absolute size-[40rem] -translate-x-64 translate-y-48 rounded-full bg-yellow-100/60" />
+        <div className="absolute size-[34rem] -translate-x-full -translate-y-64 rounded-full bg-blue-100/60" />
+        <div className="absolute size-[34rem] translate-x-64 -translate-y-full rounded-full bg-violet-100/60" />
       </div>
 
-      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-16 px-6 py-24 lg:grid-cols-2 lg:py-32">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-16 px-6 py-14 lg:grid-cols-2 lg:py-16">
         <div className="relative z-10 flex flex-col items-start gap-6">
-          <span className="rounded-full bg-rose-100 px-3 py-1 text-sm font-medium text-rose-700">
+          <span className="text-sm font-medium text-black">
             Saúde hormonal, do seu jeito.
           </span>
 
@@ -55,7 +28,12 @@ export function Hero() {
           </p>
 
           <div className="pt-2">
-            <WaitlistForm tipo="paciente" />
+            <Button asChild size="lg" className="group h-11">
+              <a href="/lista-de-espera?tipo=paciente">
+                Entrar na lista de espera
+                <IconArrowRight className="transition-transform group-hover:translate-x-0.5" stroke={2} />
+              </a>
+            </Button>
           </div>
         </div>
 

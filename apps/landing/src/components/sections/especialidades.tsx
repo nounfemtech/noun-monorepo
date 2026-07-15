@@ -1,38 +1,4 @@
-import {
-  IconGenderFemale,
-  IconActivityHeartbeat,
-  IconSalad,
-  IconBrain,
-  IconDroplet,
-} from '@tabler/icons-react'
-
-const ESPECIALIDADES = [
-  {
-    icon: IconGenderFemale,
-    title: 'Ginecologia',
-    body: 'Para acompanhamento hormonal, ciclo e saúde reprodutiva.',
-  },
-  {
-    icon: IconActivityHeartbeat,
-    title: 'Endocrinologia',
-    body: 'Para investigar e acompanhar alterações hormonais.',
-  },
-  {
-    icon: IconSalad,
-    title: 'Nutrição',
-    body: 'Para ajustar a alimentação ao seu momento hormonal.',
-  },
-  {
-    icon: IconBrain,
-    title: 'Psicologia',
-    body: 'Para cuidar da saúde emocional em cada etapa da jornada.',
-  },
-  {
-    icon: IconDroplet,
-    title: 'Urologia',
-    body: 'Para saúde urológica e hormonal masculina.',
-  },
-]
+import { ESPECIALIDADES } from '@/lib/especialidades'
 
 export function Especialidades() {
   return (

@@ -44,7 +44,9 @@ export function Farmacias() {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <Button size="lg">Quero ser farmácia parceira</Button>
+          <Button asChild size="lg">
+            <a href="/lista-de-espera?tipo=farmacia">Quero ser farmácia parceira</a>
+          </Button>
         </div>
       </div>
     </section>

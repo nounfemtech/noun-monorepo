@@ -1,4 +1,5 @@
-import { WaitlistForm } from '@/components/waitlist-form'
+import { Button } from '@/components/ui/button'
+import { IconArrowRight } from '@tabler/icons-react'
 
 const RODAPE_LINKS = [
   { label: 'Termos de uso', href: '/termos' },
@@ -15,9 +16,12 @@ export function CtaFinalRodape() {
           <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-balance text-background sm:text-4xl">
             Sua saúde hormonal não devia ser um labirinto.
           </h2>
-          <div className="w-full max-w-md rounded-2xl bg-background p-2">
-            <WaitlistForm tipo="paciente" className="sm:[&>div]:justify-center" />
-          </div>
+          <Button asChild size="lg" className="group h-11">
+            <a href="/lista-de-espera?tipo=paciente">
+              Entrar na lista de espera
+              <IconArrowRight className="transition-transform group-hover:translate-x-0.5" stroke={2} />
+            </a>
+          </Button>
         </div>
       </div>
 

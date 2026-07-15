@@ -89,7 +89,7 @@ Convenção padrão do Tailwind/shadcn, independente das 4 cores de marca:
 
 ### 4.5 Radius e bordas
 
-- Radius global: escala 0–1rem (sm/md/lg/xl/2xl/3xl/4xl), mesma convenção do resto do monorepo
+- Radius base: `--radius: 0.75rem` (divergência intencional do resto do monorepo, que usa `0.45rem`). Escala multiplicativa shadcn v4 (`sm=*0.6`, `md=*0.8`, `lg=1x`, `xl=*1.4`, `2xl=*1.8`, `3xl=*2.2`, `4xl=*2.6`): sm 0.45rem, md 0.6rem, lg 0.75rem, xl 1.05rem, 2xl 1.35rem, 3xl 1.65rem, 4xl 1.95rem.
 - Border width: default/0/0.5px/1px/1.5px/2px/3px/4px
 
 ### 4.6 Modo de cor
