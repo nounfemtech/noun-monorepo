@@ -143,48 +143,48 @@ function DropdownList({ items, className }: { items: DropdownItem[]; className?:
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-4">
-        <a href="/" className="justify-self-start">
-          <Image src="/logoNoun.svg" alt="Noun" width={32} height={32} priority />
-        </a>
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+        <div className="flex items-center gap-6">
+          <a href="/">
+            <Image src="/logoNoun.svg" alt="Noun" width={32} height={32} priority />
+          </a>
 
-        <NavigationMenu viewport={false}>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <a href={inicioItem.href}>{inicioItem.label}</a>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Sobre</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <DropdownList items={sobreItems} className="grid w-80 gap-1 p-2" />
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <DropdownList items={servicosItems} className="grid w-[520px] grid-cols-2 gap-1 p-2" />
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-
-            {trailingItems.map((item) => (
-              <NavigationMenuItem key={item.label}>
+          <NavigationMenu viewport={false}>
+            <NavigationMenuList>
+              <NavigationMenuItem>
                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <a href={item.href}>{item.label}</a>
+                  <a href={inicioItem.href}>{inicioItem.label}</a>
                 </NavigationMenuLink>
               </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
 
-        <div className="justify-self-end">
-          <Button asChild size="sm">
-            <a href="/lista-de-espera?tipo=paciente">Entrar na lista de espera</a>
-          </Button>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Sobre</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <DropdownList items={sobreItems} className="grid w-[520px] grid-flow-col grid-rows-3 gap-1 p-2" />
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <DropdownList items={servicosItems} className="grid w-[780px] grid-flow-col grid-rows-3 gap-1 p-2" />
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              {trailingItems.map((item) => (
+                <NavigationMenuItem key={item.label}>
+                  <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                    <a href={item.href}>{item.label}</a>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
+
+        <Button asChild size="sm">
+          <a href="/lista-de-espera?tipo=paciente">Entrar na lista de espera</a>
+        </Button>
       </div>
     </header>
   )
