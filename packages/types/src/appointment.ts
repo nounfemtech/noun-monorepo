@@ -1,5 +1,5 @@
 import type { UUID, Timestamp, Nullable } from './common'
-import type { ConsultationType } from './doctor'
+import type { ConsultationType } from './specialist'
 
 export type AppointmentStatus =
   | 'pending'

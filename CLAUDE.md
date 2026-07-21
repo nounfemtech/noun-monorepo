@@ -54,14 +54,16 @@ packages/
 
 ## Design System
 
-- Cor primária: **amarela** (yellow). Token `--primary` injetado pelo `ColorThemeProvider` em `packages/ui/src/providers/color-theme-provider.tsx`.
+> **Especificação completa em [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)** (extraído de `apps/admin` em 17/07/2026): tokens de cor/radius/tipografia, catálogo dos 29 primitivos `ui/*` com variantes e customizações vs. shadcn stock, utilitários (`cn`, `cva`, `useIsMobile`) e regras de contribuição. `apps/admin` é a fonte de verdade visual — qualquer app novo replica a estrutura de lá, nunca o contrário.
+
+- Cor primária: **amarela** (yellow), shade 400 (`DEFAULT_PRIMARY`). Não é uma cor fixa no CSS: é computada em runtime pelo `ColorThemeProvider` (`packages/ui/src/providers/color-theme-provider.tsx`), que lê a seleção do usuário em `localStorage` e aplica via `document.documentElement.style.setProperty`, sobrescrevendo os fallbacks SSR do `globals.css`.
 - Todas as cores usam paletas Tailwind 50-950 via CSS vars (`hsl(var(--primary))`, etc.). **Nunca** usar cores hardcoded nos componentes ou charts.
-- `--radius: 0.45rem` (preset Small do shadcn v4). Escala multiplicativa: `sm=*0.6`, `md=*0.8`, `lg=1x`, `xl=*1.4`, `2xl=*1.8`, `3xl=*2.2`, `4xl=*2.6`. Definida em `globals.css` (@theme inline) e `packages/config/tailwind/preset.ts`.
+- `--radius: 0.5rem` (valor real em `apps/admin/src/app/globals.css`; a doc antiga dizia `0.45rem`, corrigido em 17/07/2026 após auditoria). Escala multiplicativa: `sm=*0.6`, `md=*0.8`, `lg=1x`, `xl=*1.4`, `2xl=*1.8`, `3xl=*2.2`, `4xl=*2.6`. Definida em `globals.css` (@theme inline). `packages/config/tailwind/preset.ts` **não está em uso** por nenhum app (Tailwind v4 é CSS-first) — ver `DESIGN_SYSTEM.md`, Achado 1.
 - Fontes: `Reddit Sans` (sans) e `Reddit Mono` (mono).
-- Modo claro/escuro/system via `ColorThemeProvider`. Neutros usam Zinc.
+- Modo claro/escuro/system via `ColorThemeProvider` + `SpacemanThemeProvider` (admin) / `ThemeProvider` genérico de `packages/ui` (connect). Neutros usam Zinc.
 - Tonalidades disponíveis no picker: 300, 400, 500, 600, 700, 800 (removidas 100, 200, 900, 950).
 - Títulos de página: `text-xl font-semibold`.
-- Tamanho padrão de componentes shadcn: `sm`.
+- Tamanho padrão de componentes shadcn: `sm` (`Button`, `Input`, `Select`, `Textarea` têm `defaultVariants.size: "sm"`, divergente do stock que é `default`).
 
 ## Variáveis de Ambiente
 
@@ -71,6 +73,8 @@ packages/
 | `SUPABASE_ANON_KEY` | Servidor (SSR) | `.env.local` e Vercel |
 | `NEXT_PUBLIC_SUPABASE_URL` | Browser (client) | `.env.local` e Vercel |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser (client) | `.env.local` e Vercel |
+| `SUPABASE_SERVICE_ROLE_KEY` | Servidor (admin, bypassa RLS — ex. convite de tenant) | `.env.local` e Vercel |
+| `RESEND_API_KEY` | Servidor (`@noun/config/email/resend`, envio de e-mail transacional fora do fluxo nativo do Supabase Auth) | `.env.local` e Vercel |
 
 ---
 
@@ -173,18 +177,20 @@ packages/
 
 - Componentes Shadcn são consumidos exatamente como vêm da lib. **Nunca** sobrescrever propriedades visuais base (ring, border, radius, shadow, padding, height) com classes Tailwind inline ou regras globais em `globals.css`.
 - A única customização permitida é via CSS vars semânticos no `globals.css` (`--primary`, `--ring`, `--border`, etc.), que o próprio Shadcn já consome internamente.
-- Exceção: adaptações que a Úrsula indicar explicitamente. As exceções vigentes (sancionadas) são:
-  1. **Focus ring outline sem gap** (regra global `*:focus-visible` em `globals.css`): convenção Noun deliberada, ver subseção Componentes abaixo. Substitui o ring nativo do Shadcn em todo o admin.
-  2. **Bounce tátil leve em botões** (`active:scale-[0.97]` na base do `button.tsx`): efeito de clique pedido pela Úrsula, aplicado **apenas** a botões.
-  3. **Variantes semânticas** adicionadas a `Badge` e `Alert` (`info`, `success`, `warning`, `destructive`): extensões intencionais do conjunto base.
-- Escala de radius já migrada para padrão multiplicativo do shadcn v4 (admin, landing, preset, tokens). Migração de espaço de cor para `oklch` ainda pendente: depende de migrar o mobile (Tailwind v3.4 + NativeWind) e o `ColorThemeProvider` (HSL).
+- Exceção: adaptações que a Úrsula indicar explicitamente. As exceções **confirmadas no código** em 17/07/2026 são:
+  1. **Bounce tátil leve em botões** (`active:scale-[0.97]` na base do `button.tsx`): efeito de clique pedido pela Úrsula, aplicado **apenas** a botões.
+  2. **Variantes semânticas** adicionadas a `Badge`, `Alert` e `DropdownMenuItem` (`info`, `success`, `warning`, `destructive`): extensões intencionais do conjunto base.
+  3. **Variante `underline` em Tabs** (navegação por abas sublinhadas, além do `default` em pill).
+  4. **`defaultVariants.size: "sm"`** em `Button`/`Input`/`Select`/`Textarea` (stock shadcn usa `default`).
+  - ⚠️ **Pendência de auditoria (17/07/2026):** a regra "focus ring outline sem gap" (`*:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 0 }`, mencionada nas versões anteriores deste arquivo como exceção sancionada) **não foi encontrada** em `apps/admin/src/app/globals.css` nem em nenhum outro arquivo do admin durante a extração do `DESIGN_SYSTEM.md`. Ou foi removida sem atualizar a doc, ou nunca foi implementada. Os primitivos hoje usam o ring padrão do shadcn (`focus-visible:ring-[3px] focus-visible:ring-ring/50`). Decidir com a Úrsula se implementa ou remove definitivamente da documentação — ver `DESIGN_SYSTEM.md`, seção 5, Achado 2.
+- Escala de radius já migrada para padrão multiplicativo do shadcn v4 (`--radius: 0.5rem` em `globals.css`; `packages/config/tailwind/preset.ts` existe mas não está em uso — ver `DESIGN_SYSTEM.md`, Achado 1). Migração de espaço de cor para `oklch` ainda pendente: depende de migrar o mobile (Tailwind v3.4 + NativeWind) e o `ColorThemeProvider` (HSL).
+- Catálogo completo de componentes (variantes, tamanhos, customizações vs. stock) e regras de contribuição para componentes novos: ver `DESIGN_SYSTEM.md`, seções 3 e 6.
 
 ### Componentes
 - Usar `'use client'` apenas quando necessário (interatividade, hooks). Preferir Server Components.
 - Tooltip nativo (`title`) proibido: usar componente Radix `<Tooltip>`.
 - Select nativo (`<select>`) proibido: usar `<Select>` do shadcn.
-- Focus ring outline sem gap: `outline: 2px solid hsl(var(--ring))` + `outline-offset: 0` (anel rente à borda, segue o `border-radius`).
-- Menus Radix excluídos da regra global de focus ring via `:not([role='menu'], [role='menuitem'], ...)` em `globals.css`.
+- ~~Focus ring outline sem gap~~: regra não encontrada no código em 17/07/2026 (ver pendência de auditoria acima). Não seguir esta linha até a decisão ser tomada — o ring real em produção hoje é o padrão do shadcn (`focus-visible:ring-[3px] focus-visible:ring-ring/50`).
 - Não usar botões de "Voltar" em páginas de detalhe: a navegação é feita pelo breadcrumb do header.
 
 ### Badge

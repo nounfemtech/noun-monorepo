@@ -1,6 +1,6 @@
 export * from './common'
 export * from './user'
 export * from './patient'
-export * from './doctor'
+export * from './specialist'
 export * from './pharmacy'
 export * from './appointment'
