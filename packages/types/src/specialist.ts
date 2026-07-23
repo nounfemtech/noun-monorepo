@@ -235,3 +235,45 @@ export interface ExamRequest {
   completedAt: Nullable<Timestamp>
   createdAt: Timestamp
 }
+
+// ── Google Calendar (Prompt 3, OAuth por medico) ─────────────────────────────
+// Tokens (access/refresh) ficam em public.doctor_google_credentials, acessivel so via
+// service role (sem policy de RLS) — nunca chegam ao client. Este tipo e so o status
+// de conexao exibido no perfil.
+
+export interface GoogleCalendarConnection {
+  doctorId: UUID
+  googleEmail: string
+  connectedAt: Timestamp
+  tokenExpiresAt: Timestamp
+}
+
+// ── Busca de paciente para agendamento (RPC search_tenant_patients) ─────────
+// Escopo restrito a pacientes com historico de consulta no mesmo tenant (decisao do
+// Prompt 3) — nao e busca livre em toda a base de pacientes da Noun.
+
+export interface PatientSearchResult {
+  id: UUID
+  fullName: string
+  email: Nullable<string>
+  phoneMobile: Nullable<string>
+}
+
+// ── Input de prontuario (RPC upsert_medical_record) ─────────────────────────
+
+export interface SaveMedicalRecordInput {
+  appointmentId: UUID
+  patientId: UUID
+  chiefComplaint?: string
+  historyOfIllness?: string
+  pastMedicalHistory?: string
+  familyHistory?: string
+  socialHistory?: string
+  gynecologicalHistory?: string
+  currentMedications?: string
+  allergies?: string
+  physicalExam?: string
+  diagnosis?: string
+  icd10Codes?: string[]
+  therapeuticPlan?: string
+}

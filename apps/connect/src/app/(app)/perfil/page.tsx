@@ -1,10 +1,12 @@
 import { createSupabaseServer } from '@/lib/supabase-server'
+import { createSupabaseAdmin } from '@/lib/supabase-admin'
 import { redirect } from 'next/navigation'
 import { formatCRM, formatCRP, formatCRN, formatRQE } from '@noun/ui'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PerfilForm } from './form'
 import { AvatarUpload } from './avatar-upload'
 import { DocumentosCard } from './documentos'
+import { GoogleCalendarCard } from './google-calendar-card'
 
 export const metadata = { title: 'Perfil | Noun Connect' }
 
@@ -61,6 +63,14 @@ export default async function PerfilPage() {
     profile.medical_specialty ??
     'Nao informada'
 
+  // doctor_google_credentials nao tem policy de RLS (credencial sensivel, so service role
+  // acessa) — le o status de conexao via admin client, nunca os tokens em si.
+  const { data: googleConnection } = await createSupabaseAdmin()
+    .from('doctor_google_credentials')
+    .select('google_email')
+    .eq('doctor_id', profile.id)
+    .maybeSingle()
+
   return (
     <div className="p-6 space-y-4">
       <div>
@@ -115,6 +125,20 @@ export default async function PerfilPage() {
               accepts_insurance: profile.accepts_insurance ?? false,
               accepted_insurance_plans: profile.accepted_insurance_plans ?? [],
             }}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Agenda Google</CardTitle>
+          <CardDescription>
+            Necessario para gerar o link do Google Meet automaticamente ao confirmar consultas.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <GoogleCalendarCard
+            connection={googleConnection ? { googleEmail: googleConnection.google_email } : null}
           />
         </CardContent>
       </Card>
