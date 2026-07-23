@@ -1,4 +1,4 @@
-import { ThemeSwitcher, PrimaryColorPicker, ShadeColorPicker, NeutralColorPicker } from '@noun/ui'
+import { ThemeSwitcher } from '@noun/ui'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -57,27 +57,9 @@ export default function ThemePage() {
           </div>
         </section>
 
-        {/* Color Picker */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-semibold tracking-tight">Color Theme (runtime)</h2>
-          <p className="text-sm text-muted-foreground">
-            O ColorThemeProvider de packages/ui sobrepoe a paleta em runtime via localStorage.
-          </p>
-          <div className="grid gap-6 sm:grid-cols-3">
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">Cor primaria</h3>
-              <PrimaryColorPicker />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">Tonalidade</h3>
-              <ShadeColorPicker />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">Neutros</h3>
-              <NeutralColorPicker />
-            </div>
-          </div>
-        </section>
+        {/* Cores por canal: fixas via [data-tenant-type] no globals.css.
+            O connect nao monta o ColorThemeProvider (sem picker de cor em runtime):
+            ver apps/connect/CLAUDE.md, secao 6. */}
 
         {/* Buttons */}
         <section className="space-y-4">

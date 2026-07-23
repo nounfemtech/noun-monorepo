@@ -1,16 +1,24 @@
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
+import { AppSidebar } from '@/components/sidebar'
+import { NavBreadcrumb } from '@/components/nav-breadcrumb'
+import { AppointmentsRealtime } from '@/components/appointments-realtime'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
+import { Toaster } from '@/components/ui/sonner'
 
-async function getTenantType(userId: string): Promise<'specialist' | 'pharmacy'> {
+async function getProfile(userId: string) {
   const supabase = await createSupabaseServer()
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('tenant_id')
+    .select('tenant_id, full_name, email, avatar_url')
     .eq('id', userId)
     .single()
 
-  if (!profile?.tenant_id) return 'specialist'
+  if (!profile?.tenant_id) {
+    return { tenantType: 'specialist' as const, profile }
+  }
 
   const { data: tenant } = await supabase
     .from('tenants')
@@ -18,7 +26,9 @@ async function getTenantType(userId: string): Promise<'specialist' | 'pharmacy'>
     .eq('id', profile.tenant_id)
     .single()
 
-  return tenant?.type === 'pharmacy' ? 'pharmacy' : 'specialist'
+  const tenantType = tenant?.type === 'pharmacy' ? 'pharmacy' as const : 'specialist' as const
+
+  return { tenantType, profile }
 }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -27,17 +37,31 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!user) redirect('/login')
 
-  const tenantType = await getTenantType(user.id)
-  const channelLabel = tenantType === 'pharmacy' ? 'Canal Farmacia' : 'Canal Especialista'
+  const { tenantType, profile } = await getProfile(user.id)
+  const userEmail = profile?.email ?? user.email ?? null
 
   return (
-    <div data-tenant-type={tenantType} className="min-h-svh flex">
-      <aside className="w-64 border-r border-sidebar-border bg-sidebar p-4">
-        <p className="text-sm font-semibold text-sidebar-foreground">{channelLabel}</p>
-      </aside>
-      <main className="flex-1">
-        {children}
-      </main>
+    <div data-tenant-type={tenantType}>
+      <SidebarProvider>
+        <AppSidebar
+          tenantType={tenantType}
+          userName={profile?.full_name ?? userEmail ?? 'Usuario'}
+          userEmail={userEmail}
+          userAvatar={profile?.avatar_url ?? null}
+        />
+        <SidebarInset>
+          <header className="flex h-12 shrink-0 items-center gap-2 border-b sticky top-0 z-10 bg-background px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />
+            <NavBreadcrumb />
+          </header>
+          <div className="mx-auto w-full max-w-6xl px-6">
+            {children}
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+      <AppointmentsRealtime userId={user.id} />
+      <Toaster position="top-right" />
     </div>
   )
 }

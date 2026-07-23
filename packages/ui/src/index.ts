@@ -4,6 +4,7 @@
 
 // Utilidades
 export { cn } from './lib/utils'
+export { formatCRM, formatRQE, formatCRP, formatCRN, formatCRF } from './lib/formatters'
 
 // Tokens do Design System
 export * from './tokens'

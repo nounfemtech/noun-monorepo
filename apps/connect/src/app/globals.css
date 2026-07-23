@@ -2,7 +2,15 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Noun Design System — Connect
+  Neutros, radius e tokens estruturais identicos ao apps/admin (fonte de verdade
+  visual do design system). A unica divergencia sancionada e a cor primaria por
+  canal (data-tenant-type): azul specialist / lilas pharmacy, em vez do --primary
+  dinamico do ColorThemeProvider usado no admin.
+*/
 
 @theme inline {
   --font-heading: var(--font-sans);
@@ -25,6 +33,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -46,7 +55,7 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  /* Border radius */
+  /* Border radius — escala multiplicativa shadcn v4 (identica ao admin) */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -54,6 +63,12 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Border widths (identico ao admin) */
+  --border-width-thin: 0.5px;
+  --border-width-medium: 1.5px;
+  --border-width-3: 3px;
+  --border-width-4: 4px;
 
   /* Animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -75,125 +90,179 @@
 }
 
 /* ============================================================
-   Tema padrao: Canal Especialista (preset b1s91WZlY)
+   Tema padrao (light) — neutros identicos ao admin.
+   Primaria default = Canal Especialista (azul).
    ============================================================ */
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(222.2 84% 4.9%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(222.2 84% 4.9%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(222.2 84% 4.9%);
   --primary: oklch(0.52 0.105 223.128);
   --primary-foreground: oklch(0.984 0.019 200.873);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --secondary: hsl(210 40% 96.1%);
+  --secondary-foreground: hsl(222.2 47.4% 11.2%);
+  --muted: hsl(240 4.8% 95.9%);
+  --muted-foreground: hsl(240 3.8% 46.1%);
+  --accent: hsl(210 40% 96.1%);
+  --accent-foreground: hsl(222.2 47.4% 11.2%);
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(210 40% 98%);
+  --border: hsl(240 5.9% 90%);
+  --input: hsl(240 5.9% 90%);
+  --ring: oklch(0.52 0.105 223.128);
   --chart-1: oklch(0.865 0.127 207.078);
   --chart-2: oklch(0.715 0.143 215.221);
   --chart-3: oklch(0.609 0.126 221.723);
   --chart-4: oklch(0.52 0.105 223.128);
   --chart-5: oklch(0.45 0.085 224.283);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
+  --radius: 0.5rem;
+  --sidebar: hsl(0 0% 100%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
   --sidebar-primary: oklch(0.609 0.126 221.723);
   --sidebar-primary-foreground: oklch(0.984 0.019 200.873);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-accent: oklch(0.609 0.126 221.723);
+  --sidebar-accent-foreground: oklch(0.984 0.019 200.873);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 
   --font-sans: 'Reddit Sans', sans-serif;
   --font-mono: 'Reddit Mono', monospace;
 }
 
 /* ============================================================
-   Tema: Canal Farmacia (preset b5cR4Yd6W)
+   Tema explicito: Canal Especialista
+   Seletor com data-tenant-type para vencer, dentro da arvore de
+   (app)/layout.tsx, um eventual override JS de --primary (custom
+   properties inline no <html> vencem :root, mas nao vencem regra
+   que mira o proprio elemento com data-tenant-type).
+   --sidebar-accent = cor do canal: hover/active do sidebar
+   (data-[active=true]:bg-sidebar-accent) mostra o destaque do canal.
    ============================================================ */
 
-[data-tenant-type="pharmacy"] {
-  --primary: oklch(0.511 0.096 186.391);
-  --primary-foreground: oklch(0.984 0.014 180.72);
-  --chart-1: oklch(0.855 0.138 181.071);
-  --chart-2: oklch(0.704 0.14 182.503);
-  --chart-3: oklch(0.6 0.118 184.704);
-  --chart-4: oklch(0.511 0.096 186.391);
-  --chart-5: oklch(0.437 0.078 188.216);
-  --sidebar-primary: oklch(0.6 0.118 184.704);
-  --sidebar-primary-foreground: oklch(0.984 0.014 180.72);
-}
-
-/* ============================================================
-   Dark mode: Canal Especialista
-   ============================================================ */
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.45 0.085 224.283);
+[data-tenant-type="specialist"] {
+  --primary: oklch(0.52 0.105 223.128);
   --primary-foreground: oklch(0.984 0.019 200.873);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.52 0.105 223.128);
   --chart-1: oklch(0.865 0.127 207.078);
   --chart-2: oklch(0.715 0.143 215.221);
   --chart-3: oklch(0.609 0.126 221.723);
   --chart-4: oklch(0.52 0.105 223.128);
   --chart-5: oklch(0.45 0.085 224.283);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.715 0.143 215.221);
-  --sidebar-primary-foreground: oklch(0.302 0.056 229.695);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-primary: oklch(0.609 0.126 221.723);
+  --sidebar-primary-foreground: oklch(0.984 0.019 200.873);
+  --sidebar-accent: oklch(0.609 0.126 221.723);
+  --sidebar-accent-foreground: oklch(0.984 0.019 200.873);
 }
 
 /* ============================================================
-   Dark mode: Canal Farmacia
+   Tema: Canal Farmacia — lilas/violeta, tom da marca Noun
+   ============================================================ */
+
+[data-tenant-type="pharmacy"] {
+  --primary: oklch(0.541 0.281 293.009);
+  --primary-foreground: oklch(0.984 0.014 293.756);
+  --ring: oklch(0.541 0.281 293.009);
+  --chart-1: oklch(0.811 0.111 293.571);
+  --chart-2: oklch(0.702 0.183 293.541);
+  --chart-3: oklch(0.606 0.25 292.717);
+  --chart-4: oklch(0.541 0.281 293.009);
+  --chart-5: oklch(0.491 0.27 292.581);
+  --sidebar-primary: oklch(0.606 0.25 292.717);
+  --sidebar-primary-foreground: oklch(0.984 0.014 293.756);
+  --sidebar-accent: oklch(0.606 0.25 292.717);
+  --sidebar-accent-foreground: oklch(0.984 0.014 293.756);
+}
+
+/* ============================================================
+   Dark mode — neutros identicos ao admin.
+   ============================================================ */
+
+.dark {
+  --background: hsl(240 6% 8%);
+  --foreground: hsl(0 0% 96%);
+  --card: hsl(240 6% 8%);
+  --card-foreground: hsl(0 0% 96%);
+  --popover: hsl(240 6% 8%);
+  --popover-foreground: hsl(0 0% 96%);
+  --primary: oklch(0.45 0.085 224.283);
+  --primary-foreground: oklch(0.984 0.019 200.873);
+  --secondary: hsl(240 4% 18%);
+  --secondary-foreground: hsl(0 0% 96%);
+  --muted: hsl(240 4% 18%);
+  --muted-foreground: hsl(240 5% 62%);
+  --accent: hsl(240 4% 18%);
+  --accent-foreground: hsl(0 0% 96%);
+  --destructive: hsl(0 72.2% 50.6%);
+  --destructive-foreground: hsl(0 0% 98%);
+  --border: hsl(240 4% 14%);
+  --input: hsl(240 4% 14%);
+  --ring: oklch(0.45 0.085 224.283);
+  --chart-1: oklch(0.865 0.127 207.078);
+  --chart-2: oklch(0.715 0.143 215.221);
+  --chart-3: oklch(0.609 0.126 221.723);
+  --chart-4: oklch(0.52 0.105 223.128);
+  --chart-5: oklch(0.45 0.085 224.283);
+  --sidebar: hsl(240 6% 8%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: oklch(0.715 0.143 215.221);
+  --sidebar-primary-foreground: oklch(0.302 0.056 229.695);
+  --sidebar-accent: oklch(0.715 0.143 215.221);
+  --sidebar-accent-foreground: oklch(0.302 0.056 229.695);
+  --sidebar-border: hsl(240 4% 12%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+/* ============================================================
+   Dark mode: Canal Especialista (explicito, mesmo motivo do bloco light)
+   ============================================================ */
+
+[data-tenant-type="specialist"].dark,
+.dark [data-tenant-type="specialist"] {
+  --primary: oklch(0.45 0.085 224.283);
+  --primary-foreground: oklch(0.984 0.019 200.873);
+  --ring: oklch(0.45 0.085 224.283);
+  --chart-1: oklch(0.865 0.127 207.078);
+  --chart-2: oklch(0.715 0.143 215.221);
+  --chart-3: oklch(0.609 0.126 221.723);
+  --chart-4: oklch(0.52 0.105 223.128);
+  --chart-5: oklch(0.45 0.085 224.283);
+  --sidebar-primary: oklch(0.715 0.143 215.221);
+  --sidebar-primary-foreground: oklch(0.302 0.056 229.695);
+  --sidebar-accent: oklch(0.715 0.143 215.221);
+  --sidebar-accent-foreground: oklch(0.302 0.056 229.695);
+}
+
+/* ============================================================
+   Dark mode: Canal Farmacia — lilas/violeta
    ============================================================ */
 
 [data-tenant-type="pharmacy"].dark,
 .dark [data-tenant-type="pharmacy"] {
-  --primary: oklch(0.437 0.078 188.216);
-  --primary-foreground: oklch(0.984 0.014 180.72);
-  --chart-1: oklch(0.855 0.138 181.071);
-  --chart-2: oklch(0.704 0.14 182.503);
-  --chart-3: oklch(0.6 0.118 184.704);
-  --chart-4: oklch(0.511 0.096 186.391);
-  --chart-5: oklch(0.437 0.078 188.216);
-  --sidebar-primary: oklch(0.704 0.14 182.503);
-  --sidebar-primary-foreground: oklch(0.277 0.046 192.524);
+  --primary: oklch(0.491 0.27 292.581);
+  --primary-foreground: oklch(0.984 0.014 293.756);
+  --ring: oklch(0.491 0.27 292.581);
+  --chart-1: oklch(0.811 0.111 293.571);
+  --chart-2: oklch(0.702 0.183 293.541);
+  --chart-3: oklch(0.606 0.25 292.717);
+  --chart-4: oklch(0.541 0.281 293.009);
+  --chart-5: oklch(0.491 0.27 292.581);
+  --sidebar-primary: oklch(0.702 0.183 293.541);
+  --sidebar-primary-foreground: oklch(0.277 0.046 293);
+  --sidebar-accent: oklch(0.702 0.183 293.541);
+  --sidebar-accent-foreground: oklch(0.277 0.046 293);
 }
 
 /* ============================================================
-   Base styles
+   Base styles (identico ao admin)
    ============================================================ */
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
